@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customers - DANZONA PHARM</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="api.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif;}
+body{background:#f2f2f2;min-height:100vh;display:flex;}
+.sidebar{width:260px;background:#064e3b;color:#e2e8f0;height:100vh;overflow-y:auto;flex-shrink:0;box-shadow:2px 0 10px rgba(0,0,0,.1);}
+.sidebar-header{background:#043e2c;padding:20px 25px;border-bottom:1px solid #059669;}
+.sidebar h1{font-size:22px;color:#10b981;margin:0;font-weight:600;}
+.sidebar ul{list-style:none;padding:12px 0;margin:0;}
+.sidebar ul li{padding:11px 25px;display:flex;align-items:center;gap:12px;cursor:pointer;border-left:3px solid transparent;transition:all .15s;font-size:13px;font-weight:600;color:#94a3b8;}
+.sidebar ul li:hover{background:#059669;border-left-color:#10b981;color:#fff;}
+.sidebar ul li.active{background:#059669;border-left-color:#10b981;color:#fff;}
+.main-content{flex:1;display:flex;flex-direction:column;min-width:0;}
+.header{background:#10b981;color:white;padding:15px 25px;display:flex;justify-content:space-between;align-items:center;}
+.header h2{font-size:20px;margin:0;}
+.content{padding:20px;flex:1;}
+.customers-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:15px;}
+.customers-header h2{margin:0;color:#1a202c;}
+.add-btn{background:#10b981;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:8px;}
+.add-btn:hover{background:#059669;}
+.customers-table{width:100%;border-collapse:collapse;background:white;border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.08);font-size:14px;}
+.customers-table th,.customers-table td{padding:14px 16px;text-align:left;border-bottom:1px solid #f0f0f0;vertical-align:middle;}
+.customers-table th{background-color:#f8fafc;font-weight:700;color:#475569;white-space:nowrap;}
+.customers-table tr:hover{background-color:#f8fafc;}
+.cust-type{padding:5px 10px;border-radius:20px;font-size:12px;font-weight:600;}
+.cust-regular{background:#dbeafe;color:#1e40af;}
+.cust-vip{background:#fef3c7;color:#92400e;}
+.cust-new{background:#dcfce7;color:#047857;}
+.action-btns{display:flex;gap:6px;}
+.action-btn{padding:7px 11px;border:none;border-radius:5px;cursor:pointer;font-size:13px;}
+.view-btn{background:#10b981;color:white;}.view-btn:hover{background:#059669;}
+.edit-btn{background:#3b82f6;color:white;}.edit-btn:hover{background:#2563eb;}
+.delete-btn{background:#ef4444;color:white;}.delete-btn:hover{background:#dc2626;}
+.toast{position:fixed;top:20px;right:20px;background:#064e3b;color:#fff;padding:12px 20px;border-radius:8px;display:none;z-index:2000;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.15);}
+.toast.error{background:#dc2626;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1050;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:white;border-radius:12px;padding:25px;width:94%;max-width:600px;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+.modal h3{font-size:17px;font-weight:700;margin-bottom:16px;color:#1a202c;}
+.modal .form-group{margin-bottom:14px;}
+.modal label{display:block;font-weight:600;margin-bottom:5px;color:#374151;font-size:13px;}
+.modal input,.modal select,.modal textarea{width:100%;padding:10px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;}
+.modal .btn-row{display:flex;gap:10px;margin-top:20px;}
+.modal .btn-row button{flex:1;padding:10px;border:none;border-radius:6px;font-weight:600;cursor:pointer;font-size:14px;}
+.kpi-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-bottom:20px;}
+.kpi-card{background:white;border-radius:10px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.kpi-label{font-size:11px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.kpi-value{font-size:26px;font-weight:800;color:#1a202c;margin-top:4px;}
+.spinner-overlay{position:absolute;inset:0;background:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;z-index:10;border-radius:10px;}
+.spinner{width:36px;height:36px;border:3px solid #e2e8f0;border-top-color:#10b981;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.detail-section{margin-bottom:16px;}
+.detail-section label{font-weight:700;color:#64748b;font-size:12px;text-transform:uppercase;}
+.detail-section div{font-size:14px;color:#1a202c;padding:6px 0;}
+.history-table{width:100%;font-size:12px;border-collapse:collapse;}
+.history-table td,.history-table th{padding:6px 10px;border-bottom:1px solid #f0f0f0;}
+@media(max-width:768px){.sidebar{display:none;}.main-content{margin:0;}.customers-header{flex-direction:column;}.kpi-bar{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+<div class="sidebar">
+<div class="sidebar-header"><h1><i class="fas fa-users"></i> POS</h1></div>
+<ul>
+<li onclick="navigateTo('dashboard.html')"><i class="fas fa-home"></i> Dashboard</li>
+<li onclick="navigateTo('sales.html')"><i class="fas fa-shopping-cart"></i> Sales</li>
+<li onclick="navigateTo('variations.html')"><i class="fas fa-plus-circle"></i> Add Product</li>
+<li onclick="navigateTo('inventory.html')"><i class="fas fa-boxes"></i> Inventory</li>
+<li class="active" onclick="navigateTo('customers.html')"><i class="fas fa-users"></i> Customers</li>
+<li onclick="navigateTo('suppliers.html')"><i class="fas fa-truck"></i> Suppliers</li>
+<li onclick="navigateTo('reports.html')"><i class="fas fa-chart-bar"></i> Reports</li>
+<li onclick="navigateTo('receiving.html')"><i class="fas fa-file-import"></i> Receiving</li>
+<li onclick="navigateTo('deliveries.html')"><i class="fas fa-truck-loading"></i> Deliveries</li>
+<li onclick="navigateTo('expenses.html')"><i class="fas fa-receipt"></i> Expenses</li>
+<li onclick="navigateTo('employees.html')"><i class="fas fa-user-tie"></i> Employees</li>
+<li onclick="navigateTo('appointments.html')"><i class="fas fa-calendar"></i> Appointments</li>
+<li onclick="navigateTo('giftcards.html')"><i class="fas fa-gift"></i> Gift Cards</li>
+<li onclick="navigateTo('config.html')"><i class="fas fa-cog"></i> Store Config</li>
+<li onclick="navigateTo('invoices.html')"><i class="fas fa-file-invoice"></i> Invoices</li>
+<li onclick="navigateTo('locations.html')"><i class="fas fa-store"></i> Locations</li>
+<li onclick="navigateTo('messages.html')"><i class="fas fa-envelope"></i> Messages</li>
+<li onclick="navigateTo('payments.html')"><i class="fas fa-credit-card"></i> Payments</li>
+<li onclick="navigateTo('login.html')"><i class="fas fa-sign-out-alt"></i> Logout</li>
+</ul>
+</div>
+<div class="main-content">
+<div class="header"><h2><i class="fas fa-users"></i> Customer Management</h2><span style="font-weight:500;" id="pharmacyName"><i class="fas fa-clinic-medical"></i> Loading...</span></div>
+<div class="content">
+<div class="kpi-bar">
+<div class="kpi-card"><div class="kpi-label">Total Customers</div><div class="kpi-value" id="kpiTotal">0</div></div>
+<div class="kpi-card"><div class="kpi-label">VIP Customers</div><div class="kpi-value text-warning" id="kpiVip">0</div></div>
+<div class="kpi-card"><div class="kpi-label">Regular</div><div class="kpi-value text-info" id="kpiReg">0</div></div>
+<div class="kpi-card"><div class="kpi-label">New Customers</div><div class="kpi-value text-success" id="kpiNew">0</div></div>
+</div>
+<div class="customers-header">
+<h2><i class="fas fa-user-group"></i> All Customers</h2>
+<div style="display:flex;gap:10px;flex-wrap:wrap;">
+<input type="text" id="searchInput" placeholder="Search customers..." style="padding:9px 14px;border:1px solid #ddd;border-radius:6px;font-size:14px;min-width:220px;" oninput="searchCustomers(this.value)">
+<select id="typeFilter" class="form-select" style="width:auto;padding:9px 14px;" onchange="applyTypeFilter(this.value)"><option value="all">All Types</option><option value="regular">Regular</option><option value="vip">VIP</option><option value="new">New</option></select>
+<button class="add-btn" onclick="openAddModal()"><i class="fas fa-plus"></i> Add Customer</button>
+</div>
+</div>
+<div style="overflow-x:auto;">
+<table class="customers-table">
+<thead><tr><th>ID</th><th>Full Name</th><th>Email</th><th>Phone</th><th>Address</th><th>Type</th><th>Actions</th></tr></thead>
+<tbody id="customersTableBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal-overlay" id="customerModal">
+<div class="modal">
+<h3 id="modalTitle"><i class="fas fa-user-plus"></i> Add Customer</h3>
+<div class="form-group"><label>First Name *</label><input type="text" id="cf_first" placeholder="First name"></div>
+<div class="form-group"><label>Last Name *</label><input type="text" id="cf_last" placeholder="Last name"></div>
+<div class="form-group"><label>Email</label><input type="email" id="cf_email" placeholder="email@example.com"></div>
+<div class="form-group"><label>Phone</label><input type="tel" id="cf_phone" placeholder="+234 ..."></div>
+<div class="form-group"><label>Address</label><input type="text" id="cf_address" placeholder="Address"></div>
+<div class="form-group"><label>Type</label><select id="cf_type"><option value="regular">Regular</option><option value="vip">VIP</option><option value="new">New</option></select></div>
+<input type="hidden" id="cf_editId" value="">
+<div class="btn-row"><button class="btn btn-secondary" onclick="closeModal('customerModal')">Cancel</button><button class="btn btn-primary" onclick="saveCustomer()">Save Customer</button></div>
+</div>
+</div>
+<div class="modal-overlay" id="detailModal">
+<div class="modal" style="max-width:600px;">
+<h3><i class="fas fa-id-card"></i> Customer Details</h3>
+<div id="detailContent"></div>
+<div class="btn-row"><button class="btn btn-secondary" onclick="closeModal('detailModal')">Close</button><button class="btn btn-primary" id="detailEditBtn" onclick="">Edit</button><button class="btn btn-danger" id="detailDeleteBtn" onclick="">Delete</button></div>
+</div>
+</div>
+<script>
+var allCustomers=[],currentFiltered=[],editingCustomerId=null,viewingCustomerId=null;
+function $(id){return document.getElementById(id);}
+function formatCurrency(v){return '\u20A6'+(parseFloat(v)||0).toLocaleString('en-NG',{minimumFractionDigits:2});}
+function navigateTo(p){window.location.href=p;}
+function showToast(msg,isError){var t=$('toast');t.textContent=msg;t.className='toast'+(isError?' error':'');t.style.display='block';setTimeout(function(){t.style.display='none';},3000);}
+function openModal(id){$(id).classList.add('open');}
+function closeModal(id){$(id).classList.remove('open');}
+function typeClass(t){return t==='vip'?'cust-vip':t==='new'?'cust-new':'cust-regular';}
+function typeLabel(t){return t==='vip'?'VIP':t==='new'?'New':'Regular';}
+
+async function loadCustomers(){
+try{var res=await API.getCustomers();allCustomers=res||[];currentFiltered=allCustomers.slice();updateKPIs();renderCustomers(currentFiltered);$('pharmacyName').innerHTML='<i class="fas fa-clinic-medical"></i> '+(API.getPharmacyName?API.getPharmacyName():'Pharmacy');}
+catch(e){showToast('Failed to load customers: '+e.message,true);allCustomers=[];$('customersTableBody').innerHTML='<tr><td colspan="7" class="text-center text-muted py-4">Failed to load customers</td></tr>';}
+}
+
+function updateKPIs(){
+$('kpiTotal').textContent=allCustomers.length;
+$('kpiVip').textContent=allCustomers.filter(function(c){return c.customer_type==='vip';}).length;
+$('kpiReg').textContent=allCustomers.filter(function(c){return c.customer_type==='regular'||!c.customer_type;}).length;
+$('kpiNew').textContent=allCustomers.filter(function(c){return c.customer_type==='new';}).length;
+}
+
+function renderCustomers(list){
+var tbody=$('customersTableBody');if(!tbody)return;
+if(!list.length){tbody.innerHTML='<tr><td colspan="7" class="text-center text-muted py-4"><i class="fas fa-user-slash fa-2x"></i><br>No customers found</td></tr>';return;}
+var html='';
+list.forEach(function(c){
+var name=(c.first_name||'')+' '+(c.last_name||'');
+html+='<tr><td>'+(c.cust_id||'#'+c.id)+'</td><td><strong>'+(name||'N/A')+'</strong></td><td>'+(c.email||'-')+'</td><td>'+(c.phone||'-')+'</td><td>'+(c.address||'-')+'</td><td><span class="cust-type '+typeClass(c.customer_type)+'">'+typeLabel(c.customer_type)+'</span></td><td class="action-btns"><button class="action-btn view-btn" onclick="viewCustomer('+c.id+')" title="View"><i class="fas fa-eye"></i></button><button class="action-btn edit-btn" onclick="editCustomer('+c.id+')" title="Edit"><i class="fas fa-edit"></i></button><button class="action-btn delete-btn" onclick="deleteCustomer('+c.id+')" title="Delete"><i class="fas fa-trash"></i></button></td></tr>';
+});
+tbody.innerHTML=html;
+}
+
+function openAddModal(){
+editingCustomerId=null;$('modalTitle').innerHTML='<i class="fas fa-user-plus"></i> Add Customer';
+['cf_first','cf_last','cf_email','cf_phone','cf_address'].forEach(function(id){$(''+id).value='';});
+$('cf_type').value='regular';$('cf_editId').value='';
+openModal('customerModal');
+setTimeout(function(){$('cf_first').focus();},200);
+}
+
+function editCustomer(id){
+var c=allCustomers.find(function(x){return x.id===id;});if(!c)return;
+editingCustomerId=id;
+$('modalTitle').innerHTML='<i class="fas fa-user-edit"></i> Edit Customer';
+$('cf_first').value=c.first_name||'';
+$('cf_last').value=c.last_name||'';
+$('cf_email').value=c.email||'';
+$('cf_phone').value=c.phone||'';
+$('cf_address').value=c.address||'';
+$('cf_type').value=c.customer_type||'regular';
+$('cf_editId').value=id;
+openModal('customerModal');
+}
+
+async function saveCustomer(){
+var fn=$('cf_first').value.trim(),ln=$('cf_last').value.trim();
+if(!fn&&!ln){showToast('Enter at least first or last name',true);return;}
+var data={first_name:fn,last_name:ln,email:$('cf_email').value.trim(),phone:$('cf_phone').value.trim(),address:$('cf_address').value.trim(),customer_type:$('cf_type').value};
+var editId=$('cf_editId').value;
+try{
+if(editId){
+await API.updateCustomer(parseInt(editId),data);showToast('Customer updated');
+var c=allCustomers.find(function(x){return x.id===parseInt(editId);});if(c){Object.assign(c,data);}
+}else{
+var res=await API.saveCustomer(data);showToast('Customer created');
+allCustomers.unshift(res);
+}
+closeModal('customerModal');loadCustomers();
+}catch(e){showToast('Save failed: '+e.message,true);}
+}
+
+async function deleteCustomer(id){
+if(!confirm('Delete this customer? This cannot be undone.'))return;
+try{await API.deleteCustomer(id);allCustomers=allCustomers.filter(function(c){return c.id!==id;});loadCustomers();showToast('Customer deleted');}
+catch(e){showToast('Delete failed: '+e.message,true);}
+}
+
+async function viewCustomer(id){
+var c=allCustomers.find(function(x){return x.id===id;});if(!c)return;
+viewingCustomerId=id;
+var name=(c.first_name||'')+' '+(c.last_name||'');
+var html='<div class="detail-section"><label>Customer</label><div><strong>'+(name||'N/A')+'</strong> <span class="cust-type '+typeClass(c.customer_type)+'">'+typeLabel(c.customer_type)+'</span></div></div>';
+html+='<div class="detail-section"><label>Contact</label><div>'+(c.email||'No email')+'</div><div>'+(c.phone||'No phone')+'</div></div>';
+html+='<div class="detail-section"><label>Address</label><div>'+(c.address||'N/A')+'</div></div>';
+html+='<div class="detail-section"><label>Customer ID</label><div>'+(c.cust_id||'#'+c.id)+'</div></div>';
+html+='<div class="detail-section"><label>Created</label><div>'+(c.created_at||'N/A')+'</div></div>';
+html+='<hr><h6><i class="fas fa-shopping-cart"></i> Purchase History</h6><div id="custHistory" style="max-height:200px;overflow-y:auto;"><div class="spinner" style="border-top-color:#10b981;"></div></div>';
+$('detailEditBtn').onclick=function(){closeModal('detailModal');editCustomer(id);};
+$('detailDeleteBtn').onclick=function(){closeModal('detailModal');deleteCustomer(id);};
+$('detailContent').innerHTML=html;
+openModal('detailModal');
+try{var sales=await API.getSales();var custSales=sales.filter(function(s){return s.customer_id===id;});var hist=$('custHistory');if(!custSales.length){hist.innerHTML='<p class="text-muted small">No purchase history</p>';}else{var h='<table class="history-table"><thead><tr><th>Date</th><th>Total</th><th>Method</th></tr></thead><tbody>';custSales.forEach(function(s){h+='<tr><td>'+(new Date(s.date)).toLocaleDateString()+'</td><td>'+formatCurrency(s.total)+'</td><td>'+(s.payment_method||'cash')+'</td></tr>';});h+='</tbody></table>';hist.innerHTML=h;}}
+catch(e){$('custHistory').innerHTML='<p class="text-muted small">Could not load history</p>';}
+}
+
+function searchCustomers(q){var qq=q.toLowerCase();currentFiltered=allCustomers.filter(function(c){var name=((c.first_name||'')+' '+(c.last_name||'')).toLowerCase();return name.indexOf(qq)>-1||(c.phone||'').toLowerCase().indexOf(qq)>-1||(c.email||'').toLowerCase().indexOf(qq)>-1||(c.cust_id||'').toLowerCase().indexOf(qq)>-1;});applyTypeFilter($('typeFilter').value);}
+function applyTypeFilter(type){
+var base=allCustomers.filter(function(c){var qq=($('searchInput').value||'').toLowerCase();var name=((c.first_name||'')+' '+(c.last_name||'')).toLowerCase();return name.indexOf(qq)>-1||(c.phone||'').toLowerCase().indexOf(qq)>-1||(c.email||'').toLowerCase().indexOf(qq)>-1;});
+if(type!=='all')base=base.filter(function(c){return c.customer_type===type;});
+currentFiltered=base;renderCustomers(currentFiltered);
+}
+
+document.addEventListener('DOMContentLoaded',function(){if(!API.isLoggedIn()){window.location.href='login.html';return;}loadCustomers();});
+window.addEventListener('click',function(e){var dd=$('customerDropdown');if(dd&&!e.target.closest('#customerSearch')&&!e.target.closest('#customerDropdown'))dd.style.display='none';});
+</script>
+</body>
+</html>

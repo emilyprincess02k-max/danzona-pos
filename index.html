@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DANZONA PHRM - Professional POS System</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
+    body{background:#f2f2f2;color:#333;}
+    header{background:linear-gradient(135deg,#2c3e50,#1a2533);color:white;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;}
+    header h1{font-size:1.5rem;font-weight:600;}
+    nav ul{display:flex;list-style:none;gap:2rem;}
+    nav a{color:#ecf0f1;text-decoration:none;font-weight:500;transition:color 0.3s;cursor:pointer;}
+    nav a:hover{color:#3498db;}
+    .hero{background:linear-gradient(135deg,#4da3ff,#2980b9);color:white;padding:4rem 2rem;text-align:center;}
+    .hero h2{font-size:2.5rem;margin-bottom:1rem;}
+    .hero p{font-size:1.2rem;max-width:600px;margin:0 auto 2rem;}
+    .features{padding:4rem 2rem;max-width:1200px;margin:0 auto;}
+    .features h2{text-align:center;margin-bottom:3rem;color:#2c3e50;}
+    .feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem;}
+    .feature-card{background:white;border-radius:10px;padding:2rem;box-shadow:0 5px 15px rgba(0,0,0,0.08);cursor:pointer;}
+    .feature-card h3{color:#4da3ff;margin-bottom:1rem;}
+    .feature-card ul{list-style:none;}
+    .feature-card li{padding:0.5rem 0;color:#666;position:relative;padding-left:1.5rem;}
+    .feature-card li:before{content:"\f00c";font-family:"Font Awesome 6 Free";color:#27ae60;position:absolute;left:0;}
+    .cta{background:#2c3e50;color:white;padding:3rem 2rem;text-align:center;}
+    .cta h2{margin-bottom:1rem;}
+    .cta button{background:#4da3ff;color:#fff;border:none;padding:1rem 2rem;font-size:1rem;border-radius:5px;cursor:pointer;}
+    footer{background:#1a202a;color:#bdc3c7;padding:2rem;text-align:center;}
+    @media(max-width:768px){nav ul{gap:1rem;}.hero h2{font-size:1.8rem;}}
+</style>
+</head>
+<body>
+    <header>
+        <h1>DANZONA PHRM NIG LTD STORE</h1>
+        <nav>
+            <ul>
+                <li><a onclick="navigateTo('sales.html')">Sales</a></li>
+                <li><a onclick="navigateTo('inventory.html')">Inventory</a></li>
+                <li><a onclick="navigateTo('customers.html')">Customers</a></li>
+                <li><a onclick="navigateTo('employees.html')">Employees</a></li>
+                <li><a onclick="navigateTo('reports.html')">Reports</a></li>
+                <li><a onclick="navigateTo('login.html')">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+    <section class="hero">
+        <h2>Professional Point of Sale System</h2>
+        <p>Complete retail management solution with real-time tracking, inventory control, and multi-store support</p>
+    </section>
+    <section class="features">
+        <h2>Our Features</h2>
+        <div class="feature-grid">
+            <div class="feature-card" onclick="navigateTo('sales.html')">
+                <h3><i class="fas fa-shopping-cart"></i> Sales Management</h3>
+                <ul><li>Real-time sales tracking</li><li>Barcode scanning</li><li>Receipt printing</li></ul>
+            </div>
+            <div class="feature-card" onclick="navigateTo('inventory.html')">
+                <h3><i class="fas fa-boxes"></i> Inventory Control</h3>
+                <ul><li>Stock monitoring</li><li>Low-stock alerts</li><li>Bulk import/export</li></ul>
+            </div>
+            <div class="feature-card" onclick="navigateTo('customers.html')">
+                <h3><i class="fas fa-users"></i> Customer Management</h3>
+                <ul><li>CRM features</li><li>Loyalty programs</li><li>Purchase history</li></ul>
+            </div>
+        </div>
+    </section>
+    <section class="cta">
+        <h2>Ready to streamline your business?</h2>
+        <button onclick="navigateTo('login.html')"><i class="fas fa-rocket"></i> Get Started Today</button>
+    </section>
+    <footer><p>&copy; 2026 DANZONA PHRM NIG LTD STORE. All rights reserved.</p></footer>
+    <script>
+        function navigateTo(p){window.location.href=p;}
+    </script>
+</body>
+</html>
+

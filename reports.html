@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - DANZONA PHARM NIG LTD</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
+body{background:#f2f2f2;min-height:100vh;display:flex;}
+.sidebar{width:260px;background:#064e3b;color:#e2e8f0;height:100vh;overflow-y:auto;box-shadow:2px 0 10px rgba(0,0,0,0.1);flex-shrink:0;}
+.sidebar-header{background:#043e2c;padding:20px 25px;border-bottom:1px solid #059669;}
+.sidebar h1{font-size:22px;color:#10b981;margin:0;font-weight:600;}
+.sidebar ul{list-style:none;padding:15px 0;}
+.sidebar ul li{padding:12px 25px;display:flex;align-items:center;gap:12px;cursor:pointer;border-left:3px solid transparent;transition:all 0.2s ease;font-size:14px;}
+.sidebar ul li i{width:20px;text-align:center;font-size:16px;}
+.sidebar ul li:hover{background:#059669;border-left-color:#10b981;color:#ffffff;}
+.sidebar ul li.active{background:#059669;border-left-color:#10b981;color:#ffffff;}
+.main-content{flex:1;display:flex;flex-direction:column;}
+.header{background:#10b981;color:white;padding:15px 25px;display:flex;justify-content:space-between;align-items:center;}
+.header h2{font-size:20px;}
+.content{flex:1;padding:20px;}
+.report-filters{display:flex;gap:15px;margin-bottom:20px;flex-wrap:wrap;align-items:center;background:white;padding:15px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1);}
+.report-filters input,.report-filters select{padding:8px 12px;border:1px solid #ddd;border-radius:4px;}
+.report-btn{background:#10b981;color:white;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;}
+.report-btn:hover{background:#059669;}
+.report-section{background:white;border-radius:8px;padding:20px;margin-bottom:20px;box-shadow:0 2px 10px rgba(0,0,0,0.1);}
+.report-section h3{border-bottom:2px solid #eee;padding-bottom:10px;margin-bottom:15px;}
+.report-card{display:inline-block;background:#f8f9fa;padding:15px 25px;border-radius:8px;margin:10px;text-align:center;border-left:4px solid #10b981;}
+.report-card .value{font-size:24px;font-weight:bold;color:#2c3e50;}
+.report-card .label{color:#718096;font-size:14px;}
+.report-table{width:100%;border-collapse:collapse;margin-top:15px;}
+.report-table th,.report-table td{padding:12px;border-bottom:1px solid #eee;text-align:left;}
+.report-table th{background:#f8f9fa;}
+.tabs{display:flex;gap:5px;margin-bottom:20px;}
+.tab-btn{padding:12px 24px;border:none;border-radius:5px 5px 0 0;cursor:pointer;font-weight:500;background:#e2e8f0;color:#4a5568;}
+.tab-btn.active{background:#10b981;color:white;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+.closeout-section{background:white;padding:20px;border-radius:0 8px 8px 8px;box-shadow:0 2px 10px rgba(0,0,0,0.1);}
+.employee-card{display:flex;justify-content:space-between;align-items:center;padding:15px 0;border-bottom:1px solid #eee;}
+.employee-name{font-weight:500;color:#2c3e50;}
+.sales-amount{color:#10b981;font-weight:600;}
+.chart-container{background:white;padding:20px;border-radius:8px;margin-bottom:20px;box-shadow:0 2px 10px rgba(0,0,0,0.1);}
+.chart-bar{height:30px;background:#10b981;margin:10px 0;border-radius:4px;display:flex;align-items:center;padding-left:10px;color:white;font-weight:500;}
+.export-btn{background:#6b7280;color:white;border:none;padding:8px 16px;border-radius:4px;margin-left:10px;cursor:pointer;}
+.export-btn:hover{background:#4b5563;}
+.date-range-picker{background:white;padding:15px;border-radius:8px;margin-bottom:20px;box-shadow:0 2px 10px rgba(0,0,0,0.1);}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:20px;}
+.metric-card{background:white;padding:20px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1);border-top:3px solid #10b981;}
+.metric-card.warning{border-top-color:#f59e0b;}
+.metric-card.danger{border-top-color:#ef4444;}
+.metric-value{font-size:28px;font-weight:bold;color:#1f2937;margin-bottom:5px;}
+.metric-label{color:#6b7280;font-size:14px;}
+.progress-bar{height:8px;background:#e5e7eb;border-radius:4px;margin-top:10px;overflow:hidden;}
+.progress-fill{height:100%;background:#10b981;width:75%;}
+.report-actions{display:flex;gap:10px;margin-bottom:15px;}
+.filter-select{padding:8px 12px;border:1px solid #ddd;border-radius:4px;background:white;}
+.notification-toast{position:fixed;top:20px;right:20px;background:#48bb78;color:white;padding:1rem 1.5rem;border-radius:5px;display:none;z-index:1000;}
+.loading-spinner{text-align:center;padding:20px;color:#718096;}
+</style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h1>POS</h1>
+        </div>
+        <ul>
+            <li onclick="navigateTo('dashboard.html')"><i class="fas fa-home"></i> Dashboard</li>
+            <li onclick="navigateTo('sales.html')"><i class="fas fa-shopping-cart"></i> Sales</li>
+            <li onclick="navigateTo('variations.html')"><i class="fas fa-plus-circle"></i> Add New Product</li>
+            <li onclick="navigateTo('inventory.html')"><i class="fas fa-boxes"></i> Inventory</li>
+            <li onclick="navigateTo('customers.html')"><i class="fas fa-users"></i> Customers</li>
+            <li onclick="navigateTo('suppliers.html')"><i class="fas fa-truck"></i> Suppliers</li>
+            <li class="active" onclick="navigateTo('reports.html')"><i class="fas fa-chart-bar"></i> Reports</li>
+            <li onclick="navigateTo('receiving.html')"><i class="fas fa-file-import"></i> Receiving</li>
+            <li onclick="navigateTo('deliveries.html')"><i class="fas fa-truck-loading"></i> Deliveries</li>
+            <li onclick="navigateTo('expenses.html')"><i class="fas fa-receipt"></i> Expenses</li>
+            <li onclick="navigateTo('employees.html')"><i class="fas fa-user-tie"></i> Employees</li>
+            <li onclick="navigateTo('appointments.html')"><i class="fas fa-calendar"></i> Appointments</li>
+            <li onclick="navigateTo('giftcards.html')"><i class="fas fa-gift"></i> Gift Cards</li>
+            <li onclick="navigateTo('config.html')"><i class="fas fa-cog"></i> Store Config</li>
+            <li onclick="navigateTo('invoices.html')"><i class="fas fa-file-invoice"></i> Invoices</li>
+            <li onclick="navigateTo('locations.html')"><i class="fas fa-store"></i> Locations</li>
+            <li onclick="navigateTo('messages.html')"><i class="fas fa-envelope"></i> Messages</li>
+            <li onclick="navigateTo('payments.html')"><i class="fas fa-credit-card"></i> Payments</li>
+            <li onclick="navigateTo('login.html')"><i class="fas fa-sign-out-alt"></i> Logout</li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <div class="header"><h2>Reports</h2><span id="pharmacyNameDisplay" style="font-weight:500;">Loading...</span></div>
+        <div class="content">
+            <div class="date-range-picker">
+                <label style="margin-right:10px;">From:</label>
+                <input type="date" id="reportDateFrom" value="2026-05-01">
+                <label style="margin:0 10px 0 15px;">To:</label>
+                <input type="date" id="reportDateTo" value="2026-05-29">
+                <button class="report-btn" onclick="applyDateFilter()" style="margin-left:15px;">Apply</button>
+                <button class="export-btn" onclick="exportCSV()"><i class="fas fa-download"></i> Export CSV</button>
+            </div>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('favorites',this)">Favorites</button>
+                <button class="tab-btn" onclick="switchTab('closeout',this)">Closeout</button>
+                <button class="tab-btn" onclick="switchTab('employees',this)">Employees</button>
+            </div>
+            <div id="favorites" class="tab-content active">
+                <div class="metric-grid">
+                    <div class="metric-card"><div class="metric-value" id="totalSalesMTD">₦0.00</div><div class="metric-label">Total Sales (MTD)</div><div class="progress-bar"><div class="progress-fill"></div></div></div>
+                    <div class="metric-card"><div class="metric-value" id="totalOrders">0</div><div class="metric-label">Total Orders</div><div class="progress-bar"><div class="progress-fill" style="width:85%"></div></div></div>
+                    <div class="metric-card warning"><div class="metric-value" id="avgOrderValue">₦0.00</div><div class="metric-label">Avg Order Value</div><div class="progress-bar"><div class="progress-fill" style="background:#f59e0b;width:60%"></div></div></div>
+                    <div class="metric-card danger"><div class="metric-value" id="lowStockItems">0</div><div class="metric-label">Low Stock Items</div><div class="progress-bar"><div class="progress-fill" style="background:#ef4444;width:25%"></div></div></div>
+                </div>
+                <div class="chart-container">
+                    <h3 style="margin-bottom:15px;"><i class="fas fa-chart-line"></i> Sales Trend</h3>
+                    <div id="salesTrendChart" style="display:flex;align-items:flex-end;height:200px;gap:20px;padding:20px 0;"></div>
+                </div>
+                <div class="report-section">
+                    <h3>Top Selling Products</h3>
+                    <table class="report-table">
+                        <thead><tr><th>#</th><th>Product</th><th>Qty Sold</th><th>Revenue</th></tr></thead>
+                        <tbody id="topProducts"><tr><td colspan="4" class="loading-spinner">Loading...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="closeout" class="tab-content">
+                <div class="report-section closeout-section">
+                    <h3><i class="fas fa-calculator"></i> Daily Closeout Report</h3>
+                    <div class="report-filters">
+                        <input type="date" id="closeoutDate" value="2026-05-29">
+                        <button class="report-btn" onclick="generateCloseout()"><i class="fas fa-sync"></i> Generate</button>
+                        <button class="export-btn" onclick="exportCloseout()"><i class="fas fa-download"></i> Export</button>
+                    </div>
+                    <div id="closeoutData" style="margin-top:20px;">
+                        <div class="report-card"><div class="value" id="closeoutTotalSales">₦0.00</div><div class="label">Total Sales Today</div></div>
+                        <div class="report-card"><div class="value" id="closeoutTax">₦0.00</div><div class="label">Tax Collected</div></div>
+                        <div class="report-card"><div class="value" id="closeoutTransactions">0</div><div class="label">Transactions</div></div>
+                        <div class="report-card"><div class="value" id="closeoutAvg">₦0.00</div><div class="label">Avg Transaction</div></div>
+                        <table class="report-table" style="margin-top:20px;">
+                            <thead><tr><th>Payment Method</th><th>Amount</th><th>Count</th></tr></thead>
+                            <tbody id="closeoutPaymentBreakdown"><tr><td colspan="3" class="loading-spinner">Loading...</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div id="employees" class="tab-content">
+                <div class="report-section closeout-section">
+                    <h3><i class="fas fa-user-tie"></i> Employee Performance</h3>
+                    <table class="report-table">
+                        <thead><tr><th>Employee</th><th>Role</th><th>Sales Amount</th><th>Transactions</th></tr></thead>
+                        <tbody id="employeeData"><tr><td colspan="4" class="loading-spinner">Loading...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="notification-toast" id="toast">Action completed!</div>
+        </div>
+    </div>
+<script src="api.js"></script>
+<script>
+function navigateTo(p){window.location.href=p;}
+function showToast(msg, isError){
+    var t=document.getElementById('toast');
+    t.textContent=msg;
+    t.style.display='block';
+    t.style.background = isError ? '#f56565' : '#48bb78';
+    setTimeout(function(){t.style.display='none';},3000);
+}
+function formatCurrency(amount) { return '₦' + (amount || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
+function formatNumber(num) { return (num || 0).toLocaleString(); }
+
+var currentSales = [];
+var currentProducts = [];
+
+async function loadFilteredSales() {
+    try {
+        var data = await API.getSales();
+        var prods = await API.getProducts();
+        currentSales = data || [];
+        currentProducts = prods || [];
+    } catch (err) {
+        currentSales = [];
+        currentProducts = [];
+        showToast('Failed to load sales data', true);
+    }
+    var from = document.getElementById('reportDateFrom').value;
+    var to = document.getElementById('reportDateTo').value;
+    var sales = currentSales;
+    if (from && to) {
+        var start = new Date(from);
+        var end = new Date(to);
+        end.setHours(23, 59, 59, 999);
+        sales = sales.filter(function(s) { var d = new Date(s.date || s.createdAt || 0); return d >= start && d <= end; });
+    }
+    return { sales: sales, products: currentProducts };
+}
+
+async function loadCloseoutSales(date) {
+    await loadFilteredSales();
+    var targetDate = new Date(date);
+    targetDate.setHours(0, 0, 0, 0);
+    var nextDate = new Date(targetDate);
+    nextDate.setDate(nextDate.getDate() + 1);
+    var sales = currentSales.filter(function(s) {
+        var d = new Date(s.date || s.createdAt || 0);
+        return d >= targetDate && d < nextDate;
+    });
+    return { sales: sales, products: currentProducts };
+}
+
+function renderFavorites() {
+    var data = loadFilteredSales();
+    var sales = data.sales;
+    var products = data.products;
+    var totalSales = sales.reduce(function(sum, s) { return sum + (s.total || 0); }, 0);
+    var totalOrders = sales.length;
+    var avgOrder = totalOrders > 0 ? totalSales / totalOrders : 0;
+    var lowStock = (products || []).filter(function(p) { return (p.stock || 0) > 0 && (p.stock || 0) <= (p.reorder_level || 10); }).length;
+    document.getElementById('totalSalesMTD').textContent = formatCurrency(totalSales);
+    document.getElementById('totalOrders').textContent = formatNumber(totalOrders);
+    document.getElementById('avgOrderValue').textContent = formatCurrency(avgOrder);
+    document.getElementById('lowStockItems').textContent = formatNumber(lowStock);
+    renderSalesTrend(sales);
+    renderTopProducts(sales, products);
+}
+
+function renderSalesTrend(sales) {
+    var dailySales = {};
+    var today = new Date();
+    for (var i = 6; i >= 0; i--) {
+        var d = new Date(today);
+        d.setDate(d.getDate() - i);
+        var dateStr = d.toISOString().split('T')[0];
+        dailySales[dateStr] = 0;
+    }
+    (sales || []).forEach(function(s) {
+        var dateStr = s.date ? s.date.split('T')[0] : '';
+        if (dailySales.hasOwnProperty(dateStr)) { dailySales[dateStr] += s.total || 0; }
+    });
+    var container = document.getElementById('salesTrendChart');
+    var maxVal = Math.max(...Object.values(dailySales), 1);
+    var html = '';
+    Object.entries(dailySales).forEach(function(entry) {
+        var date = new Date(entry[0]);
+        var day = date.toLocaleDateString('en-US', { weekday: 'short' });
+        var val = entry[1];
+        var height = (val / maxVal) * 180;
+        html += '<div style="flex:1;text-align:center;"><div class="chart-bar" style="height:' + height + 'px;">' + day + '<br>' + formatCurrency(val) + '</div></div>';
+    });
+    container.innerHTML = html;
+}
+
+function renderTopProducts(sales, products) {
+    var productSales = {};
+    (sales || []).forEach(function(s) {
+        (s.items || []).forEach(function(item) {
+            var key = item.id + '|' + item.name;
+            if (!productSales[key]) productSales[key] = { qty: 0, revenue: 0, name: item.name };
+            productSales[key].qty += item.qty || 0;
+            productSales[key].revenue += (item.price || 0) * (item.qty || 1) * (1 - (item.discount || 0) / 100);
+        });
+    });
+    var sorted = Object.entries(productSales).sort(function(a, b) { return b[1].revenue - a[1].revenue; }).slice(0, 10);
+    var tbody = document.getElementById('topProducts');
+    tbody.innerHTML = sorted.map(function(entry, idx) {
+        return '<tr><td>' + (idx + 1) + '</td><td>' + entry[1].name + '</td><td>' + formatNumber(entry[1].qty) + '</td><td>' + formatCurrency(entry[1].revenue) + '</td></tr>';
+    }).join('') || '<tr><td colspan="4" style="text-align:center;color:#999;">No sales data</td></tr>';
+}
+
+async function generateCloseout() {
+    var date = document.getElementById('closeoutDate').value;
+    var data = await loadCloseoutSales(date);
+    var sales = data.sales;
+    var products = data.products;
+    var totalSales = sales.reduce(function(sum, s) { return sum + (s.total || 0); }, 0);
+    var totalOrders = sales.length;
+    var avgOrder = totalOrders > 0 ? totalSales / totalOrders : 0;
+    var tax = sales.reduce(function(sum, s) { return sum + (s.tax || 0); }, 0);
+    var paymentBreakdown = {};
+    sales.forEach(function(s) {
+        var method = s.payment || 'Unknown';
+        if (!paymentBreakdown[method]) paymentBreakdown[method] = { amount: 0, count: 0 };
+        paymentBreakdown[method].amount += s.total || 0;
+        paymentBreakdown[method].count += 1;
+    });
+    document.getElementById('closeoutTotalSales').textContent = formatCurrency(totalSales);
+    document.getElementById('closeoutTax').textContent = formatCurrency(tax);
+    document.getElementById('closeoutTransactions').textContent = formatNumber(totalOrders);
+    document.getElementById('closeoutAvg').textContent = formatCurrency(avgOrder);
+    var tbody = document.getElementById('closeoutPaymentBreakdown');
+    tbody.innerHTML = Object.entries(paymentBreakdown).map(function(entry) {
+        var icon = entry[0] === 'cash' ? 'fa-money-bill' : entry[0] === 'card' ? 'fa-credit-card' : entry[0] === 'transfer' ? 'fa-exchange-alt' : 'fa-gift';
+        return '<tr><td><i class="fas ' + icon + '"></i> ' + entry[0].charAt(0).toUpperCase() + entry[0].slice(1) + '</td><td>' + formatCurrency(entry[1].amount) + '</td><td>' + entry[1].count + '</td></tr>';
+    }).join('') || '<tr><td colspan="3" style="text-align:center;color:#999;">No transactions</td></tr>';
+}
+
+function renderEmployees() {
+    var data = loadFilteredSales();
+    var sales = data.sales;
+    var employeeSales = {};
+    sales.forEach(function(s) {
+        var emp = s.employee || s.cashier || 'Admin';
+        if (!employeeSales[emp]) employeeSales[emp] = { amount: 0, count: 0, role: 'Cashier' };
+        employeeSales[emp].amount += s.total || 0;
+        employeeSales[emp].count += 1;
+    });
+    var tbody = document.getElementById('employeeData');
+    tbody.innerHTML = Object.entries(employeeSales).map(function(entry) {
+        return '<tr><td class="employee-name">' + entry[0] + '</td><td>' + entry[1].role + '</td><td class="sales-amount">' + formatCurrency(entry[1].amount) + '</td><td>' + entry[1].count + '</td></tr>';
+    }).join('') || '<tr><td colspan="4" style="text-align:center;color:#999;">No sales data</td></tr>';
+}
+
+function exportCSV() {
+    var data = loadFilteredSales();
+    var sales = data.sales;
+    var headers = ['Date', 'Transaction ID', 'Items', 'Subtotal', 'Tax', 'Total', 'Payment Method'];
+    var rows = sales.map(function(s) {
+        var items = (s.items || []).map(function(i) { return i.name + ' x' + i.qty; }).join('; ');
+        return [s.date, s.id, '"' + items + '"', s.subtotal, s.tax, s.total, s.payment];
+    });
+    var csv = [headers.join(','), ...rows.map(function(r) { return r.join(','); })].join('\n');
+    downloadFile('sales-report-' + new Date().toISOString().split('T')[0] + '.csv', csv);
+}
+
+function exportCloseout() {
+    var date = document.getElementById('closeoutDate').value;
+    loadCloseoutSales(date).then(function(data) {
+        var sales = data.sales;
+        var headers = ['Date', 'Transaction ID', 'Items', 'Subtotal', 'Tax', 'Total', 'Payment Method'];
+        var rows = sales.map(function(s) {
+            var items = (s.items || []).map(function(i) { return i.name + ' x' + i.qty; }).join('; ');
+            return [s.date, s.id, '"' + items + '"', s.subtotal, s.tax, s.total, s.payment];
+        });
+        var csv = [headers.join(','), ...rows.map(function(r) { return r.join(','); })].join('\n');
+        downloadFile('closeout-' + date + '.csv', csv);
+    });
+}
+
+function downloadFile(filename, content) {
+    var blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+    showToast('Report exported: ' + filename);
+}
+
+function applyDateFilter() {
+    renderFavorites();
+    renderEmployees();
+    showToast('Date filter applied');
+}
+
+function switchTab(tabId, el) {
+    document.querySelectorAll('.tab-btn').forEach(function(btn){btn.classList.remove('active');});
+    document.querySelectorAll('.tab-content').forEach(function(c){c.classList.remove('active');});
+    el.classList.add('active');
+    document.getElementById(tabId).classList.add('active');
+    if (tabId === 'favorites') renderFavorites();
+    if (tabId === 'closeout') generateCloseout();
+    if (tabId === 'employees') renderEmployees();
+}
+
+function updatePharmacyName() {
+    var pharmName = API.getPharmacyName() || 'DANZONA PHARM';
+    var display = document.getElementById('pharmacyNameDisplay');
+    if (display) display.textContent = pharmName;
+}
+
+document.addEventListener('DOMContentLoaded', async function() {
+    if (!API.isLoggedIn()) { window.location.href = 'login.html'; return; }
+    var end = new Date();
+    var start = new Date();
+    start.setDate(start.getDate() - 30);
+    document.getElementById('reportDateFrom').value = start.toISOString().split('T')[0];
+    document.getElementById('reportDateTo').value = end.toISOString().split('T')[0];
+    document.getElementById('closeoutDate').value = end.toISOString().split('T')[0];
+    updatePharmacyName();
+    await renderFavorites();
+    await generateCloseout();
+    renderEmployees();
+});
+</script>
+</body>
+</html>

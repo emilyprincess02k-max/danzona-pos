@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Danzona POS - Multi-Pharmacy Login</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #2c3e50, #1a2533); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .login-container { background: white; border-radius: 10px; padding: 2.5rem; width: 100%; max-width: 480px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+    .login-container h2 { color: #2c3e50; margin-bottom: 0.5rem; text-align: center; }
+    .login-container .subtitle { color: #718096; text-align: center; margin-bottom: 1.5rem; font-size: 0.9rem; }
+    .tab-switch { display: flex; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; }
+    .tab-switch button { flex: 1; padding: 10px; border: none; background: none; cursor: pointer; font-size: 1rem; font-weight: 500; color: #a0aec0; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+    .tab-switch button.active { color: #3498db; border-bottom-color: #3498db; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; margin-bottom: 0.4rem; color: #4a5568; font-weight: 500; font-size: 0.9rem; }
+    .form-group input, .form-group select { width: 100%; padding: 0.75rem; border: 1.5px solid #ddd; border-radius: 5px; font-size: 0.95rem; transition: border-color 0.3s; }
+    .form-group input:focus, .form-group select:focus { outline: none; border-color: #3498db; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .login-btn { width: 100%; padding: 0.85rem; background: #3498db; color: white; border: none; border-radius: 5px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.3s; margin-top: 0.5rem; }
+    .login-btn:hover { background: #2980b9; }
+    .register-btn { background: #10b981; }
+    .register-btn:hover { background: #059669; }
+    .back-link { display: block; text-align: center; margin-top: 1.5rem; color: #3498db; text-decoration: none; cursor: pointer; font-size: 0.9rem; }
+    .notification-toast { position: fixed; top: 20px; right: 20px; padding: 1rem 1.5rem; border-radius: 5px; display: none; z-index: 1000; color: white; font-weight: 500; }
+    .notification-toast.success { background: #48bb78; }
+    .notification-toast.error { background: #f56565; }
+    .notification-toast.info { background: #4299e1; }
+    .offline-warning { background: #fff3cd; border: 1px solid #ffc107; padding: 10px; border-radius: 5px; margin-bottom: 1rem; font-size: 0.85rem; color: #856404; text-align: center; }
+    .server-status { text-align: center; margin-bottom: 1rem; font-size: 0.8rem; }
+    .server-status.online { color: #10b981; }
+    .server-status.offline { color: #f56565; }
+</style>
+</head>
+<body>
+    <div class="login-container">
+        <h2><i class="fas fa-clinic-medical"></i> Danzona POS</h2>
+        <p class="subtitle">Multi-Pharmacy Management System</p>
+
+        <div class="offline-warning" id="offlineWarning" style="display:none;">
+            <i class="fas fa-exclamation-triangle"></i> Backend server not running. Contact your administrator to start the POS server.
+        </div>
+        <div class="server-status" id="serverStatus"></div>
+
+        <div class="tab-switch">
+            <button class="active" onclick="switchTab('login')"><i class="fas fa-sign-in-alt"></i> Login</button>
+            <button onclick="switchTab('register')"><i class="fas fa-user-plus"></i> New Pharmacy</button>
+        </div>
+
+        <div id="login-tab" class="tab-content active">
+            <form onsubmit="login(event)">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Username</label>
+                    <input type="text" id="username" required placeholder="Enter username">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="password" required placeholder="Enter password">
+                </div>
+                <button type="submit" class="login-btn"><i class="fas fa-sign-in-alt"></i> Login</button>
+            </form>
+        </div>
+
+        <div id="register-tab" class="tab-content">
+            <form onsubmit="registerPharmacy(event)">
+                <div class="form-group">
+                    <label><i class="fas fa-clinic-medical"></i> Pharmacy Name *</label>
+                    <input type="text" id="pharmName" required placeholder="e.g. Danzona Pharmacy Ikeja">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-map-marker-alt"></i> Address</label>
+                    <input type="text" id="pharmAddress" placeholder="e.g. 45 Broad Street, Lagos">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-phone"></i> Phone</label>
+                    <input type="tel" id="pharmPhone" placeholder="+234 801 234 5678">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="pharmEmail" placeholder="admin@pharmacy.com">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-user-shield"></i> Admin Username *</label>
+                        <input type="text" id="adminUser" required placeholder="e.g. admin">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-lock"></i> Admin Password *</label>
+                        <input type="password" id="adminPass" required placeholder="Min. 6 characters">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-id-badge"></i> Admin Full Name</label>
+                    <input type="text" id="adminName" placeholder="e.g. Pharmacy Admin">
+                </div>
+                <button type="submit" class="login-btn register-btn"><i class="fas fa-user-plus"></i> Register Pharmacy</button>
+            </form>
+        </div>
+
+        <a class="back-link" onclick="window.location.href='index.html'"><i class="fas fa-home"></i> Back to Home</a>
+    </div>
+    <div class="notification-toast" id="toast"></div>
+
+    <script src="api.js"></script>
+    <script>
+    var API_URL = 'http://localhost:5000';
+
+    function showToast(msg, type) {
+        var t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'notification-toast ' + (type || 'success');
+        t.style.display = 'block';
+        setTimeout(function() { t.style.display = 'none'; }, 4000);
+    }
+
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-switch button').forEach(function(b) { b.classList.remove('active'); });
+        document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+        document.getElementById(tab + '-tab').classList.add('active');
+        var buttons = document.querySelectorAll('.tab-switch button');
+        if (tab === 'login') buttons[0].classList.add('active');
+        else if (tab === 'register') buttons[1].classList.add('active');
+    }
+
+    function checkServer() {
+        fetch(API_URL + '/api/auth/check', { method: 'GET', headers: { 'X-API-Key': 'ping' } })
+            .then(function(res) {
+                document.getElementById('offlineWarning').style.display = 'none';
+                var status = document.getElementById('serverStatus');
+                status.className = 'server-status online';
+                status.innerHTML = '<i class="fas fa-circle"></i> Server online';
+            })
+            .catch(function() {
+                document.getElementById('offlineWarning').style.display = 'block';
+                var status = document.getElementById('serverStatus');
+                status.className = 'server-status offline';
+                status.innerHTML = '<i class="fas fa-circle"></i> Server offline';
+            });
+    }
+
+    function login(e) {
+        e.preventDefault();
+        var username = document.getElementById('username').value.trim();
+        var password = document.getElementById('password').value;
+
+        if (!username) { showToast('Please enter your username', 'error'); return; }
+        showToast('Logging in...', 'info');
+
+        API.login('', username, password).then(function(res) {
+            if (res.error) { showToast(res.error, 'error'); return; }
+            if (res.pharmacy && res.pharmacy.address) {
+                var storeId = res.pharmacy.address.trim();
+                if (!storeId) storeId = res.pharmacy.id;
+                API.init(res.user.api_key || '', res.user.username, res.pharmacy.name, res.user, storeId);
+            } else {
+                API.init(res.user.api_key || '', res.user.username, res.pharmacy && res.pharmacy.name ? res.pharmacy.name : '', res.user, '');
+            }
+            var roleName = res.user.role ? res.user.role.toUpperCase() : 'USER';
+            showToast('Welcome, ' + res.user.name + ' (' + roleName + ')!', 'success');
+            setTimeout(function() {
+                window.location.href = 'dashboard.html';
+            }, 1000);
+        }).catch(function(err) {
+            showToast('Connection error. Is the server running?', 'error');
+            console.error(err);
+        });
+    }
+
+    function registerPharmacy(e) {
+        e.preventDefault();
+        var name = document.getElementById('pharmName').value.trim();
+        var address = document.getElementById('pharmAddress').value.trim();
+        var phone = document.getElementById('pharmPhone').value.trim();
+        var email = document.getElementById('pharmEmail').value.trim();
+        var adminUser = document.getElementById('adminUser').value.trim();
+        var adminPass = document.getElementById('adminPass').value;
+        var adminName = document.getElementById('adminName').value.trim() || adminUser;
+
+        if (!name || !adminUser || adminPass.length < 4) {
+            showToast('Fill all required fields (min 4 char password)', 'error');
+            return;
+        }
+
+        showToast('Registering pharmacy...', 'info');
+
+        API.registerPharmacy({
+            name: name,
+            address: address,
+            phone: phone,
+            email: email,
+            admin_username: adminUser,
+            admin_password: adminPass,
+            admin_name: adminName
+        }).then(function(res) {
+            if (res.error) {
+                showToast(res.error, 'error');
+                return;
+            }
+
+            showToast('Registration successful! Logging you in...', 'success');
+
+            API.login(res.api_key, res.admin_username, adminPass).then(function(loginRes) {
+                if (loginRes.error) {
+                    showToast(loginRes.error, 'error');
+                    return;
+                }
+                if (loginRes.pharmacy && loginRes.pharmacy.address) {
+                    var storeId = loginRes.pharmacy.address.trim();
+                    if (!storeId) storeId = loginRes.pharmacy.id;
+                    API.init(loginRes.user.api_key || '', loginRes.user.username, loginRes.pharmacy.name, loginRes.user, storeId);
+                } else {
+                    API.init(loginRes.user.api_key || '', loginRes.user.username, loginRes.pharmacy && loginRes.pharmacy.name ? loginRes.pharmacy.name : '', loginRes.user, '');
+                }
+                var roleName = loginRes.user.role ? loginRes.user.role.toUpperCase() : 'USER';
+                showToast('Welcome, ' + loginRes.user.name + ' (' + roleName + ')!', 'success');
+                setTimeout(function() {
+                    window.location.href = 'dashboard.html';
+                }, 1000);
+            }).catch(function(err) {
+                showToast('Connection error. Is the server running?', 'error');
+                console.error(err);
+            });
+
+            document.querySelector('form[onsubmit="registerPharmacy(event)"]').reset();
+        }).catch(function(err) {
+            showToast('Connection error. Is the server running?', 'error');
+            console.error(err);
+        });
+    }
+
+    checkServer();
+    setInterval(checkServer, 15000);
+    </script>
+</body>
+</html>

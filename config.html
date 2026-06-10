@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Config - DANZONA PHARM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
+body{background:#f2f2f2;min-height:100vh;display:flex;}
+.sidebar{width:260px;background:#064e3b;color:#e2e8f0;height:100vh;overflow-y:auto;box-shadow:2px 0 10px rgba(0,0,0,0.1);flex-shrink:0;}
+.sidebar-header{background:#043e2c;padding:20px 25px;border-bottom:1px solid #059669;}
+.sidebar h1{font-size:22px;color:#10b981;margin:0;font-weight:600;}
+.sidebar ul{list-style:none;padding:15px 0;}
+.sidebar ul li{padding:12px 25px;display:flex;align-items:center;gap:12px;cursor:pointer;border-left:3px solid transparent;transition:all 0.2s ease;font-size:14px;}
+.sidebar ul li i{width:20px;text-align:center;font-size:16px;}
+.sidebar ul li:hover{background:#059669;border-left-color:#10b981;color:#ffffff;}
+.sidebar ul li.active{background:#059669;border-left-color:#10b981;color:#ffffff;}
+.main-content{flex:1;display:flex;flex-direction:column;}
+.header{background:#10b981;color:white;padding:15px 25px;display:flex;justify-content:space-between;align-items:center;}
+.header h2{font-size:20px;}
+.content{flex:1;padding:20px;}
+.notification-toast{position:fixed;top:20px;right:20px;background:#48bb78;color:white;padding:1rem 1.5rem;border-radius:5px;display:none;z-index:1000;}
+.config-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;}
+.config-header h2{margin:0;}
+.save-config-btn{background:#4da3ff;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;font-size:16px;}
+.save-config-btn:hover{background:#3b82f6;}
+.config-section{background:#fff;border-radius:10px;padding:20px;margin-bottom:20px;box-shadow:0 2px 10px rgba(0,0,0,0.1);}
+.config-section h3{color:#2c3e50;margin-bottom:15px;display:flex;align-items:center;gap:0.5rem;}
+.config-group{display:flex;flex-direction:column;gap:0.5rem;margin-bottom:15px;}
+.config-group label{font-weight:500;color:#34495e;}
+.config-group input,.config-group select,.config-group textarea{width:100%;padding:10px;border:1px solid #ddd;border-radius:5px;font-size:16px;}
+.config-group textarea{height:80px;resize:vertical;}
+.setting-item{display:flex;justify-content:space-between;align-items:center;padding:15px 0;border-bottom:1px solid #eee;}
+.setting-label{font-weight:500;color:#34495e;}
+.setting-value{color:#718096;}
+</style>
+<script src="api.js"></script>
+<script>
+function navigateTo(page){window.location.href=page;}
+</script>
+</head>
+<body>
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h1>POS</h1>
+    </div>
+    <ul>
+        <li onclick="navigateTo('dashboard.html')"><i class="fas fa-home"></i> Dashboard</li>
+        <li onclick="navigateTo('sales.html')"><i class="fas fa-shopping-cart"></i> Sales</li>
+        <li onclick="navigateTo('variations.html')"><i class="fas fa-plus-circle"></i> Add New Product</li>
+        <li onclick="navigateTo('inventory.html')"><i class="fas fa-boxes"></i> Inventory</li>
+        <li onclick="navigateTo('customers.html')"><i class="fas fa-users"></i> Customers</li>
+        <li onclick="navigateTo('suppliers.html')"><i class="fas fa-truck"></i> Suppliers</li>
+        <li onclick="navigateTo('reports.html')"><i class="fas fa-chart-bar"></i> Reports</li>
+        <li onclick="navigateTo('receiving.html')"><i class="fas fa-file-import"></i> Receiving</li>
+        <li onclick="navigateTo('deliveries.html')"><i class="fas fa-truck-loading"></i> Deliveries</li>
+        <li onclick="navigateTo('expenses.html')"><i class="fas fa-receipt"></i> Expenses</li>
+        <li onclick="navigateTo('employees.html')"><i class="fas fa-user-tie"></i> Employees</li>
+        <li onclick="navigateTo('appointments.html')"><i class="fas fa-calendar"></i> Appointments</li>
+        <li onclick="navigateTo('giftcards.html')"><i class="fas fa-gift"></i> Gift Cards</li>
+        <li class="active" onclick="navigateTo('config.html')"><i class="fas fa-cog"></i> Store Config</li>
+        <li onclick="navigateTo('invoices.html')"><i class="fas fa-file-invoice"></i> Invoices</li>
+        <li onclick="navigateTo('locations.html')"><i class="fas fa-store"></i> Locations</li>
+        <li onclick="navigateTo('messages.html')"><i class="fas fa-envelope"></i> Messages</li>
+        <li onclick="navigateTo('payments.html')"><i class="fas fa-credit-card"></i> Payments</li>
+        <li onclick="navigateTo('login.html')"><i class="fas fa-sign-out-alt"></i> Logout</li>
+    </ul>
+</div>
+<div class="main-content">
+    <div class="header"><h2>Store Config</h2><span id="pharmacyNameDisplay" style="font-weight:500;">Loading...</span></div>
+    <div class="content">
+    <div class="config-header">
+        <h2>Store Configuration</h2>
+    </div>
+    <div class="config-section">
+        <h3><i class="fas fa-store"></i> Store Information</h3>
+        <div class="config-group">
+            <label>Store Name</label>
+            <input type="text" id="storeName" placeholder="Enter store name" value="DANZONA PHARM">
+        </div>
+    </div>
+    <div class="config-section">
+        <h3><i class="fas fa-map-marker-alt"></i> Location Settings</h3>
+        <div class="config-group">
+            <label>Store Address</label>
+            <textarea id="storeAddress" placeholder="Enter store address">123 Pharmacy Street, Lagos, Nigeria</textarea>
+        </div>
+        <div class="config-group">
+            <label>Phone Number</label>
+            <input type="tel" id="phoneNumber" placeholder="Enter phone number" value="+234 123 4567">
+        </div>
+        <div class="config-group">
+            <label>Email Address</label>
+            <input type="email" id="emailAddress" placeholder="Enter email address" value="info@danzonapharm.com">
+        </div>
+    </div>
+    <div class="config-section">
+        <h3><i class="fas fa-clock"></i> Operating Hours</h3>
+        <div class="setting-item">
+            <span class="setting-label">Opening Time</span>
+            <span class="setting-value">8:00 AM</span>
+        </div>
+        <div class="setting-item">
+            <span class="setting-label">Closing Time</span>
+            <span class="setting-value">8:00 PM</span>
+        </div>
+        <div class="setting-item">
+            <span class="setting-label">Days Open</span>
+            <span class="setting-value">Monday - Saturday</span>
+        </div>
+    </div>
+    <div class="config-section">
+        <h3><i class="fas fa-tasks"></i> Inventory Settings</h3>
+        <div class="config-group">
+            <label>Low Stock Threshold</label>
+            <input type="number" id="lowStockThreshold" min="1" value="5" placeholder="Minimum stock level">
+        </div>
+    </div>
+    <div class="config-section">
+        <h3><i class="fas fa-user-shield"></i> Security Settings</h3>
+        <div class="config-group">
+            <label>Session Timeout (minutes)</label>
+            <input type="number" id="sessionTimeout" min="5" value="30" placeholder="Session duration">
+        </div>
+    </div>
+    <div class="config-section">
+        <h3><i class="fas fa-print"></i> Receipt Settings</h3>
+        <div class="config-group">
+            <label>Store Logo</label>
+            <input type="text" id="storeLogo" placeholder="URL or path to logo" value="logo.png">
+        </div>
+        <div class="config-group">
+            <label>Footer Text</label>
+            <input type="text" id="footerText" placeholder="Footer text on receipt" value="Thank you for choosing DANZONA PHARM!">
+        </div>
+    </div>
+    <div style="text-align:center; margin-top:30px;">
+        <button class="save-config-btn" onclick="saveConfig()">
+            <i class="fas fa-save"></i> Save Configuration
+        </button>
+    </div>
+    <div class="notification-toast" id="toast">Action completed!</div>
+    </div>
+</div>
+<script src="api.js"></script>
+<script>
+function navigateTo(page){window.location.href=page;}
+function showToast(msg, isError){
+    var t=document.getElementById('toast');
+    t.textContent=msg;
+    t.style.background = isError ? '#f56565' : '#48bb78';
+    t.style.display='block';
+    setTimeout(function(){t.style.display='none';},3000);
+}
+function loadConfig(){
+    var config=JSON.parse(localStorage.getItem('storeConfig')||'{}');
+    document.getElementById('storeName').value=config.storeName||'DANZONA PHARM';
+    document.getElementById('storeAddress').value=config.storeAddress||'123 Pharmacy Street, Lagos, Nigeria';
+    document.getElementById('phoneNumber').value=config.phoneNumber||'+234 123 4567';
+    document.getElementById('emailAddress').value=config.emailAddress||'info@danzonapharm.com';
+    document.getElementById('lowStockThreshold').value=config.lowStockThreshold||5;
+    document.getElementById('sessionTimeout').value=config.sessionTimeout||30;
+    document.getElementById('storeLogo').value=config.storeLogo||'logo.png';
+    document.getElementById('footerText').value=config.footerText||'Thank you for choosing DANZONA PHARM!';
+}
+function saveConfig() {
+    var storeName=document.getElementById('storeName').value.trim();
+    var storeAddress=document.getElementById('storeAddress').value.trim();
+    var phoneNumber=document.getElementById('phoneNumber').value.trim();
+    var emailAddress=document.getElementById('emailAddress').value.trim();
+    if(!storeName||!storeAddress){
+        showToast('Store name and address are required',true);
+        return;
+    }
+    var config={
+        storeName:storeName,
+        storeAddress:storeAddress,
+        phoneNumber:phoneNumber,
+        emailAddress:emailAddress,
+        lowStockThreshold:parseInt(document.getElementById('lowStockThreshold').value)||5,
+        sessionTimeout:parseInt(document.getElementById('sessionTimeout').value)||30,
+        storeLogo:document.getElementById('storeLogo').value,
+        footerText:document.getElementById('footerText').value
+    };
+    localStorage.setItem('storeConfig',JSON.stringify(config));
+    showToast('Configuration saved!');
+}
+function updatePharmacyName() {
+    var pharmName = API.getPharmacyName() || 'DANZONA PHARM';
+    var display = document.getElementById('pharmacyNameDisplay');
+    if (display) display.textContent = pharmName;
+}
+function logout() {
+    if (confirm('Are you sure you want to logout?')) {
+        API.logout();
+        window.location.href = 'login.html';
+    }
+}
+document.addEventListener('DOMContentLoaded', function() {
+    if (!API.isLoggedIn()) { 
+        var demo = getQueryParameter('demo');
+        if (demo !== '1') {
+            window.location.href = 'login.html'; 
+            return; 
+        }
+    }
+    loadConfig();
+    updatePharmacyName();
+});
+
+function getQueryParameter(name) {
+    var params = new URLSearchParams(window.location.search);
+    return params.get(name) || '0';
+}
+</script>
+</body>
+</html>

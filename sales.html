@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sales - DANZONA PHARM</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
+body{background:#f2f2f2;min-height:100vh;display:flex;}
+.sidebar{width:260px;background:#064e3b;color:#e2e8f0;height:100vh;overflow-y:auto;box-shadow:2px 0 10px rgba(0,0,0,0.1);flex-shrink:0;}
+.sidebar-header{background:#043e2c;padding:20px 25px;border-bottom:1px solid #059669;}
+.sidebar h1{font-size:22px;color:#10b981;margin:0;font-weight:600;}
+.sidebar ul{list-style:none;padding:15px 0;}
+.sidebar ul li{padding:12px 25px;display:flex;align-items:center;gap:12px;cursor:pointer;border-left:3px solid transparent;transition:all 0.2s ease;font-size:14px;}
+.sidebar ul li:hover{background:#059669;border-left-color:#10b981;color:#ffffff;}
+.sidebar ul li.active{background:#059669;border-left-color:#10b981;color:#ffffff;}
+.main-content{flex:1;display:flex;flex-direction:column;min-width:0;}
+.header{background:#10b981;color:white;padding:15px 25px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.header h2{font-size:20px;margin:0;font-weight:600;}
+.pos-container{flex:1;padding:20px;display:flex;flex-direction:column;gap:20px;}
+.top-bar{display:flex;gap:15px;align-items:center;margin-bottom:20px;flex-wrap:wrap;}
+.top-bar input{flex:1;padding:12px 16px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;background:white;transition:border-color .2s;}
+.top-bar input:focus{outline:none;border-color:#10b981;box-shadow:0 0 0 3px rgba(16,185,129,.1);}
+.btn-sale{background:#10b981;color:white;border:none;border-radius:8px;padding:10px 20px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:all .2s;}
+.btn-hold{background:#f59e0b;color:white;border:none;border-radius:8px;padding:10px 20px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:all .2s;}
+.btn-grid{background:#6366f1;color:white;border:none;border-radius:8px;padding:10px 20px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:all .2s;}
+.btn-sale:hover{background:#059669;transform:translateY(-1px);}
+.btn-hold:hover{background:#d97706;transform:translateY(-1px);}
+.btn-grid:hover{background:#4f46e5;transform:translateY(-1px);}
+.totals{margin-top:auto;padding-top:16px;border-top:1px solid #e2e8f0;}
+.totals .total-row{display:flex;justify-content:space-between;padding:8px 0;font-size:14px;color:#64748b;}
+.totals .total-row.total{font-size:18px;font-weight:700;color:#0f172a;border-top:1px solid #e2e8f0;margin-top:8px;padding-top:12px;}
+.totals .total-row.due{font-size:16px;font-weight:600;color:#10b981;}
+.customer-panel{width:380px;background:white;border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:12px;}
+.customer-panel .customer-search{position:relative;}
+.customer-panel .customer-search input{width:100%;padding:10px 15px;border:1px solid #ddd;border-radius:5px;font-size:14px;}
+.customer-panel .customer-dropdown{position:absolute;top:100%;left:0;right:0;background:white;border:1px solid #ddd;border-radius:5px;max-height:200px;overflow-y:auto;z-index:100;margin-top:4px;box-shadow:0 4px 12px rgba(0,0,0,0.1);display:none;}
+.customer-panel .customer-dropdown div{padding:10px 12px;cursor:pointer;font-size:14px;border-bottom:1px solid #f1f5f9;}
+.customer-panel .customer-dropdown div:last-child{border-bottom:none;}
+.customer-panel .customer-dropdown div:hover{background:#f1f5f9;}
+.customer-panel .payment-method{width:100%;padding:10px 15px;border:1px solid #ddd;border-radius:5px;font-size:14px;background:white;cursor:pointer;}
+.customer-panel .amount-tendered{width:100%;padding:10px 15px;border:1px solid #ddd;border-radius:5px;font-size:14px;background:white;}
+.customer-panel .notes{width:100%;padding:10px 15px;border:1px solid #ddd;border-radius:5px;font-size:14px;background:white;min-height:80px;resize:none;}
+.customer-panel .action-btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:auto;}
+.customer-panel .btn-primary{flex:1;background:#10b981;color:white;border:none;border-radius:5px;padding:10px 15px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;}
+.customer-panel .btn-primary:hover{background:#059669;}
+.customer-panel .btn-secondary{flex:1;background:#f1f5f9;color:#475569;border:none;border-radius:5px;padding:10px 15px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;}
+.customer-panel .btn-secondary:hover{background:#e2e8f0;}
+.customer-panel .btn-hold{background:#f59e0b;color:white;border:none;border-radius:5px;padding:10px 15px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;}
+.customer-panel .btn-hold:hover{background:#d97706;}
+.loading-spinner{width:24px;height:24px;border:2px solid #ddd;border-top-color:#10b981;border-radius:50%;animation:spin .8s linear infinite;}
+.toast{position:fixed;top:20px;right:20px;background:#10b981;color:white;padding:0.8rem 1.2rem;border-radius:5px;display:none;z-index:3000;font-size:14px;box-shadow:0 4px 10px rgba(0,0,0,0.15);}
+.toast.error{background:#ef4444;color:white;}
+.user-menu{position:relative;cursor:pointer;padding:8px 12px;border-radius:5px;background:rgba(255,255,255,0.1);transition:background 0.2s;display:flex;align-items:center;gap:8px;}
+.user-menu:hover{background:rgba(255,255,255,0.2);}
+.user-dropdown{position:absolute;top:100%;right:0;margin-top:8px;background:white;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 10px 25px rgba(0,0,0,0.15);min-width:220px;z-index:1000;display:none;padding:8px;}
+.user-dropdown.active{display:block;animation:fadeIn 0.2s;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-5px);}to{opacity:1;transform:translateY(0);}}
+.user-info{padding:4px 0 8px;}
+.user-info strong{color:#2c3e50;}
+.user-info small{color:#718096;font-size:12px;}
+.user-dropdown a{display:flex;align-items:center;gap:10px;padding:10px 12px;color:#4a5568;text-decoration:none;border-radius:5px;transition:background 0.2s;font-size:14px;}
+.user-dropdown a:hover{background:#f0fdf4;color:#064e3b;}
+.user-dropdown a i{width:18px;text-align:center;color:#10b981;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.product-grid-container{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px;margin-top:16px;}
+.product-card{background:white;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.06);cursor:pointer;border:2px solid transparent;transition:all .2s;text-align:center;}
+.product-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08);}
+.product-card.out-of-stock{opacity:.6;cursor:not-allowed;border-color:#ef4444;}
+.product-card .product-name{font-weight:600;color:#1e293b;font-size:14px;margin-bottom:6px;word-break:break-word;}
+.product-card .product-price{color:#10b981;font-weight:700;font-size:16px;}
+.product-card .product-sku{font-size:11px;color:#94a3b8;margin-top:4px;}
+.product-card .product-stock{font-size:11px;color:#64748b;margin-top:6px;}
+.category-filter{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.category-filter button{padding:6px 12px;border-radius:16px;border:1px solid #e2e8f0;background:white;color:#475569;font-size:12px;cursor:pointer;transition:all .2s;}
+.category-filter button.active{background:#10b981;color:white;border-color:#10b981;}
+.content{flex:1;display:flex;gap:20px;min-height:0;padding:20px;}
+.cart-section{flex:1;background:white;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.1);padding:20px;display:flex;flex-direction:column;}
+.cart-section table{width:100%;border-collapse:collapse;font-size:14px;}
+.cart-section th,.cart-section td{padding:12px 8px;text-align:left;border-bottom:1px solid #eee;}
+.cart-section th{background-color:#f8f9fa;font-weight:600;color:#4a5568;}
+.cart-section .empty-message{text-align:center;color:#94a3b8;padding:30px;font-size:14px;}
+@media(max-width:1024px){.content{flex-direction:column;}.customer-panel{order:1;width:100%;}.cart-section{order:2;}.cart-section table{font-size:13px;}}
+@media(max-width:768px){.sidebar{display:none;}}
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="api.js"></script>
+<script>function navigateTo(p){window.location.href=p;}</script>
+</head>
+<body>
+<div class="sidebar">
+<div class="sidebar-header"><h1><i class="fas fa-shopping-cart"></i> POS</h1></div>
+<ul>
+<li class="active" onclick="navigateTo('sales.html')"><i class="fas fa-shopping-cart"></i> Sales</li>
+<li onclick="navigateTo('dashboard.html')"><i class="fas fa-home"></i> Dashboard</li>
+<li onclick="navigateTo('variations.html')"><i class="fas fa-plus-circle"></i> Add Product</li>
+<li onclick="navigateTo('inventory.html')"><i class="fas fa-boxes"></i> Inventory</li>
+<li onclick="navigateTo('customers.html')"><i class="fas fa-users"></i> Customers</li>
+<li onclick="navigateTo('suppliers.html')"><i class="fas fa-truck"></i> Suppliers</li>
+<li onclick="navigateTo('reports.html')"><i class="fas fa-chart-bar"></i> Reports</li>
+<li onclick="navigateTo('receiving.html')"><i class="fas fa-file-import"></i> Receiving</li>
+<li onclick="navigateTo('deliveries.html')"><i class="fas fa-truck-loading"></i> Deliveries</li>
+<li onclick="navigateTo('expenses.html')"><i class="fas fa-receipt"></i> Expenses</li>
+<li onclick="navigateTo('employees.html')"><i class="fas fa-user-tie"></i> Employees</li>
+<li onclick="navigateTo('appointments.html')"><i class="fas fa-calendar"></i> Appointments</li>
+<li onclick="navigateTo('giftcards.html')"><i class="fas fa-gift"></i> Gift Cards</li>
+<li onclick="navigateTo('invoices.html')"><i class="fas fa-file-invoice"></i> Invoices</li>
+<li onclick="navigateTo('payments.html')"><i class="fas fa-credit-card"></i> Payments</li>
+<li onclick="navigateTo('locations.html')"><i class="fas fa-store"></i> Locations</li>
+<li onclick="navigateTo('config.html')"><i class="fas fa-cog"></i> Store Config</li>
+<li onclick="navigateTo('messages.html')"><i class="fas fa-envelope"></i> Messages</li>
+<li onclick="navigateTo('login.html')"><i class="fas fa-sign-out-alt"></i> Logout</li>
+</ul>
+</div>
+<div class="main-content">
+<div class="header">
+<h2><i class="fas fa-shopping-cart"></i> Point of Sale</h2>
+<div class="user-menu" onclick="toggleUserMenu(event)">
+<span id="currentUserName">Loading...</span>
+<i class="fas fa-chevron-down" style="margin-left:8px;font-size:12px;"></i>
+<div class="user-dropdown" id="userDropdown">
+<div class="user-info" id="userInfo">
+<strong id="dropdownUserName">Loading...</strong>
+<small id="dropdownUserRole">Role</small>
+</div>
+<hr style="margin:8px 0;">
+<a href="#" onclick="navigateTo('config.html');closeUserMenu();"><i class="fas fa-cog"></i> Settings</a>
+<a href="#" onclick="navigateTo('payments.html');closeUserMenu();"><i class="fas fa-credit-card"></i> Store Account Payment</a>
+<a href="#" onclick="logout();closeUserMenu();"><i class="fas fa-sign-out-alt"></i> Logout</a>
+</div>
+</div>
+</div>
+<div class="pos-container">
+<div class="top-bar">
+<button class="btn-hold" onclick="showHeldTransactions()" title="Held Transactions"><i class="fas fa-history"></i> Held (<span id="heldCount">0</span>)</button>
+<input type="text" id="productSearch" placeholder="Search product or scan barcode (min 2 chars)" oninput="searchProducts(this.value)">
+<button class="btn-sale" onclick="checkout()" id="checkoutBtnTop"><i class="fas fa-shopping-cart"></i> Sale</button>
+<button class="btn-sale" onclick="showAllProducts()" id="gridBtn"><i class="fas fa-list"></i> All Products</button>
+<button class="btn-sale" onclick="showQuickAddModal()" style="background:#8b5cf6;"><i class="fas fa-bolt"></i> Quick Add</button>
+</div>
+<div class="content">
+<div class="cart-section" id="cartSection">
+<table>
+<thead>
+<tr>
+<th>+</th>
+<th>Item Name</th>
+<th>Pkg Type</th>
+<th>Price</th>
+<th>Qty.</th>
+<th>Discount</th>
+<th>Total</th>
+</tr>
+</thead>
+<tbody id="cartTableBody">
+<tr>
+<td colspan="7" class="empty-message">There are no items in the cart [Sales]</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="customer-panel">
+<div class="customer-search">
+<input type="text" id="customerSearch" placeholder="Type customer name..." autocomplete="off">
+<div class="customer-dropdown" id="customerDropdown"></div>
+</div>
+<div style="display:flex;gap:8px;">
+<button class="btn-secondary" onclick="addQuickCustomer()" title="Add Quick Customer" style="flex-shrink:0;padding:0 12px;"><i class="fas fa-user-plus"></i></button>
+<select class="payment-method" id="paymentMethod" style="flex:1;">
+<option value="cash">Cash</option>
+<option value="card">Card</option>
+<option value="transfer">Bank Transfer</option>
+<option value="pos">POS</option>
+<option value="giftcard">Gift Card</option>
+</select>
+</div>
+<input type="number" id="amountTendered" class="amount-tendered" placeholder="Amount Tendered" step="0.01" min="0">
+<div style="display:flex;gap:6px;flex-wrap:wrap;">
+<button class="btn-secondary" onclick="quickTender(500)" style="flex:1;padding:8px 10px;font-size:13px;"><i class="fas fa-money-bill"></i> ₦500</button>
+<button class="btn-secondary" onclick="quickTender(1000)" style="flex:1;padding:8px 10px;font-size:13px;"><i class="fas fa-money-bill"></i> ₦1000</button>
+<button class="btn-secondary" onclick="quickTender(2000)" style="flex:1;padding:8px 10px;font-size:13px;"><i class="fas fa-money-bill"></i> ₦2000</button>
+<button class="btn-secondary" onclick="quickTender(5000)" style="flex:1;padding:8px 10px;font-size:13px;"><i class="fas fa-money-bill"></i> ₦5000</button>
+<button class="btn-secondary" onclick="quickTender(10000)" style="flex:1;padding:8px 10px;font-size:13px;"><i class="fas fa-money-bill"></i> ₦10000</button>
+</div>
+<textarea id="saleNotes" class="notes" placeholder="Add notes..."></textarea>
+<div class="action-btns">
+<button class="btn-secondary" onclick="clearCart()" id="clearBtn"><i class="fas fa-trash"></i> Clear</button>
+<button class="btn-hold" onclick="holdTransaction()" id="holdBtn"><i class="fas fa-pause"></i> Hold</button>
+</div>
+<div class="action-btns">
+<button class="btn-primary" onclick="printReceipt()" style="flex:1;"><i class="fas fa-print"></i> Print Receipt</button>
+<button class="btn-primary" onclick="checkout()" id="checkoutBtnBottom"><i class="fas fa-shopping-cart"></i> Checkout</button>
+</div>
+<div class="totals">
+<div class="total-row"><span>Sub Total</span><span id="subTotal">₦0.00</span></div>
+<div class="total-row total"><span>Total</span><span id="totalAmount">₦0.00</span></div>
+<div class="total-row due"><span>Amount Due</span><span id="amountDue">₦0.00</span></div>
+<div class="total-row" id="changeRow" style="display:none;"><span>Change</span><span id="changeAmount" style="color:#10b981;">₦0.00</span></div>
+</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
+<script>
+var allProducts=[],cart=[],selectedCustomer=null,searchTimer=null,barcodeBuffer='';
+function $(id){return document.getElementById(id);}
+function formatCurrency(v){return '₦'+(parseFloat(v)||0).toLocaleString('en-NG',{minimumFractionDigits:2});}
+
+// Keyboard shortcuts
+document.addEventListener('keydown',function(e){
+    if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;
+    if(e.key==='F1'){$('productSearch').focus();}
+    if(e.key==='F2'){$('customerSearch').focus();}
+    if(e.key==='F3'){$('amountTendered').focus();}
+    if(e.key==='F5'){showAllProducts();}
+    if(e.key==='F6'){checkout();}
+    if(e.key==='F7'){holdTransaction();}
+    if(e.key==='F8'){clearCart();}
+    if(e.key==='F9'){printReceipt();}
+    // Barcode scanner - captures rapid keystrokes and triggers after pause
+    if(e.key.length===1){
+        barcodeBuffer+=e.key;
+        clearTimeout(searchTimer);
+        searchTimer=setTimeout(function(){
+            if(barcodeBuffer.length>=3){
+                $('productSearch').value=barcodeBuffer;
+                var ql=barcodeBuffer.toLowerCase();
+                var found=allProducts.filter(function(x){return(x.sku&&x.sku.toLowerCase()===ql)||(x.name&&x.name.toLowerCase()===ql);});
+                if(found.length===1){addToCart(found[0].id,found[0].name,found[0].selling_price||found[0].price);showDropdown([]);}
+                else{searchProducts(barcodeBuffer);}
+            }
+            barcodeBuffer='';
+        },100);
+    }
+});
+var quickAddModal=null;
+
+function showToast(msg, isError){
+    var t=$('toast');
+    if(!t){
+        var toast=document.createElement('div');
+        toast.id='toast';
+        toast.className='toast';
+        document.body.appendChild(toast);
+        t=toast;
+    }
+    t.textContent=msg;
+    t.className='toast'+(isError?' error':'');
+    t.style.display='block';
+    setTimeout(function(){t.style.display='none';},3000);
+}
+
+function showQuickAddModal(){
+    if(quickAddModal){quickAddModal.style.display='flex';return;}
+    var modalHtml='<div id="quickAddModal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:2000;display:flex;align-items:center;justify-content:center;"><div style="background:white;padding:25px;border-radius:10px;max-width:500px;width:90%;"><h3 style="margin-bottom:15px;">Quick Add Product</h3><div style="display:grid;gap:12px;"><input type="text" id="qaName" placeholder="Product Name" style="padding:10px;border:1px solid #ddd;border-radius:4px;"><input type="text" id="qaSku" placeholder="SKU (optional)" style="padding:10px;border:1px solid #ddd;border-radius:4px;"><input type="number" id="qaPrice" placeholder="Price" step="0.01" min="0" style="padding:10px;border:1px solid #ddd;border-radius:4px;"><input type="number" id="qaStock" placeholder="Stock (optional)" step="0.01" min="0" style="padding:10px;border:1px solid #ddd;border-radius:4px;"></div><div style="display:flex;gap:10px;margin-top:15px;"><button onclick="quickAddProduct()" style="flex:1;background:#10b981;color:white;border:none;padding:10px;border-radius:4px;cursor:pointer;">Add to Cart</button><button onclick="closeQuickAddModal()" style="flex:1;background:#6b7280;color:white;border:none;padding:10px;border-radius:4px;cursor:pointer;">Cancel</button></div></div></div>';
+    document.body.insertAdjacentHTML('beforeend',modalHtml);
+    quickAddModal=document.getElementById('quickAddModal');
+}
+function closeQuickAddModal(){
+    if(quickAddModal) quickAddModal.remove();
+    quickAddModal=null;
+}
+async function quickAddProduct(){
+    var name=document.getElementById('qaName').value.trim();
+    var price=parseFloat(document.getElementById('qaPrice').value)||0;
+    if(!name||price<=0){alert('Please enter name and price');return;}
+    var product={id:'quick_'+Date.now(),name:name,price:price,qty:1,discount:0};
+    addToCart(product.id,product.name,product.price);
+    closeQuickAddModal();
+}
+function searchProducts(q){
+    clearTimeout(searchTimer);
+    searchTimer=setTimeout(async function(){
+        if(!q){ showDropdown([]); return; }
+        if(allProducts.length===0){ 
+            showToast('Loading products...');
+            await loadProducts(); 
+        }
+        showToast('Searching...');
+        $('productSearch').parentElement.querySelector('.loading-spinner')?.remove();
+        var spinner=document.createElement('div');spinner.className='loading-spinner';$('productSearch').parentElement.appendChild(spinner);
+        var qq=q.toLowerCase();
+        var filtered=allProducts.filter(function(p){return(p.name||'').toLowerCase().indexOf(qq)>-1||(p.sku||'').toLowerCase().indexOf(qq)>-1;});
+        spinner.remove();
+        if(filtered.length===0){ showToast('No product found for "'+q+'"',true); showDropdown([]); return; }
+        showToast('Found '+filtered.length+' product'+(filtered.length>1?'s':''));
+        showDropdown(filtered.slice(0,20).map(function(x){
+            var price=x.selling_price||x.price;
+            var stock=parseFloat(x.stock)||0;
+            var out=stock<=0;
+            return '<div style="padding:10px;cursor:pointer;border-bottom:1px solid #f1f5f9;'+(out?'color:#94a3b8;':'')+'" onclick="addToCart('+x.id+',\''+(x.name||'').replace(/'/g,"\\'")+'\','+price+')">'+(x.sku||'')+' &bull; '+(x.name||'')+' &bull; &#8358;'+formatCurrency(price || 0)+'</div>';
+        }).join(''));
+    },200);
+}
+function showDropdown(html){
+    var old=document.getElementById('searchSelect');if(old)old.remove();
+    if(!html||html.length===0){ return; }
+    var bar=$('productSearch').parentElement;
+    var r=bar.getBoundingClientRect();
+    var pw=Math.max(300,window.innerWidth-r.left-280-30);
+    var el=document.createElement('div');
+    el.id='searchSelect';
+    el.style.cssText='position:fixed;top:'+(r.bottom+4)+'px;left:'+(r.left+2)+'px;max-width:'+pw+'px;background:#fff;border:1px solid #d1d5db;padding:6px;z-index:1500;max-height:280px;overflow-y:auto;border-radius:0 0 6px 6px;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1);';
+    el.innerHTML=html||'';
+    document.body.appendChild(el);
+}
+(function(){document.addEventListener('click',function(e){if(!e.target.closest('#searchSelect')&&e.target.id!=='productSearch'){var s=document.getElementById('searchSelect');if(s)s.remove();});})();
+function showAllProducts(){
+    var count=(allProducts||[]).length;
+    if(count===0){showToast('No products loaded',true);return;}
+    showToast('Showing '+count+' product'+(count>1?'s':''));
+    showDropdown((allProducts || []).slice(0,50).map(function(x){
+        var price=x.selling_price||x.price;
+        var stock=parseFloat(x.stock)||0;
+        return '<div style="padding:10px;cursor:pointer;border-bottom:1px solid #f1f5f9;" onclick="addToCart('+x.id+',\''+(x.name||'').replace(/'/g,"\\'")+'\','+price+')">'+(x.sku||'')+' &bull; '+(x.name||'')+' &bull; &#8358;'+formatCurrency(price || 0)+'</div>';
+    }).join(''));
+}
+function renderProductGrid(list){
+    var cartSection=$('cartSection');
+    var existingGrid=document.querySelector('.product-grid-container');
+    if(existingGrid)existingGrid.remove();
+    var container=document.createElement('div');
+    container.className='product-grid-container';
+    if(!list||!list.length){
+        container.innerHTML='<div style="grid-column:1/-1;text-align:center;color:#94a3b8;padding:30px;">No products found. <a href="variations.html" onclick="navigateTo(\'variations.html\')" style="color:#0ea5e9;cursor:pointer;">Add new product</a></div>';
+    }else{
+        list.forEach(function(p){
+            var stock=parseFloat(p.stock)||0;
+            var out=stock<=0;
+            var card=document.createElement('div');
+            card.className='product-card'+(out?' out-of-stock':'');
+            var price=p.selling_price||p.price;
+            card.innerHTML='<div class="product-name">'+(p.name||'Unnamed')+'</div><div class="product-price">'+(price?formatCurrency(price):'N/A')+'</div><div class="product-stock">'+(out?'<span style="color:#ef4444;">Out of stock</span>':'Stock: '+stock)+'</div>'+(p.sku?'<div class="product-sku">SKU: '+p.sku+'</div>':'');
+            if(!out)card.onclick=function(){addToCart(p.id,p.name,price);};
+            container.appendChild(card);
+        });
+    }
+cartSection.insertBefore(container,cartSection.firstChild);
+}
+async function loadProducts(){
+    try{var res=await API.getProducts();allProducts=res||[];}
+    catch(e){console.error('Using demo products');allProducts=[{id:1,name:'Paracetamol',selling_price:500,stock:100,sku:'PTM-001'},{id:2,name:'Amoxicillin',selling_price:1500,stock:50,sku:'AMX-002'},{id:3,name:'Vitamin C',selling_price:800,stock:75,sku:'VTC-003'},{id:4,name:'Ibuprofen',selling_price:600,stock:0,sku:'IBP-004'}];}
+    return allProducts;
+}
+function addToCart(id,name,price){
+    var pp=parseFloat(price)||0;
+    var idx=cart.findIndex(function(x){return x.product_id===id;});
+    if(idx>-1){cart[idx].qty+=1;}
+    else{cart.push({product_id:id,name:name,price:pp,qty:1,discount:0});}
+    showCart();
+    var dd=document.getElementById('searchSelect');if(dd)dd.remove();
+}
+function showCart(){
+var cartSection=$('cartSection');
+var grid=document.querySelector('.product-grid-container');
+var table=cartSection.querySelector('table');
+if(grid)grid.style.display='none';
+if(table)table.style.display='table';
+renderCart();
+}
+function renderCart(){
+var tbody=$('cartTableBody');
+if(!cart.length){
+tbody.innerHTML='<tr><td colspan="7" class="empty-message">There are no items in the cart [Sales]</td></tr>';
+}else{
+var html='';
+cart.forEach(function(item,idx){
+var lineTotal=item.price*item.qty;
+var discount=item.discount||0;
+var finalTotal=lineTotal-discount;
+var pkgType=item.pkg_type || 'Unit';
+html+='<tr><td><button onclick="removeItem('+idx+')" title="Remove" style="background:none;border:none;color:#ef4444;cursor:pointer;"><i class="fas fa-times"></i></button></td><td>'+(item.name||'Product')+'</td><td>'+pkgType+'</td><td>'+formatCurrency(item.price)+'</td><td><div style="display:inline-flex;align-items:center;gap:4px;"><button onclick="changeQty('+idx+',-1)" style="width:24px;height:24px;border:1px solid #d1d5db;background:white;border-radius:4px;cursor:pointer;">-</button><span style="min-width:20px;display:inline-block;text-align:center;">'+item.qty+'</span><button onclick="changeQty('+idx+',1)" style="width:24px;height:24px;border:1px solid #d1d5db;background:white;border-radius:4px;cursor:pointer;">+</button></div></td><td><input type="number" value="'+discount+'" onchange="updateDiscount('+idx+',this.value)" style="width:60px;padding:4px;border:1px solid #e2e8f0;border-radius:4px;font-size:12px;" placeholder="0"></td><td><strong>'+formatCurrency(finalTotal)+'</strong></td></tr>';
+});
+tbody.innerHTML=html;
+}
+    var sub=cart.reduce(function(s,x){return s+x.price*x.qty;},0);
+    var disc=cart.reduce(function(s,x){return s+(parseFloat(x.discount)||0);},0);
+    if($('subTotal'))$('subTotal').textContent=formatCurrency(sub);
+    if($('totalAmount'))$('totalAmount').textContent=formatCurrency(sub-disc);
+    if($('amountDue'))$('amountDue').textContent=formatCurrency(sub-disc);
+    updateChange();
+}
+function changeQty(idx,delta){
+if(cart[idx]){
+cart[idx].qty+=delta;
+if(cart[idx].qty<=0)cart[idx].qty=1;
+renderCart();}
+}
+function removeItem(idx){cart.splice(idx,1);renderCart();}
+function showGrid(){
+    if(!allProducts || allProducts.length===0){
+        loadProducts().then(function(){
+            renderProductGrid(allProducts);
+        });
+        return;
+    }
+    var cartSection=$('cartSection');
+    var table=cartSection.querySelector('table');
+    var grid=document.querySelector('.product-grid-container');
+    if(grid){
+        grid.style.display='grid';
+        if(table)table.style.display='none';
+    }else{
+        if(table)table.style.display='none';
+        renderProductGrid(allProducts);
+    }
+    $('productSearch').focus();
+}
+function updateDiscount(idx,val){cart[idx].discount=parseFloat(val)||0;renderCart();}
+function updateChange(){
+    var tendered=parseFloat($('amountTendered').value)||0;
+    var total=parseFloat($('totalAmount').textContent.replace(/[^\d.]/g,''))||0;
+    var change=tendered-total;
+    var changeRow=$('changeRow');
+    if(tendered>0&&changeRow){changeRow.style.display='flex';$('changeAmount').textContent=formatCurrency(change>=0?change:0);}
+    else if(changeRow){changeRow.style.display='none';}
+}
+function quickTender(amount){
+$('amountTendered').value=amount;
+updateChange();
+}
+function heldCount(){var held=JSON.parse(localStorage.getItem('heldTransactions')||'[]');$('heldCount').textContent=held.length;}
+function holdTransaction(){
+    if(!cart.length){showToast('Cart is empty', true);return;}
+    var heldTransactions=JSON.parse(localStorage.getItem('heldTransactions')||'[]');
+    heldTransactions.push({cart:[].slice.call(cart),customer:selectedCustomer,notes:$('saleNotes').value,tendered:$('amountTendered').value,payment:$('paymentMethod').value});
+    localStorage.setItem('heldTransactions',JSON.stringify(heldTransactions));
+    heldCount();
+    cart=[];selectedCustomer=null;$('customerSearch').value='';$('saleNotes').value='';$('amountTendered').value='';showCart();showToast('Transaction held!');
+}
+function showHeldTransactions(){
+    var held=JSON.parse(localStorage.getItem('heldTransactions')||'[]');
+    if(!held.length){showToast('No held transactions', true);return;}
+    var modalHtml='<div id="heldModal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:2000;display:flex;align-items:center;justify-content:center;"><div style="background:white;padding:25px;border-radius:12px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;"><h3 style="margin-bottom:15px;">Held Transactions</h3><div id="heldList"></div><button onclick="closeHeldModal()" style="margin-top:20px;width:100%;background:#6b7280;color:white;border:none;padding:10px;border-radius:6px;cursor:pointer;">Close</button></div></div>';
+    document.body.insertAdjacentHTML('beforeend',modalHtml);
+    var listHtml=held.map(function(t,i){
+        var total=t.cart.reduce(function(s,x){return s+(x.price*x.qty)-(x.discount||0);},0);
+        return '<div style="padding:12px;border-bottom:1px solid #e2e8f0;cursor:pointer;" onmouseover="this.style.background=\'#f1f5f9\'" onmouseout="this.style.background=\'white\'" onclick="recallHeld('+i+')"><div style="font-weight:600;">'+(t.customer?t.customer.name:'Walk-in')+'</div><div style="color:#64748b;font-size:13px;">Total: '+formatCurrency(total)+'</div><div style="color:#94a3b8;font-size:11px;">'+new Date().toLocaleDateString()+'</div></div>';
+    }).join('');
+    $('heldList').innerHTML=listHtml||'<div style="padding:20px;text-align:center;color:#94a3b8;">No held transactions</div>';
+}
+function closeHeldModal(){var m=$('heldModal');if(m)m.remove();}
+function recallHeld(idx){
+    var held=JSON.parse(localStorage.getItem('heldTransactions')||'[]');
+    if(held[idx]){
+        cart=[].slice.call(held[idx].cart);selectedCustomer=held[idx].customer;
+        $('customerSearch').value=held[idx].customer?held[idx].customer.name:'';
+        $('saleNotes').value=held[idx].notes||'';$('amountTendered').value=held[idx].tendered||'';
+        $('paymentMethod').value=held[idx].payment||'cash';showCart();held.splice(idx,1);
+        localStorage.setItem('heldTransactions',JSON.stringify(held));heldCount();closeHeldModal();
+    }
+}
+function clearCart(){
+    if(cart.length&&confirm('Clear all items from cart?')){
+        cart=[];selectedCustomer=null;
+        $('customerSearch').value='';$('saleNotes').value='';$('amountTendered').value='';$('paymentMethod').value='cash';
+        showCart();showToast('Cart cleared');
+    }
+}
+function addQuickCustomer(){
+var name=prompt('Customer Name:');
+if(!name)return;
+selectedCustomer={id:'quick',name:name};
+$('customerSearch').value=name;
+$('customerDropdown').style.display='none';
+}
+async function searchCustomers(q){
+    if(q.length<2){$('customerDropdown').style.display='none';return;}
+    try{var customers=await API.getCustomers();var filtered=customers.filter(function(c){return(c.name||'').toLowerCase().indexOf(q.toLowerCase())>-1||(c.phone||'').indexOf(q)>-1;});}catch(e){var filtered=[{id:1,name:'John Doe',phone:'08012345678'},{id:2,name:'Jane Smith',phone:'08098765432'}];}
+    var dd=$('customerDropdown');
+    if(filtered.length){dd.innerHTML=filtered.map(function(c){return'<div onclick="selectCustomer('+JSON.stringify(c).replace(/"/g,'&quot;')+')">'+c.name+(c.phone?' - '+c.phone:'')+'</div>';}).join('');dd.style.display='block';}else{dd.innerHTML='<div>No customers found</div>';dd.style.display='block';}}
+function selectCustomer(c){selectedCustomer=c;$('customerSearch').value=c.name;$('customerDropdown').style.display='none';}
+function printReceipt(){
+    if(!cart.length){alert('Cart is empty');return;}
+    var sub=cart.reduce(function(s,x){return s+x.price*x.qty;},0);
+    var disc=cart.reduce(function(s,x){return s+(parseFloat(x.discount)||0);},0);
+    var total=sub-disc;
+    var tendered=parseFloat($('amountTendered').value)||0;
+    var change=tendered-total;
+    var custName=selectedCustomer?selectedCustomer.name:'Walk-in';
+    var w=window.open('','_blank','width=400,height=650');
+    w.document.write('<html><head><title>Receipt</title><style>body{font-family:monospace;margin:20px;font-size:12px;}h2{text-align:center;margin:0;}hr{border:none;border-top:1px dashed #000;margin:10px 0;}.total{font-weight:bold;font-size:14px;}.receipt-header{color:#666;font-size:11px;}</style></head><body>');
+    w.document.write('<h2>DANZONA PHARM</h2>');
+    w.document.write('<p class="receipt-header">Date: '+(new Date()).toLocaleDateString()+' '+ (new Date()).toLocaleTimeString()+'<br>Customer: '+custName+'</p>');
+    w.document.write('<hr>');
+    cart.forEach(function(item){w.document.write('<div>'+item.name+' x'+item.qty+(item.discount?(' (Disc: ₦'+item.discount+')':'')+'</div>');});
+    w.document.write('<hr>');
+    w.document.write('<div>Subtotal: '+formatCurrency(sub)+'</div>');
+    if(disc>0)w.document.write('<div>Discount: -'+formatCurrency(disc)+'</div>');
+    w.document.write('<div class="total">TOTAL: '+formatCurrency(total)+'</div>');
+    if(tendered>0){
+        w.document.write('<div style="margin-top:10px;">Tendered: '+formatCurrency(tendered)+'</div>');
+        w.document.write('<div>Change: '+formatCurrency(Math.max(0,change))+'</div>');
+    }
+    w.document.write('<hr><div style="text-align:center;">Thank you for your purchase!</div>');
+    w.document.write('<div style="text-align:center;font-size:10px;margin-top:20px;">Powered by DANZONA POS</div>');
+    w.document.write('</body></html>');
+    w.document.close();w.focus();w.print();
+}
+async function checkout(){
+    if(!cart.length){alert('Cart is empty');return;}
+    var total=parseFloat($('totalAmount').textContent.replace(/[^\d.]/g,''))||0;
+    var tendered=parseFloat($('amountTendered').value)||0;
+    var payment=$('paymentMethod').value;
+    if(payment==='cash'&&tendered<total){alert('Amount tendered must be >= total');return;}
+    var btnTop=$('checkoutBtnTop'), btnBottom=$('checkoutBtnBottom');
+    var checkoutText=document.createElement('span');checkoutText.innerHTML='<span class="loading-spinner"></span> Processing...';
+    if(btnTop){btnTop.disabled=true;btnTop.innerHTML='<i class="fas fa-shopping-cart"></i> '+checkoutText.textContent;}
+    if(btnBottom){btnBottom.disabled=true;btnBottom.innerHTML='<span class="loading-spinner"></span> Processing...';}
+    var data={
+        customer_id:selectedCustomer?selectedCustomer.id:null,
+        customer_name:selectedCustomer?selectedCustomer.name:'Walk-in',
+        items:cart.map(function(x){return{product_id:x.product_id,name:x.name,qty:x.qty,unit_price:x.price,discount:parseFloat(x.discount)||0,line_total:(x.price*x.qty)-parseFloat(x.discount||0)};}),
+        subtotal:cart.reduce(function(s,x){return s+x.price*x.qty;},0),
+        discount_amount:cart.reduce(function(s,x){return s+(parseFloat(x.discount)||0);},0),
+        tax:0,total:total,payment_method:payment,amount_tendered:tendered,change:Math.max(0,tendered-total),cashier:API.getUserName?API.getUserName():'Cashier',notes:$('saleNotes').value
+    };
+    try{
+        var res=await API.saveSale(data);
+        showToast('Sale completed! #'+(res.id||res));
+    }catch(e){showToast('Demo mode: Transaction recorded', true);}
+    cart=[];selectedCustomer=null;
+    $('customerSearch').value='';$('saleNotes').value='';$('amountTendered').value='';$('paymentMethod').value='cash';
+    showCart();
+    if(btnTop){btnTop.disabled=false;btnTop.innerHTML='<i class="fas fa-shopping-cart"></i> Sale';}
+    if(btnBottom){btnBottom.disabled=false;btnBottom.innerHTML='<i class="fas fa-shopping-cart"></i> Checkout';}
+}
+document.addEventListener('DOMContentLoaded',function(){
+if(!API.isLoggedIn()){var demo=getQueryParameter('demo');if(demo!=='1'){window.location.href='login.html';return;}}
+loadCurrentUser();
+loadProducts().then(function(){
+    heldCount();
+});
+renderCart();
+$('customerSearch').addEventListener('input',function(){searchCustomers(this.value);});
+document.addEventListener('click',function(e){
+    var dropdown=document.getElementById('userDropdown');
+    var userMenu=document.querySelector('.user-menu');
+    if(dropdown && dropdown.classList.contains('active') && !userMenu.contains(e.target)){dropdown.classList.remove('active');}
+    if(!e.target.closest('.customer-search'))$('customerDropdown').style.display='none';
+});
+$('amountTendered').addEventListener('input',updateChange);
+});
+function getQueryParameter(name){var params=new URLSearchParams(window.location.search);return params.get(name)||'0';}
+
+function toggleUserMenu(event){event.stopPropagation();var dropdown=document.getElementById('userDropdown');dropdown.classList.toggle('active');}
+function closeUserMenu(){var dropdown=document.getElementById('userDropdown');dropdown.classList.remove('active');}
+function logout(){if(confirm('Are you sure you want to logout?')){API.logout();window.location.href='login.html';}}
+function loadCurrentUser(){var name=API.getUserName();var role=API.getRole();var pharmName=API.getPharmacyName()||'DANZONA PHARM';var displayName=pharmName||(name||'DANZONA PHARM');if(name||pharmName){document.getElementById('currentUserName').textContent=displayName;document.getElementById('dropdownUserName').textContent=displayName;document.getElementById('dropdownUserRole').textContent=role?role.toUpperCase():'';}}
+</script>
+</body>
+</html>

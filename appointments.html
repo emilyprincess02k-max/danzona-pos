@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointments - DANZONA PHARM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
+body{background:#f2f2f2;min-height:100vh;display:flex;}
+.sidebar{width:260px;background:#064e3b;color:#e2e8f0;height:100vh;overflow-y:auto;box-shadow:2px 0 10px rgba(0,0,0,0.1);flex-shrink:0;}
+.sidebar-header{background:#043e2c;padding:20px 25px;border-bottom:1px solid #059669;}
+.sidebar h1{font-size:22px;color:#10b981;margin:0;font-weight:600;}
+.sidebar ul{list-style:none;padding:15px 0;}
+.sidebar ul li{padding:12px 25px;display:flex;align-items:center;gap:12px;cursor:pointer;border-left:3px solid transparent;transition:all 0.2s ease;font-size:14px;}
+.sidebar ul li i{width:20px;text-align:center;font-size:16px;}
+.sidebar ul li:hover{background:#059669;border-left-color:#10b981;color:#ffffff;}
+.sidebar ul li.active{background:#059669;border-left-color:#10b981;color:#ffffff;}
+.main-content{flex:1;display:flex;flex-direction:column;}
+.header{background:#10b981;color:white;padding:15px 25px;display:flex;justify-content:space-between;align-items:center;}
+.header h2{font-size:20px;}
+.content{flex:1;padding:20px;}
+.appointments-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;}
+.appointments-header h2{margin:0;}
+.add-appointment-btn{background:#4da3ff;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;font-size:16px;}
+.add-appointment-btn:hover{background:#3b82f6;}
+.appointments-table{width:100%;border-collapse:collapse;background:white;border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.1);}
+.appointments-table th,.appointments-table td{padding:15px;text-align:left;border-bottom:1px solid #eee;}
+.appointments-table th{background-color:#f8f9fa;font-weight:600;}
+.appointments-table tr:hover{background-color:#f5f5f5;}
+.appointment-status{padding:4px 8px;border-radius:4px;font-size:14px;font-weight:500;}
+.appointment-status.scheduled{background:#dbeafe;color:#1e40af;}
+.appointment-status.completed{background:#dcfce7;color:#166534;}
+.appointment-status.cancelled{background:#fee2e2;color:#991b1b;}
+.action-btns{display:flex;gap:8px;}
+.action-btn{padding:6px 12px;border:none;border-radius:4px;cursor:pointer;font-size:14px;}
+.edit-btn{background:#3b82f6;color:white;}
+.edit-btn:hover{background:#2563eb;}
+.delete-btn{background:#ef4444;color:white;}
+.delete-btn:hover{background:#dc2626;}
+.view-btn{background:#10b981;color:white;}
+.view-btn:hover{background:#059669;}
+.notification-toast{position:fixed;top:20px;right:20px;background:#48bb78;color:white;padding:1rem 1.5rem;border-radius:5px;display:none;z-index:1000;}
+.loading-spinner{text-align:center;padding:20px;color:#718096;}
+</style>
+<script src="api.js"></script>
+<script>
+function navigateTo(page){window.location.href=page;}
+</script>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h1>POS</h1>
+        </div>
+        <ul>
+            <li onclick="navigateTo('dashboard.html')"><i class="fas fa-home"></i> Dashboard</li>
+            <li onclick="navigateTo('sales.html')"><i class="fas fa-shopping-cart"></i> Sales</li>
+            <li onclick="navigateTo('variations.html')"><i class="fas fa-plus-circle"></i> Add New Product</li>
+            <li onclick="navigateTo('inventory.html')"><i class="fas fa-boxes"></i> Inventory</li>
+            <li onclick="navigateTo('customers.html')"><i class="fas fa-users"></i> Customers</li>
+            <li onclick="navigateTo('suppliers.html')"><i class="fas fa-truck"></i> Suppliers</li>
+            <li onclick="navigateTo('reports.html')"><i class="fas fa-chart-bar"></i> Reports</li>
+            <li onclick="navigateTo('receiving.html')"><i class="fas fa-file-import"></i> Receiving</li>
+            <li onclick="navigateTo('deliveries.html')"><i class="fas fa-truck-loading"></i> Deliveries</li>
+            <li onclick="navigateTo('expenses.html')"><i class="fas fa-receipt"></i> Expenses</li>
+            <li onclick="navigateTo('employees.html')"><i class="fas fa-user-tie"></i> Employees</li>
+            <li class="active" onclick="navigateTo('appointments.html')"><i class="fas fa-calendar"></i> Appointments</li>
+            <li onclick="navigateTo('giftcards.html')"><i class="fas fa-gift"></i> Gift Cards</li>
+            <li onclick="navigateTo('config.html')"><i class="fas fa-cog"></i> Store Config</li>
+            <li onclick="navigateTo('invoices.html')"><i class="fas fa-file-invoice"></i> Invoices</li>
+            <li onclick="navigateTo('locations.html')"><i class="fas fa-store"></i> Locations</li>
+            <li onclick="navigateTo('messages.html')"><i class="fas fa-envelope"></i> Messages</li>
+            <li onclick="navigateTo('payments.html')"><i class="fas fa-credit-card"></i> Payments</li>
+            <li onclick="navigateTo('login.html')"><i class="fas fa-sign-out-alt"></i> Logout</li>
+        </ul>
+        </div>
+    <div class="main-content">
+    <div class="header"><h2>Appointments</h2><span id="pharmacyNameDisplay" style="font-weight:500;">Loading...</span></div>
+    <div class="content">
+        <div class="appointments-header">
+            <h2>Appointment Management</h2>
+            <button class="add-appointment-btn" onclick="showAddAppointmentForm()">
+                <i class="fas fa-plus"></i> Schedule Appointment
+            </button>
+        </div>
+        <div id="addAppointmentForm" style="display:none;margin-bottom:20px;padding:20px;background:white;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+            <h3 id="appointmentFormTitle">Schedule New Appointment</h3>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;">
+                <div>
+                    <label>Patient Name *</label>
+                    <input type="text" id="patientName" placeholder="Enter patient name" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+                </div>
+                <div>
+                    <label>Doctor *</label>
+                    <select id="doctorSelect" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+                        <option value="">Select Doctor</option>
+                        <option value="Dr. Adebayo">Dr. Adebayo</option>
+                        <option value="Dr. Ibrahim">Dr. Ibrahim</option>
+                        <option value="Dr. Okafor">Dr. Okafor</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Appointment Date *</label>
+                    <input type="date" id="appointmentDate" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+                </div>
+                <div>
+                    <label>Appointment Time</label>
+                    <input type="time" id="appointmentTime" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+                </div>
+                <div>
+                    <label>Reason for Visit</label>
+                    <textarea id="reason" placeholder="Reason for appointment" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;height:80px;"></textarea>
+                </div>
+            </div>
+            <div style="margin-top:15px;text-align:right;">
+                <button onclick="hideAddAppointmentForm()" style="background:#6b7280;color:white;border:none;padding:8px 16px;border-radius:4px;margin-right:10px;">Cancel</button>
+                <button onclick="scheduleAppointment()" style="background:#4da3ff;color:white;border:none;padding:8px 16px;border-radius:4px;">Schedule Appointment</button>
+            </div>
+        </div>
+        <table class="appointments-table">
+            <thead>
+                <tr>
+                    <th>Appointment ID</th>
+                    <th>Patient</th>
+                    <th>Doctor</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="appointmentsTableBody"><tr><td colspan="7" class="loading-spinner">Loading...</td></tr></tbody>
+        </table>
+    </div>
+    <div class="notification-toast" id="toast">Action completed!</div>
+    </div>
+<script>
+function showToast(msg, isError){
+    var t=document.getElementById('toast');
+    t.textContent=msg;
+    t.style.background = isError ? '#f56565' : '#48bb78';
+    t.style.display='block';
+    setTimeout(function(){t.style.display='none';},3000);
+}
+var appointments = [];
+var editAppointmentId = null;
+
+function showAddAppointmentForm() {
+    editAppointmentId = null;
+    document.getElementById('addAppointmentForm').style.display = 'block';
+    document.getElementById('appointmentFormTitle').textContent = 'Schedule New Appointment';
+    document.getElementById('patientName').value = '';
+    document.getElementById('doctorSelect').value = '';
+    document.getElementById('appointmentDate').value = '';
+    document.getElementById('appointmentTime').value = '';
+    document.getElementById('reason').value = '';
+}
+function hideAddAppointmentForm() {
+    document.getElementById('addAppointmentForm').style.display = 'none';
+    editAppointmentId = null;
+}
+async function scheduleAppointment() {
+    var patientName = document.getElementById('patientName').value.trim();
+    var doctor = document.getElementById('doctorSelect').value;
+    var date = document.getElementById('appointmentDate').value;
+    var time = document.getElementById('appointmentTime').value;
+    var reason = document.getElementById('reason').value.trim();
+    if (!patientName || !doctor || !date) { showToast('Please enter patient name, select doctor, and appointment date', true); return; }
+    try {
+        if (editAppointmentId !== null) {
+            await API.put('/appointments/' + editAppointmentId, { patient: patientName, doctor: doctor, date: date, time: time, reason: reason });
+            showToast('Appointment updated!');
+        } else {
+            var newId = appointments.length > 0 ? Math.max(...appointments.map(a => a.id)) + 1 : 1;
+            var aptId = 'APT-' + String(newId).padStart(3, '0');
+            await API.saveAppointment({ id: newId, aptId: aptId, patient: patientName, doctor: doctor, date: date, time: time, reason: reason, status: 'scheduled' });
+            showToast('Appointment scheduled successfully!');
+        }
+        hideAddAppointmentForm(); renderAppointments();
+    } catch (err) {
+        showToast(err.message || 'Failed to schedule appointment', true);
+    }
+}
+async function renderAppointments() {
+    try {
+        appointments = await API.getAppointments();
+    } catch (err) {
+        appointments = [];
+        showToast('Failed to load appointments', true);
+    }
+    var tbody = document.getElementById('appointmentsTableBody');
+    tbody.innerHTML = appointments.map(function(a) {
+        return '<tr><td>' + a.aptId + '</td><td>' + a.patient + '</td><td>' + a.doctor + '</td><td>' + a.date + '</td><td>' + a.time + '</td><td><span class="appointment-status ' + a.status + '">' + (a.status === 'scheduled' ? 'Scheduled' : (a.status === 'completed' ? 'Completed' : 'Cancelled')) + '</span></td><td class="action-btns"><button class="view-btn" onclick="viewAppointment(' + a.id + ')">View</button><button class="edit-btn" onclick="editAppointment(' + a.id + ')">Edit</button><button class="delete-btn" onclick="deleteAppointment(' + a.id + ')">Delete</button></td></tr>';
+    }).join('');
+}
+function viewAppointment(id) {
+    var a = appointments.find(apt => apt.id == id);
+    if (!a) return;
+    alert('Appointment: ' + a.aptId + '\nPatient: ' + a.patient + '\nDoctor: ' + a.doctor + '\nDate: ' + a.date);
+}
+function editAppointment(id) {
+    var a = appointments.find(apt => apt.id == id);
+    if (!a) return;
+    editAppointmentId = id;
+    document.getElementById('addAppointmentForm').style.display = 'block';
+    document.getElementById('appointmentFormTitle').textContent = 'Edit Appointment';
+    document.getElementById('patientName').value = a.patient;
+    document.getElementById('doctorSelect').value = a.doctor;
+    document.getElementById('appointmentDate').value = a.date;
+    document.getElementById('appointmentTime').value = a.time;
+    document.getElementById('reason').value = a.reason;
+}
+async function deleteAppointment(id) {
+    if (!confirm('Delete this appointment?')) return;
+    try {
+        await API.delete('/appointments/' + id);
+        showToast('Appointment deleted!');
+        renderAppointments();
+    } catch (err) {
+        showToast(err.message || 'Delete failed', true);
+    }
+}
+function updatePharmacyName() {
+    var pharmName = API.getPharmacyName() || 'DANZONA PHARM';
+    var display = document.getElementById('pharmacyNameDisplay');
+    if (display) display.textContent = pharmName;
+}
+function logout() {
+    if (confirm('Are you sure you want to logout?')) {
+        API.logout();
+        window.location.href = 'login.html';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', async function() {
+    if (!API.isLoggedIn()) { 
+        var demo = getQueryParameter('demo');
+        if (demo !== '1') {
+            window.location.href = 'login.html'; 
+            return; 
+        }
+    }
+    updatePharmacyName();
+    await renderAppointments();
+});
+
+function getQueryParameter(name) {
+    var params = new URLSearchParams(window.location.search);
+    return params.get(name) || '0';
+}
+</script>
+</body>
+</html>

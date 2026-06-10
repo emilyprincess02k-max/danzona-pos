@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deliveries - DANZONA PHARM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
+body{background:#f2f2f2;min-height:100vh;display:flex;}
+.sidebar{width:260px;background:#064e3b;color:#e2e8f0;height:100vh;overflow-y:auto;box-shadow:2px 0 10px rgba(0,0,0,0.1);flex-shrink:0;}
+.sidebar-header{background:#043e2c;padding:20px 25px;border-bottom:1px solid #059669;}
+.sidebar h1{font-size:22px;color:#10b981;margin:0;font-weight:600;}
+.sidebar ul{list-style:none;padding:15px 0;}
+.sidebar ul li{padding:12px 25px;display:flex;align-items:center;gap:12px;cursor:pointer;border-left:3px solid transparent;transition:all 0.2s ease;font-size:14px;}
+.sidebar ul li i{width:20px;text-align:center;font-size:16px;}
+.sidebar ul li:hover{background:#059669;border-left-color:#10b981;color:#ffffff;}
+.sidebar ul li.active{background:#059669;border-left-color:#10b981;color:#ffffff;}
+.main-content{flex:1;display:flex;flex-direction:column;}
+.header{background:#10b981;color:white;padding:15px 25px;display:flex;justify-content:space-between;align-items:center;}
+.header h2{font-size:20px;}
+.content{flex:1;padding:20px;}
+.deliveries-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;}
+.deliveries-header h2{margin:0;}
+.add-delivery-btn{background:#4da3ff;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;font-size:16px;}
+.add-delivery-btn:hover{background:#3b82f6;}
+.deliveries-table{width:100%;border-collapse:collapse;background:white;border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.1);}
+.deliveries-table th,.deliveries-table td{padding:15px;text-align:left;border-bottom:1px solid #eee;}
+.deliveries-table th{background-color:#f8f9fa;font-weight:600;}
+.deliveries-table tr:hover{background-color:#f5f5f5;}
+.delivery-status{padding:4px 8px;border-radius:4px;font-size:14px;font-weight:500;}
+.delivery-status.pending{background:#fef3c7;color:#92400e;}
+.delivery-status.in_transit{background:#dbeafe;color:#1e40af;}
+.delivery-status.delivered{background:#dcfce7;color:#166534;}
+.delivery-status.delayed{background:#fee2e2;color:#991b1b;}
+.action-btns{display:flex;gap:8px;}
+.action-btn{padding:6px 12px;border:none;border-radius:4px;cursor:pointer;font-size:14px;}
+.edit-btn{background:#3b82f6;color:white;}
+.edit-btn:hover{background:#2563eb;}
+.delete-btn{background:#ef4444;color:white;}
+.delete-btn:hover{background:#dc2626;}
+.view-btn{background:#10b981;color:white;}
+.view-btn:hover{background:#059669;}
+.notification-toast{position:fixed;top:20px;right:20px;background:#48bb78;color:white;padding:1rem 1.5rem;border-radius:5px;display:none;z-index:1000;}
+.loading-spinner{text-align:center;padding:20px;color:#718096;}
+</style>
+<script src="api.js"></script>
+<script>
+function navigateTo(page){window.location.href=page;}
+</script>
+</head>
+<body>
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h1>POS</h1>
+    </div>
+    <ul>
+        <li onclick="navigateTo('dashboard.html')"><i class="fas fa-home"></i> Dashboard</li>
+        <li onclick="navigateTo('sales.html')"><i class="fas fa-shopping-cart"></i> Sales</li>
+        <li onclick="navigateTo('variations.html')"><i class="fas fa-plus-circle"></i> Add New Product</li>
+        <li onclick="navigateTo('inventory.html')"><i class="fas fa-boxes"></i> Inventory</li>
+        <li onclick="navigateTo('customers.html')"><i class="fas fa-users"></i> Customers</li>
+        <li onclick="navigateTo('suppliers.html')"><i class="fas fa-truck"></i> Suppliers</li>
+        <li onclick="navigateTo('reports.html')"><i class="fas fa-chart-bar"></i> Reports</li>
+        <li onclick="navigateTo('receiving.html')"><i class="fas fa-file-import"></i> Receiving</li>
+        <li class="active" onclick="navigateTo('deliveries.html')"><i class="fas fa-truck-loading"></i> Deliveries</li>
+        <li onclick="navigateTo('expenses.html')"><i class="fas fa-receipt"></i> Expenses</li>
+        <li onclick="navigateTo('employees.html')"><i class="fas fa-user-tie"></i> Employees</li>
+        <li onclick="navigateTo('appointments.html')"><i class="fas fa-calendar"></i> Appointments</li>
+        <li onclick="navigateTo('giftcards.html')"><i class="fas fa-gift"></i> Gift Cards</li>
+        <li onclick="navigateTo('config.html')"><i class="fas fa-cog"></i> Store Config</li>
+        <li onclick="navigateTo('invoices.html')"><i class="fas fa-file-invoice"></i> Invoices</li>
+        <li onclick="navigateTo('locations.html')"><i class="fas fa-store"></i> Locations</li>
+        <li onclick="navigateTo('messages.html')"><i class="fas fa-envelope"></i> Messages</li>
+        <li onclick="navigateTo('payments.html')"><i class="fas fa-credit-card"></i> Payments</li>
+        <li onclick="navigateTo('login.html')"><i class="fas fa-sign-out-alt"></i> Logout</li>
+    </ul>
+    </div>
+    <div class="main-content">
+    <div class="header"><h2>Deliveries</h2><span id="pharmacyNameDisplay" style="font-weight:500;">Loading...</span></div>
+    <div class="content">
+        <div class="deliveries-header">
+            <h2>Delivery Management</h2>
+            <button class="add-delivery-btn" onclick="showAddDeliveryForm()">
+                <i class="fas fa-plus"></i> Schedule Delivery
+            </button>
+        </div>
+        <div id="addDeliveryForm" style="display:none;margin-bottom:20px;padding:20px;background:white;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+            <h3 id="deliveryFormTitle">Schedule New Delivery</h3>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;">
+                <div>
+                    <label>Customer *</label>
+                    <select id="customerSelect" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+                        <option value="">Select Customer</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Delivery Date *</label>
+                    <input type="date" id="deliveryDate" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+                </div>
+                <div>
+                    <label>Delivery Time</label>
+                    <input type="time" id="deliveryTime" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+                </div>
+                <div>
+                    <label>Address</label>
+                    <textarea id="deliveryAddress" placeholder="Delivery address" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;height:80px;"></textarea>
+                </div>
+                <div>
+                    <label>Contact Person</label>
+                    <input type="text" id="contactPerson" placeholder="Contact person name" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+                </div>
+                <div>
+                    <label>Contact Phone</label>
+                    <input type="tel" id="contactPhone" placeholder="Contact phone number" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+                </div>
+            </div>
+            <div style="margin-top:15px;text-align:right;">
+                <button onclick="hideAddDeliveryForm()" style="background:#6b7280;color:white;border:none;padding:8px 16px;border-radius:4px;margin-right:10px;">Cancel</button>
+                <button onclick="scheduleDelivery()" style="background:#4da3ff;color:white;border:none;padding:8px 16px;border-radius:4px;">Schedule Delivery</button>
+            </div>
+        </div>
+        <table class="deliveries-table">
+            <thead>
+                <tr>
+                    <th>Delivery ID</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="deliveriesTableBody"><tr><td colspan="5" class="loading-spinner">Loading...</td></tr></tbody>
+        </table>
+    </div>
+    <div class="notification-toast" id="toast">Action completed!</div>
+</div>
+<script>
+function showToast(msg, isError){
+    var t=document.getElementById('toast');
+    t.textContent=msg;
+    t.style.background = isError ? '#f56565' : '#48bb78';
+    t.style.display='block';
+    setTimeout(function(){t.style.display='none';},3000);
+}
+var deliveries = [];
+var editDeliveryId = null;
+
+function showAddDeliveryForm() {
+    editDeliveryId = null;
+    document.getElementById('addDeliveryForm').style.display = 'block';
+    document.getElementById('deliveryFormTitle').textContent = 'Schedule New Delivery';
+    document.getElementById('customerSelect').value = '';
+    document.getElementById('deliveryDate').value = '';
+    document.getElementById('deliveryTime').value = '';
+    document.getElementById('deliveryAddress').value = '';
+    document.getElementById('contactPerson').value = '';
+    document.getElementById('contactPhone').value = '';
+    loadCustomerOptions();
+}
+function hideAddDeliveryForm() {
+    document.getElementById('addDeliveryForm').style.display = 'none';
+    editDeliveryId = null;
+}
+
+async function loadCustomerOptions() {
+    try {
+        var customers = await API.getCustomers();
+        var select = document.getElementById('customerSelect');
+        select.innerHTML = '<option value="">Select Customer</option>' + (customers || []).map(function(c){
+            return '<option value="'+c.id+'">'+(c.firstName||'')+' '+(c.lastName||'')+'</option>';
+        }).join('');
+    } catch (err) {
+        showToast('Failed to load customers', true);
+    }
+}
+
+async function scheduleDelivery() {
+    var customer = document.getElementById('customerSelect').value;
+    var date = document.getElementById('deliveryDate').value;
+    var time = document.getElementById('deliveryTime').value;
+    var address = document.getElementById('deliveryAddress').value;
+    var contact = document.getElementById('contactPerson').value;
+    var phone = document.getElementById('contactPhone').value;
+    if (!customer || !date) { showToast('Please select customer and delivery date', true); return; }
+    try {
+        if (editDeliveryId !== null) {
+            await API.put('/deliveries/' + editDeliveryId, { customer: customer, date: date, time: time, address: address, contact: contact, phone: phone });
+            showToast('Delivery updated!');
+        } else {
+            var newId = deliveries.length > 0 ? Math.max(...deliveries.map(d => d.id)) + 1 : 1;
+            var deliveryId = 'DEL-' + String(newId).padStart(3, '0');
+            await API.saveDelivery({ id: newId, deliveryId: deliveryId, customer: customer, date: date, time: time, address: address, contact: contact, phone: phone, status: 'pending' });
+            showToast('Delivery scheduled successfully!');
+        }
+        hideAddDeliveryForm(); renderDeliveries();
+    } catch (err) {
+        showToast(err.message || 'Failed to schedule delivery', true);
+    }
+}
+async function renderDeliveries() {
+    try {
+        deliveries = await API.getDeliveries();
+    } catch (err) {
+        deliveries = [];
+        showToast('Failed to load deliveries', true);
+    }
+    var tbody = document.getElementById('deliveriesTableBody');
+    tbody.innerHTML = deliveries.map(function(d) {
+        return '<tr><td>' + d.deliveryId + '</td><td>' + d.customer + '</td><td>' + d.date + '</td><td><span class="delivery-status ' + d.status + '">' + (d.status === 'pending' ? 'Pending' : (d.status === 'in_transit' ? 'In Transit' : (d.status === 'delivered' ? 'Delivered' : 'Delayed'))) + '</span></td><td class="action-btns"><button class="view-btn" onclick="viewDelivery(' + d.id + ')">View</button><button class="edit-btn" onclick="editDelivery(' + d.id + ')">Edit</button><button class="delete-btn" onclick="deleteDelivery(' + d.id + ')">Delete</button></td></tr>';
+    }).join('');
+}
+function viewDelivery(id) {
+    var d = deliveries.find(d => d.id == id);
+    if (!d) return;
+    alert('Delivery: ' + d.deliveryId + '\nCustomer: ' + d.customer + '\nDate: ' + d.date + '\nAddress: ' + d.address);
+}
+function editDelivery(id) {
+    var d = deliveries.find(delivery => delivery.id == id);
+    if (!d) return;
+    editDeliveryId = id;
+    document.getElementById('addDeliveryForm').style.display = 'block';
+    document.getElementById('deliveryFormTitle').textContent = 'Edit Delivery';
+    document.getElementById('customerSelect').value = d.customer;
+    document.getElementById('deliveryDate').value = d.date;
+    document.getElementById('deliveryTime').value = d.time;
+    document.getElementById('deliveryAddress').value = d.address;
+    document.getElementById('contactPerson').value = d.contact;
+    document.getElementById('contactPhone').value = d.phone;
+}
+async function deleteDelivery(id) {
+    if (!confirm('Delete this delivery?')) return;
+    try {
+        await API.delete('/deliveries/' + id);
+        showToast('Delivery deleted!');
+        renderDeliveries();
+    } catch (err) {
+        showToast(err.message || 'Delete failed', true);
+    }
+}
+function updatePharmacyName() {
+    var pharmName = API.getPharmacyName() || 'DANZONA PHARM';
+    var display = document.getElementById('pharmacyNameDisplay');
+    if (display) display.textContent = pharmName;
+}
+function logout() {
+    if (confirm('Are you sure you want to logout?')) {
+        API.logout();
+        window.location.href = 'login.html';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', async function() {
+    if (!API.isLoggedIn()) { 
+        var demo = getQueryParameter('demo');
+        if (demo !== '1') {
+            window.location.href = 'login.html'; 
+            return; 
+        }
+    }
+    updatePharmacyName();
+    await renderDeliveries();
+});
+
+function getQueryParameter(name) {
+    var params = new URLSearchParams(window.location.search);
+    return params.get(name) || '0';
+}
+</script>
+</body>
+</html>

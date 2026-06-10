@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Product - DANZONA PHARM</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="api.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif;}
+body{background:#f2f2f2;min-height:100vh;display:flex;}
+.sidebar{width:260px;background:#064e3b;color:#e2e8f0;height:100vh;overflow-y:auto;flex-shrink:0;box-shadow:2px 0 10px rgba(0,0,0,.1);}
+.sidebar-header{background:#043e2c;padding:20px 25px;border-bottom:1px solid #059669;}
+.sidebar h1{font-size:22px;color:#10b981;margin:0;font-weight:600;}
+.sidebar ul{list-style:none;padding:12px 0;margin:0;}
+.sidebar ul li{padding:11px 25px;display:flex;align-items:center;gap:12px;cursor:pointer;border-left:3px solid transparent;transition:all .15s;font-size:13px;font-weight:600;color:#94a3b8;}
+.sidebar ul li:hover{background:#059669;border-left-color:#10b981;color:#fff;}
+.sidebar ul li.active{background:#059669;border-left-color:#10b981;color:#fff;}
+.main-content{flex:1;display:flex;flex-direction:column;min-width:0;}
+.header{background:#10b981;color:white;padding:15px 25px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.header h2{font-size:20px;margin:0;}
+.tabs-bar{background:#fff;border-bottom:2px solid #e2e8f0;display:flex;flex-wrap:wrap;padding:0;}
+.tab-btn{padding:12px 20px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:600;color:#6b7280;border-bottom:3px solid transparent;transition:all .15s;}
+.tab-btn:hover{color:#1f2937;background:#f9fafb;}
+.tab-btn.active{color:#10b981;border-bottom-color:#10b981;}
+.form-wrap{padding:24px;flex:1;overflow-y:auto;}
+.form-card{background:white;border-radius:10px;padding:24px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.form-card h3{font-size:15px;font-weight:700;color:#1f2937;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:14px;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-group label{font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;}
+.form-group input,.form-group select,.form-group textarea{padding:10px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;transition:border-color .15s;}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:#10b981;box-shadow:0 0 0 3px rgba(16,185,129,.12);}
+.form-actions{display:flex;gap:10px;justify-content:flex-end;padding:16px 24px;background:white;border-top:1px solid #e2e8f0;position:sticky;bottom:0;}
+.btn{padding:10px 24px;border:none;border-radius:6px;font-weight:600;cursor:pointer;font-size:14px;transition:background .15s;}
+.btn-success{background:#10b981;color:white;}.btn-success:hover{background:#059669;}
+.btn-danger{background:#ef4444;color:white;}.btn-danger:hover{background:#dc2626;}
+.btn-outline{background:white;color:#374151;border:1px solid #d1d5db;}.btn-outline:hover{background:#f9fafb;}
+.small-table{width:100%;border-collapse:collapse;font-size:13px;}
+.small-table th,.small-table td{border:1px solid #e5e7eb;padding:8px;text-align:left;}
+.small-table th{background:#f9fafb;font-weight:700;color:#6b7280;font-size:11px;text-transform:uppercase;}
+.toast{position:fixed;top:20px;right:20px;background:#064e3b;color:#fff;padding:12px 20px;border-radius:8px;display:none;z-index:2000;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.15);}
+.toast.error{background:#dc2626;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1050;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:white;border-radius:12px;padding:25px;width:94%;max-width:500px;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+.modal h3{font-size:16px;font-weight:700;margin-bottom:16px;}
+.tab-content{display:none;}.tab-content.active{display:block;}
+.badge{padding:4px 10px;border-radius:12px;font-size:11px;font-weight:700;}
+.badge-success{background:#dcfce7;color:#166534;}
+.badge-danger{background:#fee2e2;color:#991b1b;}
+@media(max-width:768px){.sidebar{display:none;}.main-content{margin:0;}}
+</style>
+</head>
+<body>
+<div class="sidebar">
+<div class="sidebar-header"><h1><i class="fas fa-plus-circle"></i> POS</h1></div>
+<ul>
+<li onclick="navigateTo('dashboard.html')"><i class="fas fa-home"></i> Dashboard</li>
+<li onclick="navigateTo('sales.html')"><i class="fas fa-shopping-cart"></i> Sales</li>
+<li class="active" onclick="navigateTo('variations.html')"><i class="fas fa-plus-circle"></i> Add / Edit Product</li>
+<li onclick="navigateTo('inventory.html')"><i class="fas fa-boxes"></i> Inventory</li>
+<li onclick="navigateTo('customers.html')"><i class="fas fa-users"></i> Customers</li>
+<li onclick="navigateTo('suppliers.html')"><i class="fas fa-truck"></i> Suppliers</li>
+<li onclick="navigateTo('reports.html')"><i class="fas fa-chart-bar"></i> Reports</li>
+<li onclick="navigateTo('receiving.html')"><i class="fas fa-file-import"></i> Receiving</li>
+<li onclick="navigateTo('expenses.html')"><i class="fas fa-receipt"></i> Expenses</li>
+<li onclick="navigateTo('employees.html')"><i class="fas fa-user-tie"></i> Employees</li>
+<li onclick="navigateTo('giftcards.html')"><i class="fas fa-gift"></i> Gift Cards</li>
+<li onclick="navigateTo('invoices.html')"><i class="fas fa-file-invoice"></i> Invoices</li>
+<li onclick="navigateTo('deliveries.html')"><i class="fas fa-truck-loading"></i> Deliveries</li>
+<li onclick="navigateTo('payments.html')"><i class="fas fa-credit-card"></i> Payments</li>
+<li onclick="navigateTo('appointments.html')"><i class="fas fa-calendar"></i> Appointments</li>
+<li onclick="navigateTo('locations.html')"><i class="fas fa-store"></i> Locations</li>
+<li onclick="navigateTo('messages.html')"><i class="fas fa-envelope"></i> Messages</li>
+<li onclick="navigateTo('config.html')"><i class="fas fa-cog"></i> Store Config</li>
+<li onclick="navigateTo('login.html')"><i class="fas fa-sign-out-alt"></i> Logout</li>
+</ul>
+</div>
+<div class="main-content">
+<div class="header">
+<h2 id="formTitle"><i class="fas fa-plus-circle"></i> Add New Product</h2>
+<span style="font-weight:500;" id="pharmacyName"><i class="fas fa-clinic-medical"></i> Loading...</span>
+</div>
+<div class="tabs-bar" id="tabsBar">
+<button class="tab-btn active" onclick="switchTab('item-info',this)"><i class="fas fa-info-circle"></i> Item Info</button>
+<button class="tab-btn" onclick="switchTab('pricing',this)"><i class="fas fa-tags"></i> Pricing</button>
+<button class="tab-btn" onclick="switchTab('inventory',this)"><i class="fas fa-boxes-stacked"></i> Inventory</button>
+<button class="tab-btn" onclick="switchTab('locations',this)"><i class="fas fa-store"></i> Locations</button>
+</div>
+<div class="form-wrap">
+<form id="productForm" onsubmit="return false;">
+<div id="item-info" class="tab-content active">
+<div class="form-card">
+<h3><i class="fas fa-info-circle"></i> Product Information</h3>
+<div class="form-row"><div class="form-group"><label>Product Name *</label><input type="text" id="productName" placeholder="e.g. Paracetamol 500mg" required></div><div class="form-group"><label>SKU / Code *</label><input type="text" id="productSKU" placeholder="e.g. MED-001" required></div></div>
+<div class="form-row"><div class="form-group"><label>Category</label><select id="productCategory"><option>Tablet</option><option>Capsule</option><option>Suspension</option><option>Injectable</option><option>Cream/Ointment</option><option>Syrup</option><option>Equipment</option><option>PPE</option><option>Sanitizer</option><option>Supplements</option><option>Uncategorized</option></select></div><div class="form-group"><label>Reorder Level</label><input type="number" id="reorderLevel" value="10" min="0"></div></div>
+<div class="form-group"><label>Description</label><textarea id="productDescription" rows="2" placeholder="Product description..."></textarea></div>
+</div>
+</div>
+<div id="pricing" class="tab-content">
+<div class="form-card">
+<h3><i class="fas fa-tag"></i> Prices & Packaging</h3>
+<p class="text-muted small mb-3">Set selling price and cost price. Tiered packaging is optional.</p>
+<div class="form-row"><div class="form-group"><label>Selling Price (₦) *</label><input type="number" id="sellPrice" placeholder="0.00" step="0.01" min="0" required></div><div class="form-group"><label>Cost Price (₦)</label><input type="number" id="costPrice" placeholder="0.00" step="0.01" min="0"></div></div>
+<div class="form-row">
+<div class="form-group"><label>Packet Price</label><input type="number" id="pktPrice" step="0.01" placeholder="0.00"></div><div class="form-group"><label>Qty per Packet</label><input type="number" id="pktQty" value="1" min="1"></div>
+<div class="form-group"><label>Bottle Price</label><input type="number" id="bttPrice" step="0.01" placeholder="0.00"></div><div class="form-group"><label>Qty per Bottle</label><input type="number" id="bttQty" value="1" min="1"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Carton Price</label><input type="number" id="ctnPrice" step="0.01" placeholder="0.00"></div><div class="form-group"><label>Qty per Carton</label><input type="number" id="ctnQty" value="1" min="1"></div>
+<div class="form-group"><label>Box Price</label><input type="number" id="boxPrice" step="0.01" placeholder="0.00"></div><div class="form-group"><label>Qty per Box</label><input type="number" id="boxQty" value="1" min="1"></div>
+</div>
+</div>
+</div>
+<div id="inventory" class="tab-content">
+<div class="form-card">
+<h3><i class="fas fa-boxes-stacked"></i> Stock & Expiry</h3>
+<div class="form-row"><div class="form-group"><label>Opening Stock Qty *</label><input type="number" id="stockQty" value="0" min="0" required></div><div class="form-group"><label>Expiry Date</label><input type="date" id="expiryDate"></div></div>
+</div>
+</div>
+<div id="locations" class="tab-content">
+<div class="form-card">
+<h3><i class="fas fa-store"></i> Store Locations</h3>
+<p class="text-muted small">Select which store locations stock this product at.</p>
+<div id="locationsCheckboxes" class="form-row" style="margin-top:8px;"><div class="text-muted small">Loading locations...</div></div>
+</div>
+</div>
+</form>
+</div>
+<div class="form-actions">
+<button class="btn btn-outline" onclick="resetForm()"><i class="fas fa-rotate-left"></i> Reset</button>
+<button class="btn btn-danger" id="deleteBtn" style="display:none;" onclick="deleteProduct()"><i class="fas fa-trash"></i> Delete Product</button>
+<button class="btn btn-success" onclick="saveProduct()"><i class="fas fa-save"></i> Save Product</button>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+var editingId=null, locationsList=[];
+function $(id){return document.getElementById(id);}
+function formatCurrency(v){return '\u20A6'+(parseFloat(v)||0).toLocaleString('en-NG',{minimumFractionDigits:2});}
+function navigateTo(p){window.location.href=p;}
+function showToast(msg,isError){var t=$('toast');t.textContent=msg;t.className='toast'+(isError?' error':'');t.style.display='block';setTimeout(function(){t.style.display='none';},3500);}
+function switchTab(tab,el){
+document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+document.querySelectorAll('.tab-content').forEach(function(c){c.classList.remove('active');});
+el.classList.add('active');
+var map={'item-info':'item-info','variations':'item-info','packaging':'pricing','pricing':'pricing','inventory':'inventory','images':'item-info','related':'item-info'};
+var target=map[tab]||tab;
+var targetEl=$(''+target);if(targetEl)targetEl.classList.add('active');
+if(el)el.classList.add('active');
+}
+
+function buildPackagePrices(){
+var prices={};
+var pairs=[['pkt',$('pktPrice').value,$('pktQty').value],['btt',$('bttPrice').value,$('bttQty').value],['ctn',$('ctnPrice').value,$('ctnQty').value],['box',$('boxPrice').value,$('boxQty').value]];
+pairs.forEach(function(p){if(p[1])prices[p[0]]={price:parseFloat(p[1]),qty:parseInt(p[2])||1};});
+return JSON.stringify(prices);
+}
+
+function loadFormFromData(p){
+if(!p)return;
+$('productName').value=p.name||'';
+$('productSKU').value=p.sku||'';
+$('productCategory').value=p.category_name||'Uncategorized';
+$('productDescription').value=p.description||'';
+$('sellPrice').value=p.price||'';
+$('costPrice').value=p.cost_price||'';
+$('reorderLevel').value=p.reorder_level||10;
+$('stockQty').value=p.stock||0;
+$('expiryDate').value=p.expiry||'';
+var prices={};
+try{prices=JSON.parse(typeof p.prices==='string'?p.prices:JSON.stringify(p.prices||{}));}catch(e){prices={};}
+$('pktPrice').value=prices.pkt?prices.pkt.price||'':'';$('pktQty').value=prices.pkt?prices.pkt.qty||1:1;
+$('bttPrice').value=prices.btt?prices.btt.price||'':'';$('bttQty').value=prices.btt?prices.btt.qty||1:1;
+$('ctnPrice').value=prices.ctn?prices.ctn.price||'':'';$('ctnQty').value=prices.ctn?prices.ctn.qty||1:1;
+$('boxPrice').value=prices.box?prices.box.price||'':'';$('boxQty').value=prices.box?prices.box.qty||1:1;
+}
+
+async function loadLocations(){
+try{var res=await API.getLocations();locationsList=res||[];}
+catch(e){locationsList=[];}
+var c=$('locationsCheckboxes');c.innerHTML='';
+if(!locationsList.length){c.innerHTML='<div class="text-muted small">No locations configured. Add in Locations page.</div>';return;}
+locationsList.forEach(function(l){
+c.innerHTML+='<div class="form-group"><label><input type="checkbox" class="loc-check" value="'+l.id+'"> '+l.name+(l.address?' - '+l.address:'')+'</label></div>';
+});
+}
+
+function resetForm(){editingId=null;$('productForm').reset();$('deleteBtn').style.display='none';$('formTitle').innerHTML='<i class="fas fa-plus-circle"></i> Add New Product';$('stockQty').value=0;$('reorderLevel').value=10;}
+
+async function saveProduct(){
+var name=$('productName').value.trim(),sku=$('productSKU').value.trim(),price=$('sellPrice').value;
+if(!name||!sku){showToast('Name and SKU are required',true);return;}
+if(!price||parseFloat(price)<=0){showToast('Enter a valid selling price',true);return;}
+var data={
+name:name,sku:sku,category_name:$('productCategory').value,
+description:$('productDescription').value.trim(),
+price:parseFloat(price),cost_price:parseFloat($('costPrice').value)||0,
+stock:parseInt($('stockQty').value)||0,reorder_level:parseInt($('reorderLevel').value)||10,
+expiry:$('expiryDate').value||null,prices:buildPackagePrices()
+};
+try{
+var usedSku=sku;
+if(editingId){
+var existing=await API.getProducts();
+var dup=existing.find(function(p){return p.sku===usedSku&&p.id!==editingId;});
+}
+if(editingId){var res=await API.updateProduct(editingId,data);showToast('Product updated successfully!','success');}
+else{var res=await API.saveProduct(data);editingId=res.id;$('deleteBtn').style.display='inline-flex';showToast('Product created! ID: #'+res.id,'success');}
+$('formTitle').innerHTML=editingId?'<i class="fas fa-edit"></i> Edit Product #'+editingId:'<i class="fas fa-plus-circle"></i> Add New Product';
+}catch(e){showToast('Save failed: '+e.message,true);console.error(e);}
+}
+
+async function deleteProduct(){
+if(!editingId)return;
+if(!confirm('Delete this product permanently?'))return;
+try{await API.deleteProduct(editingId);showToast('Product deleted');resetForm();navigateTo('inventory.html');}
+catch(e){showToast('Delete failed: '+e.message,true);}
+}
+
+async function loadForEdit(){
+var params=new URLSearchParams(window.location.search);
+var editId=params.get('edit');
+if(!editId){resetForm();return;}
+try{var res=await API.getProducts();var p=res.find(function(x){return x.id==editId;});if(!p){showToast('Product not found',true);return;}editingId=p.id;loadFormFromData(p);$('deleteBtn').style.display='inline-flex';$('formTitle').innerHTML='<i class="fas fa-edit"></i> Edit: '+p.name;switchTab('item-info',document.querySelectorAll('.tab-btn')[0]);document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});document.querySelectorAll('.tab-btn')[0].classList.add('active');}
+catch(e){showToast('Failed to load product: '+e.message,true);}
+}
+
+document.addEventListener('DOMContentLoaded',async function(){
+if(!API.isLoggedIn()){window.location.href='login.html';return;}
+$('pharmacyName').innerHTML='<i class="fas fa-clinic-medical"></i> '+(API.getPharmacyName?API.getPharmacyName():'Pharmacy');
+await Promise.all([loadLocations()]);
+loadForEdit();
+});
+</script>
+</body>
+</html>

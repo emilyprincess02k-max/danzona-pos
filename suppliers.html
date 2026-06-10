@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suppliers - DANZONA PHARM</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="api.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif;}
+body{background:#f2f2f2;min-height:100vh;display:flex;}
+.sidebar{width:260px;background:#064e3b;color:#e2e8f0;height:100vh;overflow-y:auto;flex-shrink:0;box-shadow:2px 0 10px rgba(0,0,0,.1);}
+.sidebar-header{background:#043e2c;padding:20px 25px;border-bottom:1px solid #059669;}
+.sidebar h1{font-size:22px;color:#10b981;margin:0;font-weight:600;}
+.sidebar ul{list-style:none;padding:12px 0;margin:0;}
+.sidebar ul li{padding:11px 25px;display:flex;align-items:center;gap:12px;cursor:pointer;border-left:3px solid transparent;transition:all .15s;font-size:13px;font-weight:600;color:#94a3b8;}
+.sidebar ul li:hover{background:#059669;border-left-color:#10b981;color:#fff;}
+.sidebar ul li.active{background:#059669;border-left-color:#10b981;color:#fff;}
+.main-content{flex:1;display:flex;flex-direction:column;min-width:0;}
+.header{background:#10b981;color:white;padding:15px 25px;display:flex;justify-content:space-between;align-items:center;}
+.header h2{font-size:20px;margin:0;}
+.content{padding:20px;flex:1;}
+.suppliers-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:15px;}
+.suppliers-header h2{margin:0;}
+.add-supplier-btn{background:#10b981;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:8px;}
+.add-supplier-btn:hover{background:#059669;}
+.suppliers-table{width:100%;border-collapse:collapse;background:white;border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.08);font-size:14px;}
+.suppliers-table th,.suppliers-table td{padding:14px 16px;text-align:left;border-bottom:1px solid #f0f0f0;vertical-align:middle;}
+.suppliers-table th{background:#f8fafc;font-weight:700;color:#475569;white-space:nowrap;}
+.suppliers-table tr:hover{background-color:#f8fafc;}
+.badge{padding:5px 10px;border-radius:20px;font-size:12px;font-weight:600;}
+.badge-active{background:#dcfce7;color:#166534;}
+.badge-inactive{background:#fee2e2;color:#991b1b;}
+.action-btns{display:flex;gap:6px;}
+.action-btn{padding:7px 11px;border:none;border-radius:5px;cursor:pointer;font-size:13px;}
+.view-btn{background:#10b981;color:white;}.view-btn:hover{background:#059669;}
+.edit-btn{background:#3b82f6;color:white;}.edit-btn:hover{background:#2563eb;}
+.delete-btn{background:#ef4444;color:white;}.delete-btn:hover{background:#dc2626;}
+.toast{position:fixed;top:20px;right:20px;background:#064e3b;color:#fff;padding:12px 20px;border-radius:8px;display:none;z-index:2000;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.15);}
+.toast.error{background:#dc2626;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1050;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:white;border-radius:12px;padding:25px;width:94%;max-width:560px;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+.modal h3{font-size:17px;font-weight:700;margin-bottom:16px;color:#1a202c;}
+.form-group{margin-bottom:14px;}
+.form-group label{display:block;font-weight:600;margin-bottom:5px;color:#374151;font-size:13px;}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;}
+.btn-row{display:flex;gap:10px;margin-top:20px;}
+.btn-row button{flex:1;padding:10px;border:none;border-radius:6px;font-weight:600;cursor:pointer;font-size:14px;}
+.kpi-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-bottom:20px;}
+.kpi-card{background:white;border-radius:10px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.kpi-label{font-size:11px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.kpi-value{font-size:26px;font-weight:800;color:#1a202c;margin-top:4px;}
+.detail-section{margin-bottom:14px;}
+.detail-section label{font-weight:700;color:#64748b;font-size:12px;text-transform:uppercase;}
+.detail-section div{font-size:14px;color:#1a202c;padding:4px 0;}
+@media(max-width:768px){.sidebar{display:none;}.main-content{margin:0;}.suppliers-header{flex-direction:column;}}
+</style>
+</head>
+<body>
+<div class="sidebar">
+<div class="sidebar-header"><h1><i class="fas fa-truck"></i> POS</h1></div>
+<ul>
+<li onclick="navigateTo('dashboard.html')"><i class="fas fa-home"></i> Dashboard</li>
+<li onclick="navigateTo('sales.html')"><i class="fas fa-shopping-cart"></i> Sales</li>
+<li onclick="navigateTo('variations.html')"><i class="fas fa-plus-circle"></i> Add Product</li>
+<li onclick="navigateTo('inventory.html')"><i class="fas fa-boxes"></i> Inventory</li>
+<li onclick="navigateTo('customers.html')"><i class="fas fa-users"></i> Customers</li>
+<li class="active" onclick="navigateTo('suppliers.html')"><i class="fas fa-truck"></i> Suppliers</li>
+<li onclick="navigateTo('reports.html')"><i class="fas fa-chart-bar"></i> Reports</li>
+<li onclick="navigateTo('receiving.html')"><i class="fas fa-file-import"></i> Receiving</li>
+<li onclick="navigateTo('expenses.html')"><i class="fas fa-receipt"></i> Expenses</li>
+<li onclick="navigateTo('employees.html')"><i class="fas fa-user-tie"></i> Employees</li>
+<li onclick="navigateTo('appointments.html')"><i class="fas fa-calendar"></i> Appointments</li>
+<li onclick="navigateTo('giftcards.html')"><i class="fas fa-gift"></i> Gift Cards</li>
+<li onclick="navigateTo('invoices.html')"><i class="fas fa-file-invoice"></i> Invoices</li>
+<li onclick="navigateTo('deliveries.html')"><i class="fas fa-truck-loading"></i> Deliveries</li>
+<li onclick="navigateTo('payments.html')"><i class="fas fa-credit-card"></i> Payments</li>
+<li onclick="navigateTo('locations.html')"><i class="fas fa-store"></i> Locations</li>
+<li onclick="navigateTo('messages.html')"><i class="fas fa-envelope"></i> Messages</li>
+<li onclick="navigateTo('config.html')"><i class="fas fa-cog"></i> Store Config</li>
+<li onclick="navigateTo('login.html')"><i class="fas fa-sign-out-alt"></i> Logout</li>
+</ul>
+</div>
+<div class="main-content">
+<div class="header"><h2><i class="fas fa-truck"></i> Suppliers</h2><span style="font-weight:500;" id="pharmacyName"><i class="fas fa-clinic-medical"></i> Loading...</span></div>
+<div class="content">
+<div class="kpi-bar">
+<div class="kpi-card"><div class="kpi-label">Total Suppliers</div><div class="kpi-value" id="kpiTotal">0</div></div>
+<div class="kpi-card"><div class="kpi-label">Active</div><div class="kpi-value text-success" id="kpiActive">0</div></div>
+</div>
+<div class="suppliers-header">
+<h2>All Suppliers</h2>
+<div style="display:flex;gap:10px;flex-wrap:wrap;">
+<input type="text" id="searchInput" placeholder="Search suppliers..." style="padding:9px 14px;border:1px solid #ddd;border-radius:6px;font-size:14px;min-width:220px;" oninput="searchSuppliers(this.value)">
+<select id="statusFilter" class="form-select" style="width:auto;padding:9px 14px;" onchange="applyFilter()"><option value="all">All Status</option><option value="active">Active</option><option value="inactive">Inactive</option></select>
+<button class="add-supplier-btn" onclick="openAddModal()"><i class="fas fa-plus"></i> Add Supplier</button>
+<button onclick="exportSuppliersCSV()" style="background:#4a5568;color:white;border:none;padding:9px 14px;border-radius:6px;cursor:pointer;"><i class="fas fa-file-export"></i> Export CSV</button>
+<button onclick="printSuppliers()" style="background:#6b7280;color:white;border:none;padding:9px 14px;border-radius:6px;cursor:pointer;"><i class="fas fa-print"></i> Print</button>
+</div>
+</div>
+<div style="overflow-x:auto;">
+<table class="suppliers-table">
+<thead><tr><th>Name</th><th>Contact Person</th><th>Phone</th><th>Email</th><th>Address</th><th>Status</th><th>Actions</th></tr></thead>
+<tbody id="suppliersTableBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal-overlay" id="supplierModal">
+<div class="modal">
+<h3 id="modalTitle"><i class="fas fa-plus"></i> Add Supplier</h3>
+<div class="form-row" style="grid-template-columns:1fr 1fr;gap:14px;">
+<div class="form-group"><label>Supplier Name *</label><input type="text" id="sf_name" placeholder="e.g. Emzor Pharmaceuticals"></div>
+<div class="form-group"><label>Contact Person</label><input type="text" id="sf_contact" placeholder="e.g. John Doe"></div>
+<div class="form-group"><label>Phone</label><input type="tel" id="sf_phone" placeholder="+234 ..."></div>
+<div class="form-group"><label>Email</label><input type="email" id="sf_email" placeholder="email@example.com"></div>
+</div>
+<div class="form-group"><label>Address</label><textarea id="sf_address" rows="2" placeholder="Full address"></textarea></div>
+<div class="form-group"><label>Status</label><select id="sf_status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+<input type="hidden" id="sf_editId" value="">
+<div class="btn-row"><button class="btn btn-secondary" onclick="closeModal('supplierModal')">Cancel</button><button class="btn btn-primary" onclick="saveSupplier()">Save Supplier</button></div>
+</div>
+</div>
+<div class="modal-overlay" id="detailModal">
+<div class="modal" style="max-width:500px;">
+<h3><i class="fas fa-truck"></i> Supplier Details</h3>
+<div id="detailContent"></div>
+<div class="btn-row"><button class="btn btn-secondary" onclick="closeModal('detailModal')">Close</button><button class="btn btn-primary" id="detailEditBtn" onclick="">Edit</button><button class="btn btn-danger" id="detailDelBtn" onclick="">Delete</button></div>
+</div>
+</div>
+<script>
+var allSuppliers=[],viewingId=null,editingId=null;
+function $(id){return document.getElementById(id);}
+function formatCurrency(v){return '\u20A6'+(parseFloat(v)||0).toLocaleString('en-NG');}
+function navigateTo(p){window.location.href=p;}
+function showToast(msg,isError){var t=$('toast');t.textContent=msg;t.className='toast'+(isError?' error':'');t.style.display='block';setTimeout(function(){t.style.display='none';},3000);}
+function openModal(id){$(id).classList.add('open');}
+function closeModal(id){$(id).classList.remove('open');}
+
+async function loadSuppliers(){
+    try{var res=await API.getSuppliers();allSuppliers=res||[];updateKPIs();renderSuppliers(allSuppliers);$('pharmacyName').innerHTML='<i class="fas fa-clinic-medical"></i> '+(API.getPharmacyName?API.getPharmacyName():'Pharmacy');}
+    catch(e){showToast('Failed to load suppliers: '+e.message,true);allSuppliers=[];$('suppliersTableBody').innerHTML='<tr><td colspan="7" style="text-align:center;color:#999;">Failed to load suppliers</td></tr>';}
+}
+function updateKPIs(){$('kpiTotal').textContent=allSuppliers.length;$('kpiActive').textContent=allSuppliers.filter(function(s){return s.status==='active';}).length;}
+function renderSuppliers(list){
+    var tbody=$('suppliersTableBody');if(!tbody)return;
+    if(!list.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#999;">No suppliers found</td></tr>';return;}
+    var html='';
+    list.forEach(function(s){
+        html+='<tr><td><strong>'+(s.name||'N/A')+'</strong></td><td>'+(s.contact_person||'-')+'</td><td>'+(s.phone||'-')+'</td><td>'+(s.email||'-')+'</td><td>'+(s.address||'-')+'</td><td><span class="badge '+((s.status==='active'?'badge-active':'badge-inactive'))+'">'+(s.status||'unknown')+'</span></td><td class="action-btns"><button class="action-btn view-btn" onclick="viewSupplier('+s.id+')" title="View"><i class="fas fa-eye"></i></button><button class="action-btn edit-btn" onclick="editSupplier('+s.id+')" title="Edit"><i class="fas fa-edit"></i></button><button class="action-btn delete-btn" onclick="deleteSupplier('+s.id+')" title="Delete"><i class="fas fa-trash"></i></button></td></tr>';
+    });
+    tbody.innerHTML=html;
+}
+function openAddModal(){editingId=null;$('modalTitle').innerHTML='<i class="fas fa-plus"></i> Add Supplier';['sf_name','sf_contact','sf_phone','sf_email','sf_address'].forEach(function(id){$(''+id).value='';});$('sf_status').value='active';$('sf_editId').value='';openModal('supplierModal');setTimeout(function(){$('sf_name').focus();},200);}
+function editSupplier(id){var s=allSuppliers.find(function(x){return x.id===id;});if(!s)return;editingId=id;$('modalTitle').innerHTML='<i class="fas fa-edit"></i> Edit Supplier';$('sf_name').value=s.name||'';$('sf_contact').value=s.contact_person||'';$('sf_phone').value=s.phone||'';$('sf_email').value=s.email||'';$('sf_address').value=s.address||'';$('sf_status').value=s.status||'active';$('sf_editId').value=id;openModal('supplierModal');}
+function searchSuppliers(q){var qq=q.toLowerCase();var base=allSuppliers.filter(function(s){return(s.name||'').toLowerCase().indexOf(qq)>-1||(s.phone||'').toLowerCase().indexOf(qq)>-1||(s.email||'').toLowerCase().indexOf(qq)>-1;});applyFilter(base);}
+function applyFilter(base){
+if(!base)base=allSuppliers.slice();
+var st=$('statusFilter').value;
+if(st!=='all')base=base.filter(function(s){return s.status===st;});
+renderSuppliers(base);
+}
+async function saveSupplier(){
+var name=$('sf_name').value.trim();
+if(!name){showToast('Supplier name required',true);return;}
+var data={name:name,contact_person:$('sf_contact').value.trim(),phone:$('sf_phone').value.trim(),email:$('sf_email').value.trim(),address:$('sf_address').value.trim(),status:$('sf_status').value};
+try{
+if(editingId){var res=await API.updateSupplier(parseInt(editingId),data);showToast('Supplier updated');}
+else{var res=await API.saveSupplier(data);showToast('Supplier created');allSuppliers.unshift(res);}
+closeModal('supplierModal');loadSuppliers();
+}catch(e){showToast('Save failed: '+e.message,true);}
+}
+async function deleteSupplier(id){
+if(!confirm('Delete this supplier?'))return;
+try{await API.deleteSupplier(id);showToast('Supplier deleted');allSuppliers=allSuppliers.filter(function(s){return s.id!==id;});loadSuppliers();}
+catch(e){showToast('Delete failed: '+e.message,true);}
+}
+function viewSupplier(id){
+    var s=allSuppliers.find(function(x){return x.id===id;});if(!s)return;viewingId=id;
+    var html='<div class="detail-section"><label>Name</label><div><strong>'+(s.name||'N/A')+'</strong></div></div>';
+    html+='<div class="detail-section"><label>Contact Person</label><div>'+(s.contact_person||'-')+'</div></div>';
+    html+='<div class="detail-section"><label>Phone</label><div>'+(s.phone||'-')+'</div></div>';
+    html+='<div class="detail-section"><label>Email</label><div>'+(s.email||'-')+'</div></div>';
+    html+='<div class="detail-section"><label>Address</label><div>'+(s.address||'-')+'</div></div>';
+    html+='<div class="detail-section"><label>Status</label><div><span class="badge '+((s.status==='active'?'badge-active':'badge-inactive'))+'">'+(s.status||'unknown')+'</span></div></div>';
+    html+='<div class="detail-section"><label>Created</label><div>'+(s.created_at||'N/A')+'</div></div>';
+    $('detailEditBtn').onclick=function(){closeModal('detailModal');editSupplier(id);};
+    $('detailDelBtn').onclick=function(){closeModal('detailModal');deleteSupplier(id);};
+    $('detailContent').innerHTML=html;
+    openModal('detailModal');
+}
+function exportSuppliersCSV(){
+    var data=allSuppliers.filter(function(s){return(s.status==='active' || s.status==='inactive');});
+    if(data.length===0){showToast('No suppliers to export',true);return;}
+    var csv='Name,Contact Person,Phone,Email,Address,Status,Created\n';
+    data.forEach(function(s){csv+='"'+s.name+'","'+(s.contact_person||'')+'","'+(s.phone||'')+'","'+(s.email||'')+'","'+(s.address||'')+'","'+(s.status||'')+'","'+(s.created_at||'')+'"\n';});
+    var blob=new Blob([csv],{type:'text/csv'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;
+    a.download='suppliers_'+new Date().toISOString().split('T')[0]+'.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('Suppliers exported!');
+}
+function printSuppliers(){
+    var printContent='<h2 style="text-align:center;">Suppliers Report - DANZONA PHARM</h2><p style="text-align:center;color:#666;">Generated: '+new Date().toLocaleDateString()+'</p><table border="1" cellpadding="8" style="width:100%;border-collapse:collapse;margin-top:20px;"><thead><tr><th>Name</th><th>Contact</th><th>Phone</th><th>Email</th><th>Status</th></tr></thead><tbody>';
+    allSuppliers.forEach(function(s){printContent+='<tr><td>'+s.name+'</td><td>'+(s.contact_person||'')+'</td><td>'+(s.phone||'')+'</td><td>'+(s.email||'')+'</td><td>'+s.status+'</td></tr>';});
+    printContent+='</tbody></table>';
+    var win=window.open('','', 'width=900,height=650');
+    win.document.write('<html><head><title>Print Suppliers</title><style>body{font-family:Arial;} th,td{border:1px solid #ddd;padding:8px;text-align:left;} th{background:#f8f9fa;}</style></head><body>'+printContent+'</body></html>');
+    win.document.close();
+    win.focus();
+    win.print();
+}
+document.addEventListener('DOMContentLoaded',function(){if(!API.isLoggedIn()){window.location.href='login.html';return;}loadSuppliers();});
+</script>
+</body>
+</html>

@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employees - DANZONA PHARM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
+body{background:#f2f2f2;min-height:100vh;display:flex;}
+.sidebar{width:260px;background:#064e3b;color:#e2e8f0;height:100vh;overflow-y:auto;box-shadow:2px 0 10px rgba(0,0,0,0.1);flex-shrink:0;}
+.sidebar-header{background:#043e2c;padding:20px 25px;border-bottom:1px solid #059669;}
+.sidebar h1{font-size:22px;color:#10b981;margin:0;font-weight:600;}
+.sidebar ul{list-style:none;padding:15px 0;}
+.sidebar ul li{padding:12px 25px;display:flex;align-items:center;gap:12px;cursor:pointer;border-left:3px solid transparent;transition:all 0.2s ease;font-size:14px;}
+.sidebar ul li i{width:20px;text-align:center;font-size:16px;}
+.sidebar ul li:hover{background:#059669;border-left-color:#10b981;color:#ffffff;}
+.sidebar ul li.active{background:#059669;border-left-color:#10b981;color:#ffffff;}
+.main-content{flex:1;display:flex;flex-direction:column;}
+.header{background:#10b981;color:white;padding:15px 25px;display:flex;justify-content:space-between;align-items:center;}
+.content{padding:20px;flex:1;overflow-y:auto;}
+.employees-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5rem;margin-bottom:1.5rem;}
+.kpi-card{background:#fff;border-radius:10px;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,0.08);text-align:center;}
+.kpi-card h4{color:#718096;font-size:0.875rem;margin-bottom:0.5rem;font-weight:500;}
+.kpi-card .value{font-size:2rem;font-weight:700;color:#2c3e50;}
+.filter-bar{display:flex;gap:15px;margin-bottom:20px;flex-wrap:wrap;align-items:center;}
+.filter-bar input,.filter-bar select{padding:10px 15px;border:1px solid #ddd;border-radius:5px;font-size:14px;min-width:200px;}
+.filter-bar button{padding:10px 20px;background:#10b981;color:white;border:none;border-radius:5px;cursor:pointer;font-size:14px;}
+.filter-bar button:hover{background:#059669;}
+.export-btn{background:#4da3ff;}
+.export-btn:hover{background:#3d8ae7;}
+.employees-header h2{margin:0;}
+.add-employee-btn{background:#10b981;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;font-size:16px;}
+.add-employee-btn:hover{background:#059669;}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;}
+.form-group label{display:block;margin-bottom:5px;font-weight:500;color:#4a5568;}
+.form-group input,.form-group select{width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;font-size:14px;}
+.employees-table{width:100%;border-collapse:collapse;background:white;border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.1);}
+.employees-table th,.employees-table td{padding:15px;text-align:left;border-bottom:1px solid #eee;}
+.employees-table th{background-color:#f8f9fa;font-weight:600;}
+.employees-table tr:hover{background-color:#f5f5f5;}
+.employee-status{padding:4px 8px;border-radius:4px;font-size:14px;font-weight:500;}
+.employee-status.active{background:#dcfce7;color:#166534;}
+.employee-status.inactive{background:#fee2e2;color:#991b1b;}
+.action-btns{display:flex;gap:8px;}
+.action-btn{padding:6px 12px;border:none;border-radius:4px;cursor:pointer;font-size:14px;}
+.edit-btn{background:#10b981;color:white;}
+.edit-btn:hover{background:#059669;}
+.delete-btn{background:#ef4444;color:white;}
+.delete-btn:hover{background:#dc2626;}
+.view-btn{background:#10b981;color:white;}
+.view-btn:hover{background:#059669;}
+.notification-toast{position:fixed;top:20px;right:20px;background:#48bb78;color:white;padding:1rem 1.5rem;border-radius:5px;display:none;z-index:1000;}
+.user-menu{position:relative;cursor:pointer;padding:8px 12px;border-radius:5px;background:rgba(255,255,255,0.1);transition:background 0.2s;display:flex;align-items:center;gap:8px;}
+.user-menu:hover{background:rgba(255,255,255,0.2);}
+.user-dropdown{position:absolute;top:100%;right:0;margin-top:8px;background:white;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 10px 25px rgba(0,0,0,0.15);min-width:220px;z-index:1000;display:none;padding:8px;}
+.user-dropdown.active{display:block;animation:fadeIn 0.2s;}
+.user-info{padding:4px 0 8px;}
+.user-info strong{color:#2c3e50;}
+.user-info small{color:#718096;font-size:12px;}
+.user-dropdown a{display:flex;align-items:center;gap:10px;padding:10px 12px;color:#4a5568;text-decoration:none;border-radius:5px;transition:background 0.2s;font-size:14px;}
+.user-dropdown a:hover{background:#f0fdf4;color:#064e3b;}
+.user-dropdown a i{width:18px;text-align:center;color:#10b981;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-5px);}to{opacity:1;transform:translateY(0);}}
+@media(max-width:768px){.employees-header{flex-direction:column;gap:15px;}.add-employee-btn{width:100%;}}
+.loading-spinner{text-align:center;padding:20px;color:#718096;}
+</style>
+<script src="api.js"></script>
+<script>
+function navigateTo(page){window.location.href=page;}
+</script>
+</head>
+<body>
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h1>POS</h1>
+    </div>
+    <ul>
+        <li onclick="navigateTo('dashboard.html')"><i class="fas fa-home"></i> Dashboard</li>
+        <li onclick="navigateTo('sales.html')"><i class="fas fa-shopping-cart"></i> Sales</li>
+        <li onclick="navigateTo('variations.html')"><i class="fas fa-plus-circle"></i> Add New Product</li>
+        <li onclick="navigateTo('inventory.html')"><i class="fas fa-boxes"></i> Inventory</li>
+        <li onclick="navigateTo('customers.html')"><i class="fas fa-users"></i> Customers</li>
+        <li onclick="navigateTo('suppliers.html')"><i class="fas fa-truck"></i> Suppliers</li>
+        <li onclick="navigateTo('reports.html')"><i class="fas fa-chart-bar"></i> Reports</li>
+        <li onclick="navigateTo('receiving.html')"><i class="fas fa-file-import"></i> Receiving</li>
+        <li onclick="navigateTo('deliveries.html')"><i class="fas fa-truck-loading"></i> Deliveries</li>
+        <li onclick="navigateTo('expenses.html')"><i class="fas fa-receipt"></i> Expenses</li>
+        <li class="active" onclick="navigateTo('employees.html')"><i class="fas fa-user-tie"></i> Employees</li>
+        <li onclick="navigateTo('appointments.html')"><i class="fas fa-calendar"></i> Appointments</li>
+        <li onclick="navigateTo('giftcards.html')"><i class="fas fa-gift"></i> Gift Cards</li>
+        <li onclick="navigateTo('config.html')"><i class="fas fa-cog"></i> Store Config</li>
+        <li onclick="navigateTo('invoices.html')"><i class="fas fa-file-invoice"></i> Invoices</li>
+        <li onclick="navigateTo('locations.html')"><i class="fas fa-store"></i> Locations</li>
+        <li onclick="navigateTo('messages.html')"><i class="fas fa-envelope"></i> Messages</li>
+        <li onclick="navigateTo('payments.html')"><i class="fas fa-credit-card"></i> Payments</li>
+        <li onclick="navigateTo('login.html')"><i class="fas fa-sign-out-alt"></i> Logout</li>
+    </ul>
+</div>
+<div class="main-content">
+    <div class="header">
+        <h2>Employees</h2>
+        <div class="user-menu" onclick="toggleUserMenu(event)">
+            <span id="currentUserName">Loading...</span>
+            <span id="userRoleBadge" style="background:rgba(255,255,255,0.2);padding:2px 8px;border-radius:3px;font-size:11px;margin-left:5px;"></span>
+            <i class="fas fa-chevron-down" style="margin-left:8px;font-size:12px;"></i>
+            <div class="user-dropdown" id="userDropdown">
+                <div class="user-info">
+                    <strong id="dropdownUserName">Loading...</strong>
+                    <small id="dropdownUserRole">Role</small>
+                </div>
+                <hr style="margin:8px 0;">
+                <a href="#" onclick="navigateTo('config.html');closeUserMenu();"><i class="fas fa-cog"></i> Settings</a>
+                <a href="#" onclick="navigateTo('payments.html');closeUserMenu();"><i class="fas fa-credit-card"></i> Store Account Payment</a>
+                <hr style="margin:8px 0;">
+                <a href="#" onclick="logout();"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+    </div>
+    <div class="content">
+        <div class="kpi-grid">
+            <div class="kpi-card"><h4>Total Employees</h4><div class="value" id="totalEmployees">-</div></div>
+            <div class="kpi-card"><h4>Active</h4><div class="value" id="activeEmployees" style="color:#10b981;">-</div></div>
+            <div class="kpi-card"><h4>Inactive</h4><div class="value" id="inactiveEmployees" style="color:#f56565;">-</div></div>
+            <div class="kpi-card"><h4>Monthly Payroll</h4><div class="value" id="monthlyPayroll">₦0</div></div>
+        </div>
+        <div class="employees-header">
+            <h2>Employee Management</h2>
+            <div style="display:flex;gap:10px;">
+                <button class="add-employee-btn" onclick="showAddEmployeeForm()">
+                    <i class="fas fa-plus"></i> Add New Employee
+                </button>
+                <button class="add-employee-btn" onclick="printEmployeeList()" style="background:#4a5568;">
+                    <i class="fas fa-print"></i> Print
+                </button>
+            </div>
+        </div>
+        <div class="filter-bar">
+            <input type="text" id="searchInput" placeholder="Search employees..." onkeyup="filterEmployees()">
+            <select id="departmentFilter" onchange="filterEmployees()">
+                <option value="">All Departments</option>
+                <option value="management">Management</option>
+                <option value="pharmacy">Pharmacy</option>
+                <option value="sales">Sales</option>
+                <option value="admin">Administration</option>
+                <option value="security">Security</option>
+            </select>
+            <select id="statusFilter" onchange="filterEmployees()">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+            </select>
+            <button class="export-btn" onclick="exportEmployeesCSV()"><i class="fas fa-file-export"></i> Export CSV</button>
+            <button onclick="clearFilters()" style="background:#6b7280;color:white;padding:10px 15px;border:none;border-radius:5px;cursor:pointer;"><i class="fas fa-times"></i> Clear</button>
+        </div>
+        <div id="addEmployeeForm" style="display:none;margin-bottom:20px;padding:20px;background:white;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+            <h3 id="employeeFormTitle">Add New Employee</h3>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;">
+                <div><label>First Name *</label><input type="text" id="firstName" placeholder="Enter first name" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;"></div>
+                <div><label>Last Name *</label><input type="text" id="lastName" placeholder="Enter last name" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;"></div>
+                <div><label>Email Address</label><input type="email" id="emailAddress" placeholder="Email address" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;"></div>
+                <div><label>Phone Number</label><input type="tel" id="phoneNumber" placeholder="Phone number" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;"></div>
+                <div><label>Position</label><input type="text" id="position" placeholder="Job position" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;"></div>
+                <div class="form-group"><label>Department</label><select id="department" class="form-group select"><option value="">Select Department</option><option value="management">Management</option><option value="pharmacy">Pharmacy</option><option value="sales">Sales</option><option value="admin">Administration</option><option value="security">Security</option></select></div>
+                <div class="form-group"><label>Salary (₦)</label><input type="number" id="salary" placeholder="Monthly salary" class="form-group input"></div>
+                <div class="form-group"><label>Hire Date</label><input type="date" id="hireDate" class="form-group input"></div>
+                <div class="form-group"><label>Employment Type</label><select id="employmentType" class="form-group select"><option value="full-time">Full-time</option><option value="part-time">Part-time</option><option value="contract">Contract</option></select></div>
+                <div class="form-group"><label>Password</label><input type="password" id="password" placeholder="Login password" class="form-group input"></div>
+            </div>
+            <div style="margin-top:15px;text-align:right;">
+                <button onclick="hideAddEmployeeForm()" style="background:#6b7280;color:white;border:none;padding:8px 16px;border-radius:4px;margin-right:10px;">Cancel</button>
+                <button onclick="addEmployee()" style="background:#4da3ff;color:white;border:none;padding:8px 16px;border-radius:4px;" id="employeeSubmitBtn">Add Employee</button>
+            </div>
+            <button onclick="resetEmployeeForm()" style="margin-top:10px;background:#a0aec0;color:white;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;"><i class="fas fa-redo"></i> Reset Form</button>
+        </div>
+<table class="employees-table">
+<thead>
+<tr><th>Employee ID</th><th>Full Name</th><th>Position</th><th>Department</th><th>Phone</th><th>Salary</th><th>Hire Date</th><th>Status</th><th>Actions</th></tr>
+</thead>
+<tbody id="employeesTableBody"><tr><td colspan="9" class="loading-spinner">Loading...</td></tr></tbody>
+</table>
+        <div id="pagination" style="margin-top:20px;display:flex;justify-content:center;align-items:center;gap:10px;"></div>
+    </div>
+    <div class="notification-toast" id="toast">Action completed!</div>
+</div>
+<script>
+var employees = [];
+var editEmployeeId = null;
+var currentPage = 1;
+var itemsPerPage = 10;
+var filteredEmployees = [];
+
+function showToast(msg, isError){
+    var t=document.getElementById('toast');
+    t.textContent=msg;
+    t.style.background = isError ? '#f56565' : '#48bb78';
+    t.style.display='block';
+    setTimeout(function(){t.style.display='none';},3000);
+}
+
+function updateKPIStats() {
+    document.getElementById('totalEmployees').textContent = employees.length;
+    document.getElementById('activeEmployees').textContent = employees.filter(e => e.status === 'active').length;
+    document.getElementById('inactiveEmployees').textContent = employees.filter(e => e.status === 'inactive').length;
+    var payroll = employees.reduce((sum, e) => sum + (parseFloat(e.salary) || 0), 0);
+    document.getElementById('monthlyPayroll').textContent = '₦' + payroll.toLocaleString();
+}
+
+function showAddEmployeeForm() {
+    editEmployeeId = null;
+    document.getElementById('addEmployeeForm').style.display = 'block';
+    document.getElementById('employeeFormTitle').textContent = 'Add New Employee';
+    document.getElementById('firstName').value = '';
+    document.getElementById('lastName').value = '';
+    document.getElementById('emailAddress').value = '';
+    document.getElementById('phoneNumber').value = '';
+    document.getElementById('position').value = '';
+    document.getElementById('department').value = '';
+    document.getElementById('salary').value = '';
+    document.getElementById('hireDate').value = '';
+    document.getElementById('employmentType').value = 'full-time';
+    document.getElementById('password').value = '';
+    document.getElementById('employeeSubmitBtn').textContent = 'Add Employee';
+}
+function hideAddEmployeeForm() {
+    document.getElementById('addEmployeeForm').style.display = 'none';
+    editEmployeeId = null;
+}
+
+async function addEmployee() {
+    var firstName = document.getElementById('firstName').value.trim();
+    var lastName = document.getElementById('lastName').value.trim();
+    var email = document.getElementById('emailAddress').value.trim();
+    var phone = document.getElementById('phoneNumber').value.trim();
+    var position = document.getElementById('position').value.trim();
+    var department = document.getElementById('department').value;
+    var salary = parseFloat(document.getElementById('salary').value) || 0;
+    var hireDate = document.getElementById('hireDate').value;
+    var employmentType = document.getElementById('employmentType').value;
+    var password = document.getElementById('password').value;
+    if (!firstName || !lastName) { showToast('Please enter first and last name', true); return; }
+    try {
+        if (editEmployeeId !== null) {
+            var updateData = { firstName: firstName, lastName: lastName, email: email, phone: phone, position: position, department: department, salary: salary, hireDate: hireDate, employmentType: employmentType };
+            if (password) updateData.password = password;
+            await API.updateEmployee(editEmployeeId, updateData);
+            showToast('Employee updated!');
+        } else {
+            var newId = employees.length > 0 ? Math.max(...employees.map(e => parseInt(e.id)))+1 : 1;
+            var empId = 'EMP-' + String(newId).padStart(3, '0');
+            await API.saveEmployee({ id: newId, empId: empId, firstName: firstName, lastName: lastName, email: email, phone: phone, position: position, department: department, status: 'active', salary: salary, hireDate: hireDate, employmentType: employmentType, password: password || '123456' });
+            showToast('Employee added successfully!');
+        }
+        hideAddEmployeeForm();
+        loadEmployees();
+    } catch (err) {
+        showToast(err.message || 'Operation failed', true);
+    }
+}
+
+function viewEmployee(id) {
+    var emp = employees.find(e => e.id == id);
+    if (!emp) return;
+    var modal = document.createElement('div');
+    modal.innerHTML = '<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center;z-index:2000;"><div style="background:white;padding:25px;border-radius:10px;max-width:500px;width:90%;"><h3 style="margin-bottom:15px;">Employee Details</h3><div style="margin-bottom:10px;"><strong>Name:</strong> ' + emp.firstName + ' ' + emp.lastName + '</div><div style="margin-bottom:10px;"><strong>ID:</strong> ' + emp.empId + '</div><div style="margin-bottom:10px;"><strong>Email:</strong> ' + (emp.email || 'N/A') + '</div><div style="margin-bottom:10px;"><strong>Phone:</strong> ' + (emp.phone || 'N/A') + '</div><div style="margin-bottom:10px;"><strong>Position:</strong> ' + (emp.position || 'N/A') + '</div><div style="margin-bottom:10px;"><strong>Department:</strong> ' + (emp.department ? emp.department.charAt(0).toUpperCase() + emp.department.slice(1) : 'N/A') + '</div><div style="margin-bottom:10px;"><strong>Salary:</strong> ₦' + (emp.salary || 0).toLocaleString() + '</div><div style="margin-bottom:10px;"><strong>Hire Date:</strong> ' + (emp.hireDate || 'N/A') + '</div><div style="margin-bottom:10px;"><strong>Type:</strong> ' + (emp.employmentType || 'N/A') + '</div><div style="margin-bottom:10px;"><strong>Status:</strong> <span class="employee-status ' + emp.status + '">' + (emp.status === 'active' ? 'Active' : 'Inactive') + '</span></div><div style="margin-top:15px;text-align:right;"><button onclick="toggleEmployeeStatus(' + emp.id + ')" style="background:' + (emp.status === 'active' ? '#f56565' : '#10b981') + ';color:white;border:none;padding:8px 16px;border-radius:5px;margin-right:10px;cursor:pointer;"><i class="fas fa-toggle-' + (emp.status === 'active' ? 'off' : 'on') + '"></i> ' + (emp.status === 'active' ? 'Deactivate' : 'Activate') + '</button><button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:#6b7280;color:white;border:none;padding:8px 16px;border-radius:5px;cursor:pointer;">Close</button></div></div></div>';
+    document.body.appendChild(modal);
+}
+
+async function toggleEmployeeStatus(id) {
+    var emp = employees.find(e => e.id == id);
+    if (!emp) return;
+    var newStatus = emp.status === 'active' ? 'inactive' : 'active';
+    try {
+        await API.updateEmployee(id, { status: newStatus });
+        showToast('Employee status updated!');
+        document.querySelectorAll('[style*="position:fixed"]').forEach(function(m) { m.remove(); });
+        loadEmployees();
+    } catch (err) {
+        showToast(err.message || 'Update failed', true);
+    }
+}
+
+function editEmployee(id) {
+    var emp = employees.find(e => e.id == id);
+    if (!emp) return;
+    editEmployeeId = id;
+    document.getElementById('addEmployeeForm').style.display = 'block';
+    document.getElementById('employeeFormTitle').textContent = 'Edit Employee';
+    document.getElementById('firstName').value = emp.firstName || '';
+    document.getElementById('lastName').value = emp.lastName || '';
+    document.getElementById('emailAddress').value = emp.email || '';
+    document.getElementById('phoneNumber').value = emp.phone || '';
+    document.getElementById('position').value = emp.position || '';
+    document.getElementById('department').value = emp.department || '';
+    document.getElementById('salary').value = emp.salary || '';
+    document.getElementById('hireDate').value = emp.hireDate || '';
+    document.getElementById('employmentType').value = emp.employmentType || 'full-time';
+    document.getElementById('password').value = '';
+    document.getElementById('employeeSubmitBtn').textContent = 'Update Employee';
+}
+
+async function deleteEmployee(id) {
+    if (!confirm('Delete this employee?')) return;
+    try {
+        await API.deleteEmployee(id);
+        showToast('Employee deleted!');
+        loadEmployees();
+    } catch (err) {
+        showToast(err.message || 'Delete failed', true);
+    }
+}
+
+function filterEmployees() {
+    var search = document.getElementById('searchInput').value.toLowerCase();
+    var dept = document.getElementById('departmentFilter').value;
+    var status = document.getElementById('statusFilter').value;
+    filteredEmployees = employees.filter(function(e) {
+        var matchesSearch = (e.firstName || '').toLowerCase().includes(search) || (e.lastName || '').toLowerCase().includes(search) || (e.empId || '').toLowerCase().includes(search) || (e.position || '').toLowerCase().includes(search);
+        var matchesDept = !dept || e.department === dept;
+        var matchesStatus = !status || e.status === status;
+        return matchesSearch && matchesDept && matchesStatus;
+    });
+    currentPage = 1;
+    renderEmployees();
+}
+
+function renderEmployees() {
+    var tbody = document.getElementById('employeesTableBody');
+    var start = (currentPage - 1) * itemsPerPage;
+    var pageEmployees = filteredEmployees.slice(start, start + itemsPerPage);
+    if (pageEmployees.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#999;padding:30px;">No employees found</td></tr>';
+    } else {
+        tbody.innerHTML = pageEmployees.map(function(e) {
+            return '<tr><td>' + e.empId + '</td><td><span style="font-weight:600;">' + e.firstName + ' ' + e.lastName + '</span></td><td>' + e.position + '</td><td>' + (e.department ? e.department.charAt(0).toUpperCase() + e.department.slice(1) : '') + '</td><td>' + (e.phone || '') + '</td><td>₦' + (e.salary || 0).toLocaleString() + '</td><td>' + (e.hireDate || 'N/A') + '</td><td><span class="employee-status ' + e.status + '">' + (e.status === 'active' ? 'Active' : 'Inactive') + '</span></td><td class="action-btns"><button class="view-btn" onclick="viewEmployee(' + e.id + ')">View</button><button class="edit-btn" onclick="editEmployee(' + e.id + ')">Edit</button><button class="delete-btn" onclick="deleteEmployee(' + e.id + ')">Delete</button></td></tr>';
+        }).join('');
+    }
+    renderPagination();
+    updateKPIStats();
+}
+
+function renderPagination() {
+    var totalPages = Math.ceil(filteredEmployees.length / itemsPerPage);
+    var pagination = document.getElementById('pagination');
+    if (totalPages <= 1) { pagination.innerHTML = ''; return; }
+    var html = '';
+    if (currentPage > 1) { html += '<button onclick="currentPage--; renderEmployees()" style="padding:8px 12px;background:#fff;border:1px solid #ddd;border-radius:4px;cursor:pointer;">&laquo; Prev</button>'; }
+    html += '<span style="padding:8px 15px;">Page ' + currentPage + ' of ' + totalPages + '</span>';
+    if (currentPage < totalPages) { html += '<button onclick="currentPage++; renderEmployees()" style="padding:8px 12px;background:#fff;border:1px solid #ddd;border-radius:4px;cursor:pointer;">Next &raquo;</button>'; }
+    pagination.innerHTML = html;
+}
+
+function exportEmployeesCSV() {
+    var data = filteredEmployees.length > 0 ? filteredEmployees : employees;
+    if (data.length === 0) { showToast('No employees to export', true); return; }
+    var csv = 'Employee ID,Full Name,Email,Phone,Position,Department,Salary,Hire Date,Status,Employment Type\n';
+    data.forEach(function(e) {
+        csv += e.empId + ',' + e.firstName + ' ' + e.lastName + ',' + (e.email || '') + ',' + (e.phone || '') + ',' + e.position + ',' + (e.department || '') + ',' + (e.salary || 0) + ',' + (e.hireDate || '') + ',' + e.status + ',' + (e.employmentType || '') + "\n";
+    });
+    var blob = new Blob([csv], { type: 'text/csv' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'employees_' + new Date().toISOString().split('T')[0] + '.csv';
+    a.click();
+    showToast('Employees exported to CSV!');
+}
+
+function printEmployeeList() {
+    var data = filteredEmployees.length > 0 ? filteredEmployees : employees;
+    var printContent = '<h2>Employee List - DANZONA PHARM</h2><table border="1" cellpadding="8" style="width:100%;border-collapse:collapse;"><thead><tr><th>Employee ID</th><th>Name</th><th>Position</th><th>Department</th><th>Phone</th><th>Salary</th><th>Hire Date</th><th>Status</th></tr></thead><tbody>';
+    data.forEach(function(e) {
+        printContent += '<tr><td>' + e.empId + '</td><td>' + e.firstName + ' ' + e.lastName + '</td><td>' + e.position + '</td><td>' + (e.department || '') + '</td><td>' + (e.phone || '') + '</td><td>₦' + (e.salary || 0).toLocaleString() + '</td><td>' + (e.hireDate || '') + '</td><td>' + e.status + '</td></tr>';
+    });
+    printContent += '</tbody></table>';
+    var win = window.open('', '', 'width=900,height=650');
+    win.document.write('<html><head><title>Print Employee List</title><style>body{font-family:Arial;} table{border-collapse:collapse;width:100%;} th,td{border:1px solid #ddd;padding:8px;text-align:left;} th{background:#f8f9fa;}</style></head><body>' + printContent + '</body></html>');
+    win.document.close();
+    win.focus();
+    win.print();
+    win.close();
+}
+
+function clearFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('departmentFilter').value = '';
+    document.getElementById('statusFilter').value = '';
+    filterEmployees();
+}
+
+function resetEmployeeForm() {
+    document.getElementById('firstName').value = '';
+    document.getElementById('lastName').value = '';
+    document.getElementById('emailAddress').value = '';
+    document.getElementById('phoneNumber').value = '';
+    document.getElementById('position').value = '';
+    document.getElementById('department').value = '';
+    document.getElementById('salary').value = '';
+    document.getElementById('hireDate').value = '';
+    document.getElementById('employmentType').value = 'full-time';
+    document.getElementById('password').value = '';
+    editEmployeeId = null;
+    document.getElementById('employeeFormTitle').textContent = 'Add New Employee';
+}
+
+function toggleUserMenu(event) {
+    event.stopPropagation();
+    var dropdown = document.getElementById('userDropdown');
+    dropdown.classList.toggle('active');
+}
+function closeUserMenu() {
+    var dropdown = document.getElementById('userDropdown');
+    dropdown.classList.remove('active');
+}
+function loadCurrentUser() {
+    var name = API.getUserName();
+    var role = API.getRole();
+    var pharmName = API.getPharmacyName() || 'DANZONA PHARM';
+    var displayName = pharmName || (name || 'DANZONA PHARM');
+    if (name || pharmName) {
+        document.getElementById('currentUserName').textContent = displayName;
+        document.getElementById('dropdownUserName').textContent = displayName;
+        document.getElementById('userRoleBadge').textContent = role ? role.toUpperCase() : '';
+        document.getElementById('dropdownUserRole').textContent = role ? role.toUpperCase() : '';
+    }
+}
+function logout() {
+    closeUserMenu();
+    if (confirm('Are you sure you want to logout?')) {
+        API.logout();
+        window.location.href = 'login.html';
+    }
+}
+document.addEventListener('click', function(e) {
+    var dropdown = document.getElementById('userDropdown');
+    var userMenu = document.querySelector('.user-menu');
+    if (dropdown && dropdown.classList.contains('active') && !userMenu.contains(e.target)) {
+        dropdown.classList.remove('active');
+    }
+});
+
+async function loadEmployees() {
+    try {
+        var tbody = document.getElementById('employeesTableBody');
+        tbody.innerHTML = '<tr><td colspan="8" class="loading-spinner">Loading employees...</td></tr>';
+        employees = await API.getEmployees();
+        filteredEmployees = [...employees];
+        renderEmployees();
+    } catch (err) {
+        document.getElementById('employeesTableBody').innerHTML = '<tr><td colspan="8" style="text-align:center;color:#f56565;">Failed to load employees</td></tr>';
+        showToast(err.message || 'Failed to load employees', true);
+    }
+}
+
+window.addEventListener('DOMContentLoaded', async function() {
+    if (!API.isLoggedIn()) { 
+        var demo = getQueryParameter('demo');
+        if (demo !== '1') {
+            window.location.href = 'login.html'; 
+            return; 
+        }
+    }
+    loadCurrentUser();
+    await loadEmployees();
+});
+
+function getQueryParameter(name) {
+    var params = new URLSearchParams(window.location.search);
+    return params.get(name) || '0';
+}
+</script>
+</body>
+</html>
