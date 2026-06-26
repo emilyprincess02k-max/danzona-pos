@@ -3,83 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expenses - DANZONA PHARM</title>
+    <title>Expenses - SHEDS POS</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
-body{background:#f2f2f2;min-height:100vh;display:flex;}
-.sidebar{width:260px;background:#064e3b;color:#e2e8f0;height:100vh;overflow-y:auto;box-shadow:2px 0 10px rgba(0,0,0,0.1);flex-shrink:0;}
-.sidebar-header{background:#043e2c;padding:20px 25px;border-bottom:1px solid #059669;}
-.sidebar h1{font-size:22px;color:#10b981;margin:0;font-weight:600;}
-.sidebar ul{list-style:none;padding:15px 0;}
-.sidebar ul li{padding:12px 25px;display:flex;align-items:center;gap:12px;cursor:pointer;border-left:3px solid transparent;transition:all 0.2s ease;font-size:14px;}
-.sidebar ul li i{width:20px;text-align:center;font-size:16px;}
-.sidebar ul li:hover{background:#059669;border-left-color:#10b981;color:#ffffff;}
-.sidebar ul li.active{background:#059669;border-left-color:#10b981;color:#ffffff;}
-.main-content{flex:1;display:flex;flex-direction:column;}
-.header{background:#10b981;color:white;padding:15px 25px;display:flex;justify-content:space-between;align-items:center;}
-.header h2{font-size:20px;}
-.content{flex:1;padding:20px;}
-.notification-toast{position:fixed;top:20px;right:20px;background:#48bb78;color:white;padding:1rem 1.5rem;border-radius:5px;display:none;z-index:1000;}
-.expenses-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;}
-.add-expense-btn{background:#10b981;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;font-size:16px;}
-.add-expense-btn:hover{background:#059669;}
-.expenses-table{width:100%;border-collapse:collapse;background:white;border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.1);}
-.expenses-table th,.expenses-table td{padding:15px;text-align:left;border-bottom:1px solid #eee;}
-.expenses-table th{background-color:#f8f9fa;font-weight:600;}
-.expenses-table tr:hover{background-color:#f5f5f5;}
-.loading-spinner{text-align:center;padding:20px;color:#718096;}
-</style>
-<script src="api.js"></script>
-<script>
-function navigateTo(page){window.location.href=page;}
-</script>
+    <link rel="stylesheet" href="common.css">
+    <script src="api.js"></script>
+    <script src="common.js"></script>
 </head>
 <body>
-<div class="sidebar">
-    <div class="sidebar-header">
-        <h1>POS</h1>
+<div class="sidebar" id="sidebar"></div>
+<div class="main-content">
+    <div class="header">
+        <h2><i class="fas fa-receipt"></i> Expenses</h2>
+        <div id="userMenu"></div>
+        <div class="header-clock" id="topClock"></div>
     </div>
-    <ul>
-        <li onclick="navigateTo('dashboard.html')"><i class="fas fa-home"></i> Dashboard</li>
-        <li onclick="navigateTo('sales.html')"><i class="fas fa-shopping-cart"></i> Sales</li>
-        <li onclick="navigateTo('variations.html')"><i class="fas fa-plus-circle"></i> Add New Product</li>
-        <li onclick="navigateTo('inventory.html')"><i class="fas fa-boxes"></i> Inventory</li>
-        <li onclick="navigateTo('customers.html')"><i class="fas fa-users"></i> Customers</li>
-        <li onclick="navigateTo('suppliers.html')"><i class="fas fa-truck"></i> Suppliers</li>
-        <li onclick="navigateTo('reports.html')"><i class="fas fa-chart-bar"></i> Reports</li>
-        <li onclick="navigateTo('receiving.html')"><i class="fas fa-file-import"></i> Receiving</li>
-        <li onclick="navigateTo('deliveries.html')"><i class="fas fa-truck-loading"></i> Deliveries</li>
-        <li class="active" onclick="navigateTo('expenses.html')"><i class="fas fa-receipt"></i> Expenses</li>
-        <li onclick="navigateTo('employees.html')"><i class="fas fa-user-tie"></i> Employees</li>
-        <li onclick="navigateTo('appointments.html')"><i class="fas fa-calendar"></i> Appointments</li>
-        <li onclick="navigateTo('giftcards.html')"><i class="fas fa-gift"></i> Gift Cards</li>
-        <li onclick="navigateTo('config.html')"><i class="fas fa-cog"></i> Store Config</li>
-        <li onclick="navigateTo('invoices.html')"><i class="fas fa-file-invoice"></i> Invoices</li>
-        <li onclick="navigateTo('locations.html')"><i class="fas fa-store"></i> Locations</li>
-        <li onclick="navigateTo('messages.html')"><i class="fas fa-envelope"></i> Messages</li>
-        <li onclick="navigateTo('payments.html')"><i class="fas fa-credit-card"></i> Payments</li>
-        <li onclick="navigateTo('login.html')"><i class="fas fa-sign-out-alt"></i> Logout</li>
-    </ul>
-    </div>
-    <div class="main-content">
-    <div class="header"><h2>Expenses</h2><span id="pharmacyNameDisplay" style="font-weight:500;">Loading...</span></div>
     <div class="content">
-    <div class="expenses-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;">
-        <h2>Expense Management</h2>
-        <button class="add-expense-btn" onclick="showAddExpenseForm()"><i class="fas fa-plus"></i> Add Expense</button>
-    </div>
-    <div id="addExpenseForm" style="display:none;margin-bottom:20px;padding:20px;background:white;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.1);">
-        <h3 id="expenseFormTitle">Add New Expense</h3>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;">
-            <div>
-                <label>Date *</label>
-                <input type="date" id="expenseDate" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label"><i class="fas fa-receipt"></i> Total Expenses</div>
+                <div class="kpi-value" id="totalExpenses">?0.00</div>
+                <div class="kpi-sub">All recorded expenses</div>
             </div>
+            <div class="kpi-card">
+                <div class="kpi-label"><i class="fas fa-calendar"></i> This Month</div>
+                <div class="kpi-value" id="monthlyExpenses">?0.00</div>
+                <div class="kpi-sub">Current period</div>
+            </div>
+        </div>
+        <div class="page-head">
             <div>
-                <label>Category *</label>
-                <select id="expenseCategory" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
-                    <option value="">Select Category</option>
+                <h3>Expense Management</h3>
+                <p>Track and manage business expenses.</p>
+            </div>
+            <button class="btn btn-primary" onclick="showAddExpenseForm()"><i class="fas fa-plus"></i> Add Expense</button>
+        </div>
+        <div class="panel">
+            <div class="toolbar">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search description..." oninput="renderExpenses()">
+                <select id="categoryFilter" class="form-select" onchange="renderExpenses()">
+                    <option value="all">All Categories</option>
                     <option value="utilities">Utilities</option>
                     <option value="rent">Rent</option>
                     <option value="supplies">Supplies</option>
@@ -87,152 +49,220 @@ function navigateTo(page){window.location.href=page;}
                     <option value="maintenance">Maintenance</option>
                     <option value="other">Other</option>
                 </select>
-            </div>
-            <div>
-                <label>Description *</label>
-                <input type="text" id="expenseDescription" placeholder="Enter description" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
-            </div>
-            <div>
-                <label>Amount (₦) *</label>
-                <input type="number" id="expenseAmount" min="0" step="0.01" placeholder="Enter amount" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
-            </div>
-            <div>
-                <label>Payment Method</label>
-                <select id="expensePaymentMethod" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
-                    <option value="cash">Cash</option>
-                    <option value="card">Card</option>
-                    <option value="transfer">Transfer</option>
-                </select>
+                <button class="btn btn-info" onclick="exportExpensesCSV()"><i class="fas fa-file-export"></i> Export CSV</button>
+                <button class="btn btn-secondary" onclick="printExpenses()"><i class="fas fa-print"></i> Print</button>
             </div>
         </div>
-        <div style="margin-top:15px;text-align:right;">
-            <button onclick="hideAddExpenseForm()" style="background:#6b7280;color:white;border:none;padding:8px 16px;border-radius:4px;margin-right:10px;">Cancel</button>
-            <button onclick="addExpense()" style="background:#4da3ff;color:white;border:none;padding:8px 16px;border-radius:4px;">Add Expense</button>
+        <div id="addExpenseForm" class="modal-overlay">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 id="expenseFormTitle">Add New Expense</h3>
+                    <button class="modal-close" onclick="POS.closeModal('addExpenseForm')">&times;</button>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="required">Date</label>
+                        <input type="date" id="expenseDate" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="required">Category</label>
+                        <select id="expenseCategory" class="form-select">
+                            <option value="">Select Category</option>
+                            <option value="utilities">Utilities</option>
+                            <option value="rent">Rent</option>
+                            <option value="supplies">Supplies</option>
+                            <option value="payroll">Payroll</option>
+                            <option value="maintenance">Maintenance</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group full">
+                        <label class="required">Description</label>
+                        <input type="text" id="expenseDescription" class="form-control" placeholder="Enter description">
+                    </div>
+                    <div class="form-group">
+                        <label class="required">Amount (?)</label>
+                        <input type="number" id="expenseAmount" class="form-control" min="0" step="0.01" placeholder="Enter amount">
+                    </div>
+                    <div class="form-group">
+                        <label>Payment Method</label>
+                        <select id="expensePaymentMethod" class="form-select">
+                            <option value="cash">Cash</option>
+                            <option value="card">Card</option>
+                            <option value="transfer">Transfer</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="POS.closeModal('addExpenseForm')">Cancel</button>
+                    <button class="btn btn-success" onclick="addExpense()">Save Expense</button>
+                </div>
+            </div>
+        </div>
+        <div class="table-panel">
+            <div class="table-top">
+                <strong><i class="fas fa-list"></i> Expense Records</strong>
+                <span id="expenseCount">0 expenses</span>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Payment Method</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expensesTableBody">
+                        <tr><td colspan="6" class="empty-state">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-    <table class="expenses-table" style="width:100%;border-collapse:collapse;background:white;border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.1);">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Category</th>
-                <th>Description</th>
-                <th>Amount</th>
-                <th>Payment Method</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody id="expensesTableBody"><tr><td colspan="6" class="loading-spinner">Loading...</td></tr></tbody>
-    </table>
-    <div class="expenses-summary" style="margin-top:20px;background:white;padding:20px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.1);">
-        <h3>Monthly Summary</h3>
-        <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:18px;"><span>Total This Month:</span><span id="monthlyTotal" style="font-weight:bold;color:#064e3b;">₦0.00</span></div>
-    </div>
-    </div>
-    <div class="notification-toast" id="toast">Action completed!</div>
 </div>
+<div class="toast" id="toast"></div>
 <script>
-function showToast(msg, isError){
-    var t=document.getElementById('toast');
-    t.textContent=msg;
-    t.style.background = isError ? '#f56565' : '#48bb78';
-    t.style.display='block';
-    setTimeout(function(){t.style.display='none';},3000);
-}
 var expenses = [];
+var filteredExpenses = [];
 var editExpenseId = null;
-
+var catLabels = { utilities: 'Utilities', rent: 'Rent', supplies: 'Supplies', payroll: 'Payroll', maintenance: 'Maintenance', other: 'Other' };
 function showAddExpenseForm() {
     editExpenseId = null;
-    document.getElementById('addExpenseForm').style.display = 'block';
-    document.getElementById('expenseFormTitle').textContent = 'Add New Expense';
-    document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
-    document.getElementById('expenseCategory').value = '';
-    document.getElementById('expenseDescription').value = '';
-    document.getElementById('expenseAmount').value = '';
-    document.getElementById('expensePaymentMethod').value = 'cash';
+    $('addExpenseForm').classList.add('open');
+    $('expenseFormTitle').textContent = 'Add New Expense';
+    $('expenseDate').value = new Date().toISOString().split('T')[0];
+    $('expenseCategory').value = '';
+    $('expenseDescription').value = '';
+    $('expenseAmount').value = '';
+    $('expensePaymentMethod').value = 'cash';
 }
-function hideAddExpenseForm() { document.getElementById('addExpenseForm').style.display = 'none'; editExpenseId = null; }
+function $(id) { return document.getElementById(id); }
 async function addExpense() {
-    var date = document.getElementById('expenseDate').value;
-    var category = document.getElementById('expenseCategory').value;
-    var desc = document.getElementById('expenseDescription').value.trim();
-    var amount = parseFloat(document.getElementById('expenseAmount').value) || 0;
-    var method = document.getElementById('expensePaymentMethod').value;
-    if (!date || !category || !desc || amount <= 0) { showToast('Please fill all required fields', true); return; }
+    var date = $id('expenseDate').value;
+    var category = $id('expenseCategory').value;
+    var desc = $id('expenseDescription').value.trim();
+    var amount = parseFloat($id('expenseAmount').value) || 0;
+    var method = $id('expensePaymentMethod').value;
+    if (!date || !category || !desc || amount <= 0) {
+        POS.showToast('Please fill all required fields', true);
+        return;
+    }
     try {
         if (editExpenseId !== null) {
-            await API.put('/expenses/' + editExpenseId, { date: date, category: category, description: desc, amount: amount, method: method });
-            showToast('Expense updated!');
+            await API.updateExpense(editExpenseId, { date: date, category: category, description: desc, amount: amount, method: method });
+            POS.showToast('Expense updated!');
         } else {
-            var newId = expenses.length > 0 ? Math.max(...expenses.map(e => e.id)) + 1 : 1;
+            var newId = expenses.length > 0 ? Math.max.apply(null, expenses.map(function(e) { return e.id; })) + 1 : 1;
             await API.saveExpense({ id: newId, date: date, category: category, description: desc, amount: amount, method: method });
-            showToast('Expense added successfully!');
+            POS.showToast('Expense added successfully!');
         }
-        renderExpenses(); hideAddExpenseForm();
+        POS.closeModal('addExpenseForm');
+        renderExpenses();
     } catch (err) {
-        showToast(err.message || 'Failed to save expense', true);
+        POS.showToast(err.message || 'Failed to save expense', true);
     }
 }
 async function renderExpenses() {
     try {
-        expenses = await API.getExpenses();
+        expenses = await API.getExpenses() || [];
     } catch (err) {
         expenses = [];
-        showToast('Failed to load expenses', true);
+        POS.showToast('Failed to load expenses', true);
     }
-    var tbody = document.getElementById('expensesTableBody');
-    if (!tbody) return;
-    tbody.innerHTML = expenses.slice().reverse().map(function(e) {
-        var catLabels = { utilities: 'Utilities', rent: 'Rent', supplies: 'Supplies', payroll: 'Payroll', maintenance: 'Maintenance', other: 'Other' };
-        return '<tr><td>' + e.date + '</td><td>' + (catLabels[e.category]||e.category) + '</td><td>' + e.description + '</td><td>₦' + (e.amount||0).toFixed(2) + '</td><td>' + (e.method||'').charAt(0).toUpperCase() + (e.method||'').slice(1) + '</td><td><button class="edit-btn" onclick="editExpense(' + e.id + ')">Edit</button><button class="delete-btn" onclick="deleteExpense(' + e.id + ')" style="margin-left:8px;">Delete</button></td></tr>';
+    var q = $id('searchInput').value.toLowerCase();
+    var cat = $id('categoryFilter').value;
+    filteredExpenses = expenses.filter(function(e) {
+        var matchesSearch = (e.description || '').toLowerCase().includes(q);
+        var matchesCat = cat === 'all' || e.category === cat;
+        return matchesSearch && matchesCat;
+    });
+    var tbody = $id('expensesTableBody');
+    $id('expenseCount').textContent = filteredExpenses.length + ' expenses';
+    var total = expenses.reduce(function(sum, e) { return sum + (parseFloat(e.amount) || 0); }, 0);
+    $id('totalExpenses').textContent = POS.formatCurrency(total);
+    if (!filteredExpenses.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No expenses found</td></tr>';
+        return;
+    }
+    tbody.innerHTML = filteredExpenses.map(function(e) {
+        return '<tr>' +
+            '<td>' + POS.formatDate(e.date) + '</td>' +
+            '<td>' + POS.esc(catLabels[e.category] || e.category) + '</td>' +
+            '<td>' + POS.esc(e.description) + '</td>' +
+            '<td>' + POS.formatCurrency(e.amount || 0) + '</td>' +
+            '<td>' + POS.esc((e.method || '').charAt(0).toUpperCase() + (e.method || '').slice(1)) + '</td>' +
+            '<td class="action-btns">' +
+            '<button class="icon-btn edit" onclick="editExpense(' + e.id + ')"><i class="fas fa-edit"></i></button>' +
+            '<button class="icon-btn delete" onclick="deleteExpense(' + e.id + ')"><i class="fas fa-trash"></i></button>' +
+            '</td></tr>';
     }).join('');
-    var total = expenses.reduce((sum, e) => sum + (e.amount||0), 0);
-    document.getElementById('monthlyTotal').textContent = '₦' + total.toFixed(2);
 }
 function editExpense(id) {
-    var exp = expenses.find(e => e.id == id);
+    var exp = expenses.find(function(e) { return e.id == id; });
     if (!exp) return;
     editExpenseId = id;
-    document.getElementById('addExpenseForm').style.display = 'block';
-    document.getElementById('expenseFormTitle').textContent = 'Edit Expense';
-    document.getElementById('expenseDate').value = exp.date;
-    document.getElementById('expenseCategory').value = exp.category;
-    document.getElementById('expenseDescription').value = exp.description;
-    document.getElementById('expenseAmount').value = exp.amount;
-    document.getElementById('expensePaymentMethod').value = exp.method;
+    $id('expenseFormTitle').textContent = 'Edit Expense';
+    $id('expenseDate').value = exp.date;
+    $id('expenseCategory').value = exp.category;
+    $id('expenseDescription').value = exp.description;
+    $id('expenseAmount').value = exp.amount;
+    $id('expensePaymentMethod').value = exp.method;
+    $id('addExpenseForm').classList.add('open');
 }
 async function deleteExpense(id) {
     if (!confirm('Delete this expense?')) return;
     try {
-        await API.delete('/expenses/' + id);
-        showToast('Expense deleted!');
+        await API.deleteExpense(id);
+        POS.showToast('Expense deleted!');
         renderExpenses();
     } catch (err) {
-        showToast(err.message || 'Delete failed', true);
+        POS.showToast(err.message || 'Delete failed', true);
     }
 }
-function updatePharmacyName() {
-    var pharmName = API.getPharmacyName() || 'DANZONA PHARM';
-    var display = document.getElementById('pharmacyNameDisplay');
-    if (display) display.textContent = pharmName;
-}
-
-document.addEventListener('DOMContentLoaded', async function() {
-    if (!API.isLoggedIn()) { 
-        var demo = getQueryParameter('demo');
-        if (demo !== '1') {
-            window.location.href = 'login.html'; 
-            return; 
-        }
+function exportExpensesCSV() {
+    var data = filteredExpenses.length > 0 ? filteredExpenses : expenses;
+    if (!data.length) {
+        POS.showToast('No expenses to export', true);
+        return;
     }
-    updatePharmacyName();
-    await renderExpenses();
+    POS.exportCSV('expenses_' + POS.today() + '.csv',
+        ['Date', 'Category', 'Description', 'Amount', 'Payment Method'],
+        data.map(function(e) {
+            return {
+                Date: e.date || '',
+                Category: catLabels[e.category] || e.category,
+                Description: e.description || '',
+                Amount: e.amount || 0,
+                'Payment Method': e.method || ''
+            };
+        })
+    );
+}
+function printExpenses() {
+    var data = filteredExpenses.length > 0 ? filteredExpenses : expenses;
+    POS.printTable('SHEDS POS Expenses Report',
+        ['Date', 'Category', 'Description', 'Amount', 'Payment Method'],
+        data.map(function(e) {
+            return {
+                Date: POS.formatDate(e.date),
+                Category: catLabels[e.category] || e.category,
+                Description: e.description || '',
+                Amount: POS.formatCurrency(e.amount || 0),
+                'Payment Method': e.method || ''
+            };
+        })
+    );
+}
+document.addEventListener('DOMContentLoaded', function() {
+    if (!POS.requireAuth()) return;
+    POS.renderSidebar();
+    POS.renderUserMenu();
+    renderExpenses();
 });
-
-function getQueryParameter(name) {
-    var params = new URLSearchParams(window.location.search);
-    return params.get(name) || '0';
-}
 </script>
 </body>
 </html>

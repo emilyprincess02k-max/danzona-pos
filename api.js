@@ -3,7 +3,7 @@
  * Usage: API.init(apiKey, username); then API.get('/products'), API.post('/sales', data), etc.
  */
 var API = (function() {
-    var BASE_URL = 'http://localhost:5000/api';
+    var BASE_URL = '';
     var apiKey = localStorage.getItem('danzona_api_key') || '';
     var username = localStorage.getItem('danzona_username') || '';
     var pharmacyName = localStorage.getItem('danzona_pharmacy_name') || '';

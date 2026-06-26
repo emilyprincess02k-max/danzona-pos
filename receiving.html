@@ -1,535 +1,366 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Receiving - DANZONA PHARM</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
-body{background:#f1f5f9;min-height:100vh;display:flex;}
-.sidebar{width:260px;background:#064e3b;color:#e2e8f0;height:100vh;overflow-y:auto;box-shadow:2px 0 10px rgba(0,0,0,0.1);flex-shrink:0;}
-.sidebar-header{background:#043e2c;padding:20px 25px;border-bottom:1px solid #059669;}
-.sidebar h1{font-size:22px;color:#10b981;margin:0;font-weight:600;}
-.sidebar ul{list-style:none;padding:15px 0;}
-.sidebar ul li{padding:12px 25px;display:flex;align-items:center;gap:12px;cursor:pointer;border-left:3px solid transparent;transition:all 0.2s ease;font-size:14px;}
-.sidebar ul li i{width:20px;text-align:center;font-size:16px;}
-.sidebar ul li:hover{background:#059669;border-left-color:#10b981;color:#ffffff;}
-.sidebar ul li.active{background:#059669;border-left-color:#10b981;color:#ffffff;}
-.main-content{flex:1;display:flex;flex-direction:column;}
-.header{background:#064e3b;color:white;padding:15px 25px;display:flex;justify-content:space-between;align-items:center;}
-.header h2{font-size:20px;}
-.content{flex:1;padding:20px;display:flex;flex-direction:column;gap:20px;}
-.top-bar{background:#fff;padding:18px 22px;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.08);display:flex;gap:15px;align-items:center;flex-wrap:wrap;}
-.top-bar label{font-weight:600;font-size:14px;color:#065f46;}
-.top-bar select,.top-bar input{padding:8px 10px;border:1px solid #d1d5db;border-radius:5px;font-size:14px;max-width:280px;}
-.supplier-details{background:#f8fafc;border:1px solid #e2e8f0;padding:12px 16px;border-radius:6px;font-size:13px;color:#334155;min-height:42px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
-.supplier-details .tag{background:#ecfdf5;color:#065f46;padding:4px 8px;border-radius:4px;font-size:12px;font-weight:500;}
-.area{background:#fff;padding:22px;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.08);}
-.area-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
-.area-header h3{margin:0;font-size:18px;color:#064e3b;}
-.search-row{display:flex;gap:8px;margin-bottom:16px;position:relative;}
-.search-row input{flex:1;padding:10px 12px;border:1px solid #d1d5db;border-radius:5px 0 0 5px;font-size:14px;}
-.search-row .btn{padding:10px 16px;border:none;color:white;cursor:pointer;font-size:13px;border-radius:0 5px 5px 0;display:inline-flex;align-items:center;gap:6px;font-weight:500;}
-.btn-receive{background:#10b981;}
-.btn-suspend{background:#3b82f6;}
-.btn-clear{background:#ef4444;}
-.btn-all{background:#6b7280;border-radius:0 5px 5px 0;}
-.btn-resume{background:#8b5cf6;margin-right:6px;border-radius:5px;padding:8px 14px;border:none;color:white;cursor:pointer;font-size:13px;display:inline-flex;align-items:center;gap:6px;}
-.btn-save{background:#064e3b;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;font-size:13px;display:inline-flex;align-items:center;gap:6px;font-weight:500;}
-.btn-save:hover{background:#043e2c;}
-table{width:100%;border-collapse:collapse;font-size:14px;}
-table th,table td{padding:12px 10px;border:1px solid #e5e7eb;text-align:center;}
-table th{background:#f8fafc;font-weight:600;color:#374151;}
-table td input,table td select{width:100%;padding:6px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:13px;}
-.empty{padding:35px;text-align:center;color:#9ca3af;font-size:15px;}
-.summary-row{display:flex;gap:28px;margin-top:16px;font-size:15px;color:#374151;}
-.summary-row .val{font-weight:700;color:#064e3b;}
-.summary-actions{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;}
-.history-panel{background:#fff;padding:22px;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.08);}
-.history-panel h3{font-size:18px;color:#064e3b;margin:0 0 12px 0;}
-.history-table{width:100%;border-collapse:collapse;font-size:13px;}
-.history-table th{background:#f8fafc;padding:10px;border:1px solid #e5e7eb;text-align:left;font-weight:600;}
-.history-table td{padding:10px;border:1px solid #e5e7eb;}
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:2000;justify-content:center;align-items:center;}
-.modal.active{display:flex;}
-.modal-box{background:#fff;min-width:340px;max-width:480px;padding:24px;font-family:Courier,monospace;border-radius:6px;}
-.modal-header{text-align:center;margin-bottom:14px;border-bottom:1px dashed #000;padding-bottom:10px;}
-.modal-header h2{font-size:16px;margin:0;}
-.modal-header p{margin:4px 0;font-size:13px;}
-.modal-body{font-size:13px;}
-.modal-footer{text-align:center;margin-top:14px;border-top:1px dashed #000;padding-top:10px;display:flex;gap:8px;justify-content:center;}
-.modal-btn{padding:8px 16px;border:none;border-radius:4px;cursor:pointer;font-size:13px;color:#fff;}
-.modal-print{background:#10b981;}
-.modal-close{background:#6b7280;}
-.toast{position:fixed;top:20px;right:20px;background:#10b981;color:white;padding:0.8rem 1.2rem;border-radius:5px;display:none;z-index:3000;font-size:14px;box-shadow:0 4px 10px rgba(0,0,0,0.15);}
-.badge{display:inline-block;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;}
-.badge-paid{background:#dcfce7;color:#166534;}
-.badge-pending{background:#fef3c7;color:#92400e;}
-.user-menu{position:relative;cursor:pointer;padding:8px 12px;border-radius:5px;background:rgba(255,255,255,0.1);display:flex;align-items:center;gap:8px;}
-.user-menu:hover{background:rgba(255,255,255,0.2);}
-.user-dropdown{position:absolute;top:100%;right:0;margin-top:8px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 10px 25px rgba(0,0,0,0.15);min-width:220px;z-index:1000;display:none;padding:8px;}
-.user-dropdown.active{display:block;}
-.user-info{padding:4px 0 8px;}
-.user-info strong{color:#2c3e50;}
-.user-info small{color:#718096;font-size:12px;}
-.user-dropdown a{display:flex;align-items:center;gap:8px;padding:8px 10px;color:#4a5568;text-decoration:none;border-radius:4px;transition:background 0.2s;font-size:13px;}
-.user-dropdown a:hover{background:#f0fdf4;color:#064e3b;}
-.user-dropdown a i{width:18px;text-align:center;color:#10b981;}
-.loading-spinner{text-align:center;padding:20px;color:#718096;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receiving - SHEDS POS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="common.css">
+    <script src="api.js"></script>
+    <script src="common.js"></script>
 </head>
 <body>
-<div class="sidebar">
-<div class="sidebar-header"><h1>POS</h1></div>
-<ul>
-    <li onclick="window.location.href='dashboard.html'"><i class="fas fa-home"></i> Dashboard</li>
-    <li onclick="window.location.href='sales.html'"><i class="fas fa-shopping-cart"></i> Sales</li>
-    <li onclick="window.location.href='variations.html'"><i class="fas fa-plus-circle"></i> Add New Product</li>
-    <li onclick="window.location.href='inventory.html'"><i class="fas fa-boxes"></i> Inventory</li>
-    <li onclick="window.location.href='customers.html'"><i class="fas fa-users"></i> Customers</li>
-    <li onclick="window.location.href='suppliers.html'"><i class="fas fa-truck"></i> Suppliers</li>
-    <li onclick="window.location.href='reports.html'"><i class="fas fa-chart-bar"></i> Reports</li>
-    <li class="active" onclick="window.location.href='receiving.html'"><i class="fas fa-file-import"></i> Receiving</li>
-    <li onclick="window.location.href='deliveries.html'"><i class="fas fa-truck-loading"></i> Deliveries</li>
-    <li onclick="window.location.href='expenses.html'"><i class="fas fa-receipt"></i> Expenses</li>
-    <li onclick="window.location.href='employees.html'"><i class="fas fa-user-tie"></i> Employees</li>
-    <li onclick="window.location.href='appointments.html'"><i class="fas fa-calendar"></i> Appointments</li>
-    <li onclick="window.location.href='giftcards.html'"><i class="fas fa-gift"></i> Gift Cards</li>
-    <li onclick="window.location.href='config.html'"><i class="fas fa-cog"></i> Store Config</li>
-    <li onclick="window.location.href='invoices.html'"><i class="fas fa-file-invoice"></i> Invoices</li>
-    <li onclick="window.location.href='locations.html'"><i class="fas fa-store"></i> Locations</li>
-    <li onclick="window.location.href='messages.html'"><i class="fas fa-envelope"></i> Messages</li>
-    <li onclick="window.location.href='payments.html'"><i class="fas fa-credit-card"></i> Payments</li>
-    <li onclick="window.location.href='login.html'"><i class="fas fa-sign-out-alt"></i> Logout</li>
-</ul>
-</div>
-
+<div class="sidebar" id="sidebar"></div>
 <div class="main-content">
-<div class="header">
-    <h2>Purchase & Receiving</h2>
-    <div class="user-menu" onclick="toggleUserMenu(event)">
-        <span id="currentUserName">Loading...</span>
-        <i class="fas fa-chevron-down" style="margin-left:8px;font-size:12px;"></i>
-<div class="user-dropdown" id="userDropdown">
-            <div class="user-info" id="userInfo">
-                <strong id="dropdownUserName">Loading...</strong>
-                <small id="dropdownUserRole">Role</small>
-            </div>
-            <hr style="margin:8px 0;">
-            <a href="#" onclick="window.location.href='config.html';closeUserMenu();"><i class="fas fa-cog"></i> Settings</a>
-            <a href="#" onclick="window.location.href='payments.html';closeUserMenu();"><i class="fas fa-credit-card"></i> Store Account Payment</a>
-            <a href="#" onclick="switchToAdmin();closeUserMenu();"><i class="fas fa-user-shield"></i> Switch to Admin</a>
-            <hr style="margin:8px 0;">
-            <a href="#" onclick="logout();"><i class="fas fa-sign-out-alt"></i> Logout</a>
-        </div>
+    <div class="header">
+        <h2><i class="fas fa-file-import"></i> Receiving</h2>
+        <div id="userMenu"></div>
+        <div class="header-clock" id="topClock"></div>
     </div>
-</div>
-
-<div class="content">
-    <div class="top-bar">
-        <label>Supplier:</label>
-        <select id="supplierSelect" onchange="onSupplierChange()">
-            <option value="">-- Select Supplier --</option>
-        </select>
-        <div class="supplier-details" id="supplierDetails">
-            <span>Select a supplier to view contact details</span>
-        </div>
-        <label style="margin-left:10px;">Reference:</label>
-        <input type="text" id="referenceInput" placeholder="PO / Invoice #">
-        <label>Date:</label>
-        <input type="date" id="receivingDate">
-    </div>
-
-    <div class="area">
-        <div class="area-header">
-            <h3>Current Receiving</h3>
-            <div style="display:flex;gap:6px;">
-                <button class="btn-resume" id="resumeBtn" onclick="resumeSuspended()" style="display:none;"><i class="fas fa-play"></i> Resume Suspended</button>
+    <div class="content">
+        <div class="page-head">
+            <div>
+                <h3>Purchase Receiving</h3>
+                <p>Record inventory purchases from suppliers.</p>
             </div>
         </div>
-
-        <div class="search-row">
-            <input type="text" id="searchInput" placeholder="Search product or scan barcode (min 2 chars)" onkeyup="searchItems(this.value)">
-            <button class="btn btn-receive" onclick="addTopSelected()"><i class="fas fa-plus"></i> Receive</button>
-            <button class="btn btn-suspend" onclick="suspendReceiving()"><i class="fas fa-pause"></i> Suspend</button>
-            <button class="btn btn-clear" onclick="clearReceiving()"><i class="fas fa-trash"></i> Clear</button>
-            <button class="btn btn-all" onclick="showAllProducts()"><i class="fas fa-list"></i> All</button>
+        <div class="panel">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Supplier *</label>
+                    <select id="supplierSelect" class="form-select" onchange="onSupplierChange()">
+                        <option value="">-- Select Supplier --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Reference</label>
+                    <input type="text" id="referenceInput" class="form-control" placeholder="PO / Invoice #">
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="receivingDate" class="form-control">
+                </div>
+            </div>
         </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th style="text-align:left;">Product</th>
-                    <th width="120">Pkg Type</th>
-                    <th width="90">Qty</th>
-                    <th width="130">Cost Price (&#8358;)</th>
-                    <th width="130">Batch / Expiry</th>
-                    <th width="130">Line Total (&#8358;)</th>
-                    <th width="60"></th>
-                </tr>
-            </thead>
-            <tbody id="receivingBody">
-                <tr><td colspan="7" class="empty">No items added. Search or click All to add products.</td></tr>
-            </tbody>
-        </table>
-
-        <div class="summary-row">
-            <span>Items: <span class="val" id="totalItems">0</span></span>
-            <span>Total Cost: <span class="val" id="totalCost">&#8358;0.00</span></span>
+        <div class="panel">
+            <div class="toolbar">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search product or scan barcode (min 2 chars)" onkeyup="searchItems(this.value)">
+                <button class="btn btn-primary" onclick="showAllProducts()"><i class="fas fa-list"></i> All Products</button>
+            </div>
         </div>
-        <div class="summary-actions">
-            <button class="btn-save" onclick="saveToInventory()"><i class="fas fa-check"></i> Confirm & Save to Inventory</button>
+        <div class="table-panel">
+            <div class="table-top"><strong><i class="fas fa-list"></i> Receiving Items</strong></div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Pkg Type</th>
+                            <th>Qty</th>
+                            <th>Cost Price (₦)</th>
+                            <th>Expiry</th>
+                            <th>Line Total (₦)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="receivingBody">
+                        <tr><td colspan="7" class="empty-state">No items added. Search or click All Products to add.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="kpi-grid" style="margin-top:15px;">
+            <div class="kpi-card"><div class="kpi-label">Total Items</div><div class="kpi-value" id="totalItems">0</div></div>
+            <div class="kpi-card"><div class="kpi-label">Total Cost</div><div class="kpi-value" id="totalCost">₦0.00</div></div>
+        </div>
+        <div class="action-buttons" style="margin-top:15px;">
+            <button class="btn btn-success" onclick="saveToInventory()"><i class="fas fa-check"></i> Confirm & Save</button>
+            <button class="btn btn-warning" onclick="suspendReceiving()"><i class="fas fa-pause"></i> Suspend</button>
+            <button class="btn btn-outline" onclick="openSuspendedModal()"><i class="fas fa-folder-open"></i> Suspended Receivings</button>
+            <button class="btn btn-danger" onclick="clearReceiving()"><i class="fas fa-trash"></i> Clear</button>
+        </div>
+        <div class="table-panel" style="margin-top:15px;display:none;" id="suspendedPanel">
+            <div class="table-top"><strong><i class="fas fa-pause-circle"></i> Suspended Receiving Sessions</strong><button class="btn btn-sm btn-outline" onclick="closeSuspendedPanel()" style="float:right;"><i class="fas fa-times"></i></button></div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Date</th><th>Ref</th><th>Supplier</th><th>Items</th><th>Total</th><th>Actions</th></tr></thead>
+                    <tbody id="suspendedBody"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="table-panel" style="margin-top:30px;">
+            <div class="table-top"><strong><i class="fas fa-history"></i> Receiving History</strong></div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Ref</th>
+                            <th>Supplier</th>
+                            <th>Items</th>
+                            <th>Total</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody"><tr><td colspan="6" class="empty-state">No history yet.</td></tr></tbody>
+                </table>
+            </div>
         </div>
     </div>
-
-    <div class="history-panel">
-        <h3><i class="fas fa-clock-rotate-left"></i> Receiving History</h3>
-        <div style="overflow-x:auto;">
-            <table class="history-table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Ref</th>
-                        <th>Supplier</th>
-                        <th>Items</th>
-                        <th>Total</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="historyBody"><tr><td colspan="7" style="color:#9ca3af;text-align:center;padding:18px;">No receiving history yet.</td></tr></tbody>
-            </table>
-        </div>
-        <div id="historyDetail" style="margin-top:14px;display:none;"></div>
-    </div>
 </div>
-</div>
-
-<div class="modal" id="receiptModal">
-    <div class="modal-box" style="max-width:480px;padding:24px;">
-        <div class="modal-header">
-            <h2>DANZONA PHARM NIG LTD</h2>
-            <p>Receiving / Purchase Receipt</p>
-            <p>----------------------------</p>
-            <p id="rDateTime"></p>
-        </div>
-        <div class="modal-body">
-            <table style="font-size:13px;width:100%;">
-                <thead><tr><th style="text-align:left;">Product</th><th>Qty</th><th>Unit Cost</th><th>Total</th></tr></thead>
-                <tbody id="rItems"></tbody>
-            </table>
-            <p style="margin-top:10px;font-weight:bold;text-align:right;">TOTAL: <span id="rTotal">&#8358;0.00</span></p>
-            <p><strong>Supplier:</strong> <span id="rSupplier"></span></p>
-            <p><strong>Contact:</strong> <span id="rContact"></span></p>
-            <p><strong>Phone:</strong> <span id="rPhone"></span></p>
-            <p><strong>Reference:</strong> <span id="rRef"></span></p>
-            <p><strong>Received By:</strong> <span id="rReceivedBy"></span></p>
-        </div>
-        <div class="modal-footer">
-            <button class="modal-btn modal-print" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
-            <button class="modal-btn modal-close" onclick="closeReceipt()">Close</button>
-        </div>
-    </div>
-</div>
-
 <div class="toast" id="toast"></div>
-
-<script src="api.js"></script>
 <script>
 var receivingItems = [];
-var products = [];
-var suppliers = [];
+var products = JSON.parse(localStorage.getItem('danzona_products') || '[]');
+var suppliers = JSON.parse(localStorage.getItem('danzona_suppliers') || '[]');
 var receivingHistory = [];
-var editingIndex = -1;
 var suspendedSession = null;
-
-function navigateTo(page){window.location.href=page;}
-function showToast(msg, isError){
-    var t=document.getElementById('toast');
-    t.textContent=msg;
-    t.style.background = isError ? '#ef4444' : '#10b981';
-    t.style.display='block';
-    setTimeout(function(){ t.style.display='none'; }, 3000);
-}
-
-async function init(){
+var suspendedList = [];
+var PRODUCTS_KEY = 'danzona_products';
+var SUPPLIERS_KEY = 'danzona_suppliers';
+var HISTORY_KEY = 'danzona_receiving_history';
+var SUSPENDED_KEY = 'danzona_receiving_suspended';
+function $id(id) { return document.getElementById(id); }
+async function init() {
     try {
-        products = await API.getProducts();
-        suppliers = await API.getSuppliers();
+        var prodRes = await API.getProducts();
+        products = (prodRes && prodRes.length) ? prodRes : JSON.parse(localStorage.getItem(PRODUCTS_KEY) || '[]');
     } catch (err) {
-        showToast('Failed to load data: ' + err.message, true);
-        products = [];
-        suppliers = [];
+        products = JSON.parse(localStorage.getItem(PRODUCTS_KEY) || '[]');
     }
-    var sel = document.getElementById('supplierSelect');
-    var activeSuppliers = (suppliers || []).filter(function(s){ return s.status === 'active'; });
-    sel.innerHTML = '<option value="">-- Select Supplier --</option>' + activeSuppliers.map(function(s){ return '<option value="'+s.id+'">'+s.name+'</option>'; }).join('');
-    document.getElementById('receivingDate').valueAsDate = new Date();
+    try {
+        var supRes = await API.getSuppliers();
+        suppliers = (supRes && supRes.length) ? supRes : JSON.parse(localStorage.getItem(SUPPLIERS_KEY) || '[]');
+    } catch (err) {
+        suppliers = JSON.parse(localStorage.getItem(SUPPLIERS_KEY) || '[]');
+    }
+    if (!products.length) {
+        products = [
+            {id:1,name:'Paracetamol 500mg',sku:'PTM-001',cost_price:200,selling_price:500,stock:100,packaging_types:[{id:'pkt',name:'Packet',price:500}]},
+            {id:2,name:'Amoxicillin 500mg',sku:'AMX-002',cost_price:800,selling_price:1500,stock:50,packaging_types:[{id:'bottle',name:'Bottle',price:1500}]},
+            {id:3,name:'Vitamin C 1000mg',sku:'VTC-003',cost_price:300,selling_price:800,stock:75,packaging_types:[{id:'pkt',name:'Packet',price:800}]}
+        ];
+    }
+    if (!suppliers.length) {
+        suppliers = [
+            {id:'SUP-1',name:'Default Supplier',contact:'Admin',phone:'08000000000',email:'supplier@example.com',status:'active'},
+            {id:'SUP-2',name:'Pharma Distributors',contact:'John Doe',phone:'08012345678',email:'orders@pharmadist.com',status:'active'}
+        ];
+    }
+    var sel = $id('supplierSelect');
+    var activeSuppliers = suppliers.filter(function(s) { return s.status === 'active'; });
+    sel.innerHTML = '<option value="">-- Select Supplier --</option>' + activeSuppliers.map(function(s) {
+        return '<option value="' + s.id + '">' + POS.esc(s.name) + '</option>';
+    }).join('');
+    $id('receivingDate').valueAsDate = new Date();
+    try { receivingHistory = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch(e) { receivingHistory = []; }
     renderHistory();
-    loadCurrentUser();
 }
-
-function loadCurrentUser() {
-    var name = API.getUserName();
-    var role = API.getRole();
-    var pharmName = API.getPharmacyName() || 'DANZONA PHARM';
-    var displayName = pharmName || (name || 'DANZONA PHARM');
-    if (name || pharmName) {
-        document.getElementById('currentUserName').textContent = displayName;
-        document.getElementById('dropdownUserName').textContent = displayName;
-        document.getElementById('dropdownUserRole').textContent = role ? role.toUpperCase() : '';
+function onSupplierChange() {
+    var id = $id('supplierSelect').value;
+    var box = $id('supplierDetails');
+    if (box && id) {
+        var s = suppliers.find(function(x) { return String(x.id) === String(id); });
+        if (s) box.innerHTML = '<strong>' + POS.esc(s.name) + '</strong><span class="badge badge-success" style="margin-left:10px;"><i class="fas fa-user"></i> ' + POS.esc(s.contact) + '</span>';
     }
 }
-
-function onSupplierChange(){
-    var id = parseInt(document.getElementById('supplierSelect').value);
-    var box = document.getElementById('supplierDetails');
-    if(!id){ box.innerHTML = '<span>Select a supplier to view contact details</span>'; return; }
-    var s = (suppliers || []).find(function(x){ return x.id === id; });
-    if(!s) return;
-    box.innerHTML = '<strong>'+s.name+'</strong> <span class="tag"><i class="fas fa-user"></i> '+s.contact+'</span> <span class="tag"><i class="fas fa-phone"></i> '+s.phone+'</span> <span class="tag"><i class="fas fa-envelope"></i> '+s.email+'</span> <span class="tag"><i class="fas fa-map-marker-alt"></i> '+s.address+'</span>';
-}
-
-function productCost(prod){ return prod.cost_price || 0; }
-
-function searchItems(q){
-    if(!q || q.length < 2){ return; }
-    var p = products || [];
+function productCost(prod) { return parseFloat(prod.cost_price || prod.selling_price || 0); }
+function searchItems(q) {
+    var searchSelect = $id('searchSelect');
+    if (searchSelect) searchSelect.remove();
+    if (!q || q.length < 2) return;
     var ql = q.toLowerCase();
-    var found = p.filter(function(x){ return (x.name && x.name.toLowerCase().indexOf(ql) > -1) || (x.sku && x.sku.toLowerCase().indexOf(ql) > -1); });
-    if(found.length === 0){ showToast('No product found for "'+q+'"',true); showDropdown([]); return; }
-    var items = found.slice(0, 20);
-    showDropdown(items.map(function(x){
-        return '<div style="padding:10px;cursor:pointer;border-bottom:1px solid #f1f5f9;" onclick="addToReceivingFromSearch('+x.id+')">'+(x.sku||'')+' &bull; '+x.name+' &bull; &#8358;'+productCost(x).toLocaleString()+'</div>';
-    }).join(''));
+    var found = products.filter(function(x) {
+        return (x.name && x.name.toLowerCase().indexOf(ql) > -1) || (x.sku && x.sku.toLowerCase().indexOf(ql) > -1);
+    });
+    if (!found.length) {
+        POS.showToast('No product found for "' + q + '"', true);
+        return;
+    }
+    var html = found.slice(0, 20).map(function(x) {
+        return '<div style="padding:10px;cursor:pointer;border-bottom:1px solid var(--border);" onclick="addToReceivingFromSearch(' + x.id + ')">' + POS.esc(x.sku || '') + ' - ' + POS.esc(x.name) + ' - ' + POS.formatCurrency(productCost(x)) + '</div>';
+    }).join('');
+    showDropdown(html);
 }
-
-function addToReceivingFromSearch(id){
-    var p = (products || []).find(function(x){ return x.id == id; });
-    if(!p) return;
-    var cp = productCost(p);
-    var existing = receivingItems.find(function(x){ return x.id == p.id; });
-    var nextQty = existing ? existing.qty + 1 : 1;
+function addToReceivingFromSearch(id) {
+    var p = products.find(function(x) { return x.id == id; });
+    if (!p) return;
+    var existing = receivingItems.find(function(x) { return x.id == p.id; });
     var rec = {
-        id: p.id, name: p.name, sku: p.sku || '', category: p.category || '',
-        pkgType: existing ? existing.pkgType : (p.defaultPkgReceive || 'pkt'),
-        qty: nextQty,
-        cost_price: existing ? existing.cost_price : cp,
-        expiry: existing ? existing.expiry : (p.expiry || ''),
-        costSource: existing ? existing.costSource : 'catalog'
+        id: p.id, name: p.name, sku: p.sku || '',
+        pkgType: existing ? existing.pkgType : (p.pkgType || 'pkt'),
+        qty: existing ? existing.qty + 1 : 1,
+        cost_price: existing ? existing.cost_price : productCost(p),
+        expiry: existing ? existing.expiry : (p.expiry || '')
     };
-    if(existing){ existing.qty = rec.qty; existing.cost_price = rec.cost_price; existing.expiry = rec.expiry; existing.pkgType = rec.pkgType; }
+    if (existing) { existing.qty = rec.qty; existing.cost_price = rec.cost_price; }
     else { receivingItems.push(rec); }
-    document.getElementById('searchInput').value = '';
-    var sel = document.getElementById('searchSelect'); if(sel) sel.remove();
-    updateReceiving(); showToast('Added '+p.name);
+    $id('searchInput').value = '';
+    $id('searchSelect') && $id('searchSelect').remove();
+    updateReceiving();
+    POS.showToast('Added ' + p.name);
 }
-
-function addTopSelected(){
-    var sels = document.querySelectorAll('#receivingBody tr .search-stock-select');
-    if(sels.length > 0){ sels[0].focus(); sels[0].click(); return; }
-    showToast('Use search above to find a product, then click Receive.');
-}
-
-function showDropdown(html){
-    var old = document.getElementById('searchSelect'); if(old) old.remove();
-    if(!html){ return; }
-    var bar = document.querySelector('.search-row');
+function showDropdown(html) {
+    var old = $id('searchSelect'); if (old) old.remove();
+    if (!html) return;
+    var bar = document.querySelector('.toolbar');
+    if (!bar) return;
     var r = bar.getBoundingClientRect();
-    var pw = Math.max(300, window.innerWidth - r.left - 280 - 30);
     var el = document.createElement('div');
     el.id = 'searchSelect';
-    el.style.cssText = 'position:fixed;top:'+(r.bottom+4)+'px;left:'+(r.left+260)+'px;max-width:'+pw+'px;background:#fff;border:1px solid #d1d5db;padding:6px;z-index:1500;max-height:280px;overflow-y:auto;border-radius:0 0 6px 6px;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1);';
-    el.innerHTML = html || '';
+    el.style.cssText = 'position:fixed;top:' + (r.bottom + 4) + 'px;left:' + r.left + 'px;max-width:400px;background:#fff;border:1px solid var(--border);padding:6px;z-index:1500;max-height:280px;overflow-y:auto;border-radius:0 0 6px 6px;box-shadow:var(--shadow);';
+    el.innerHTML = html;
     document.body.appendChild(el);
 }
-
-function showAllProducts(){
-    showDropdown((products || []).slice(0,50).map(function(x){
-        return '<div style="padding:10px;cursor:pointer;border-bottom:1px solid #f1f5f9;" onclick="addToReceivingFromSearch('+x.id+')">'+(x.sku||'')+' &bull; '+x.name+' &bull; &#8358;'+productCost(x).toLocaleString()+'</div>';
+function showAllProducts() {
+    showDropdown(products.slice(0, 50).map(function(x) {
+        return '<div style="padding:10px;cursor:pointer;border-bottom:1px solid var(--border);" onclick="addToReceivingFromSearch(' + x.id + ')">' + POS.esc(x.sku || '') + ' - ' + POS.esc(x.name) + ' - ' + POS.formatCurrency(productCost(x)) + '</div>';
     }).join(''));
 }
-
-(function(){ document.addEventListener('click', function(e){ if(!e.target.closest('#searchSelect') && e.target.id !== 'searchInput'){ var s=document.getElementById('searchSelect'); if(s) s.remove(); } }); })();
-
-function updateReceiving(){
-    var b = document.getElementById('receivingBody');
-    if(!receivingItems.length){ b.innerHTML = '<tr><td colspan="7" class="empty">No items added. Search or click All to add products.</td></tr>'; document.getElementById('totalItems').textContent='0'; document.getElementById('totalCost').textContent='&#8358;0.00'; return; }
-    var totalQty=0, totalCost=0, h='';
-    var pkgLabels = {pkt:'Pkt',sachet:'Sach',btt:'Btl',ctn:'Ctn',box:'Box'};
-    receivingItems.forEach(function(x, i){
-        var ct = (x.cost_price * (x.qty || 1)).toFixed(2);
-        totalQty += (x.qty || 0);
-        totalCost += (x.cost_price * (x.qty || 1)) || 0;
-        var pkgOpts = ['pkt','sachet','btt','ctn','box'].map(function(k){ return '<option value="'+k+'"'+(x.pkgType===k?' selected':'')+'>'+(pkgLabels[k]||k)+'</option>'; }).join('');
-        h += '<tr><td style="text-align:left;"><strong>'+x.name+'</strong><br><small style="color:#6b7280;">'+(x.sku||'')+' '+(x.category||'')+'</small></td>'+
-             '<td><select onchange="updateItem('+i+',\'pkgType\',this.value)">'+pkgOpts+'</select></td>'+
-             '<td><input type="number" min="0" value="'+(x.qty||0)+'" onchange="updateItem('+i+',\'qty\',this.value)"></td>'+
-             '<td><input type="number" min="0" step="0.01" value="'+x.cost_price.toFixed(2)+'" onchange="updateItem('+i+',\'cost_price\',this.value)"></td>'+
-             '<td><input type="date" value="'+(x.expiry||'')+'" onchange="updateItem('+i+',\'expiry\',this.value)"></td>'+
-             '<td style="font-weight:600;">&#8358;'+Number(ct).toLocaleString()+'</td>'+
-             '<td><button onclick="removeItem('+i+')" style="background:#fee2e2;color:#991b1b;border:none;padding:5px 8px;border-radius:3px;cursor:pointer;"><i class="fas fa-times"></i></button></td></tr>';
-    });
-    b.innerHTML = h;
-    document.getElementById('totalItems').textContent = totalQty;
-    document.getElementById('totalCost').textContent = '&#8358;'+totalCost.toLocaleString();
-}
-
-function updateItem(i, field, val){
-    var v = (field === 'qty' || field === 'cost_price') ? (parseFloat(val) || 0) : val;
-    receivingItems[i][field] = v;
-    updateReceiving();
-}
-
-function removeItem(i){
-    receivingItems.splice(i, 1);
-    updateReceiving();
-}
-
-function suspendReceiving(){
-    if(receivingItems.length === 0){ showToast('Nothing to suspend', true); return; }
-    suspendedSession = {
-        items: JSON.parse(JSON.stringify(receivingItems)),
-        supplierId: document.getElementById('supplierSelect').value,
-        ref: document.getElementById('referenceInput').value,
-        date: document.getElementById('receivingDate').value,
-        time: new Date().toISOString()
-    };
-    document.getElementById('resumeBtn').style.display = 'inline-flex';
-    showToast('Receiving suspended - you can resume later.');
-}
-
-function resumeSuspended(){
-    if(!suspendedSession){ showToast('No suspended session found', true); return; }
-    if(receivingItems.length > 0 && !confirm('Resume suspended session? Current unsaved items will be replaced.')) return;
-    receivingItems = JSON.parse(JSON.stringify(suspendedSession.items || []));
-    var sSel = document.getElementById('supplierSelect');
-    if(suspendedSession.supplierId) sSel.value = suspendedSession.supplierId;
-    var rInp = document.getElementById('referenceInput');
-    if(rInp) rInp.value = suspendedSession.ref || '';
-    var dInp = document.getElementById('receivingDate');
-    if(dInp) dInp.value = suspendedSession.date || '';
-    document.getElementById('resumeBtn').style.display = 'none';
-    onSupplierChange();
-    updateReceiving();
-    suspendedSession = null;
-    showToast('Suspended session restored.');
-}
-
-function clearReceiving(){
-    if(receivingItems.length === 0) return;
-    if(!confirm('Clear all items from current receiving?')) return;
-    receivingItems = [];
-    updateReceiving();
-}
-
-async function saveToInventory(){
-    if(receivingItems.length === 0){ showToast('No items to receive', true); return; }
-    var sid = document.getElementById('supplierSelect').value;
-    if(!sid){ showToast('Please select a supplier', true); return; }
-    var sup = (suppliers || []).find(function(x){return x.id == sid;});
-    var supName = sup ? sup.name : 'Unknown';
-
-    var record = {
-        date: document.getElementById('receivingDate').value,
-        time: new Date().toISOString(),
-        ref: document.getElementById('referenceInput').value || 'N/A',
-        supplierName: supName,
-        supplierId: sid,
-        items: JSON.parse(JSON.stringify(receivingItems)),
-        total: receivingItems.reduce(function(s,x){ return s + (x.cost_price * (x.qty || 1)); }, 0),
-        status: 'completed',
-        receivedBy: API.getUserName() || 'Admin'
-    };
-    if(sup){
-        record.supplierContact = sup.contact;
-        record.supplierPhone = sup.phone;
-        record.supplierEmail = sup.email;
-        record.supplierAddress = sup.address;
-    }
-    receivingHistory.unshift(record);
-    receivingItems = [];
-    updateReceiving();
-    renderHistory();
-    showToast('Purchase confirmed - inventory updated.');
-    setTimeout(function(){ location.reload(); }, 1200);
-}
-
-function renderHistory(){
-    var tbody = document.getElementById('historyBody');
-    if(!receivingHistory.length){ tbody.innerHTML = '<tr><td colspan="7" style="color:#9ca3af;text-align:center;padding:18px;">No receiving history yet.</td></tr>'; return; }
-    tbody.innerHTML = receivingHistory.slice(0, 20).map(function(r, i){
-        return '<tr><td style="white-space:nowrap;">'+(r.date||'N/A')+'</td><td>'+(r.ref||'N/A')+'</td><td>'+(r.supplierName||'N/A')+'</td><td>'+(r.items?r.items.reduce((s,x)=>s+(x.qty||0),0):0)+'</td><td>&#8358;'+(r.total||0).toLocaleString()+'</td><td><span class="badge badge-paid">Completed</span></td><td><button onclick="viewHistoryItem('+i+')" style="background:#eff6ff;color:#1d4ed8;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px;">View</button></td></tr>';
-    }).join('');
-}
-
-function viewHistoryItem(i){
-    var r = receivingHistory[i];
-    if(!r) return;
-    var box = document.getElementById('historyDetail');
-    box.style.display = 'block';
-    var items = (r.items || []).map(function(x){ return '<tr><td style="text-align:left;">'+x.name+'</td><td>'+(x.qty||0)+'</td><td>&#8358;'+(x.cost_price||0).toLocaleString()+'</td><td>&#8358;'+(x.cost_price*(x.qty||0)).toLocaleString()+'</td></tr>'; }).join('');
-    box.innerHTML = '<div style="background:#f8fafc;border:1px solid #e2e8f0;padding:16px;border-radius:6px;"><strong>Details '+(r.ref||'N/A')+'</strong> | Date: '+(r.date||'N/A')+' | Supplier: '+(r.supplierName||'N/A')+
-        (r.supplierContact ? ' | Contact: '+r.supplierContact+' | Phone: '+r.supplierPhone : '')+
-        '<br><table style="margin-top:10px;"><thead><tr><th style="text-align:left;">Item</th><th>Qty</th><th>Unit Cost</th><th>Total</th></tr></thead><tbody>'+(items||'<tr><td colspan="4">No items</td></tr>')+'</tbody></table>'+
-        '<p style="text-align:right;font-weight:bold;margin-top:8px;">Total: &#8358;'+(r.total||0).toLocaleString()+'</p>'+
-        '<button onclick="document.getElementById(\'historyDetail\').style.display=\'none\'" style="background:#6b7280;color:#fff;border:none;padding:6px 12px;border-radius:4px;margin-top:8px;cursor:pointer;">Close</button>'+
-        '</div>';
-}
-
-function processReceiving(){
-    if(receivingItems.length === 0){ showToast('Add items before receiving', true); return; }
-    var sid = parseInt(document.getElementById('supplierSelect').value);
-    var sup = sid ? (suppliers || []).find(function(x){return x.id == sid;}) : null;
-    var modal = document.getElementById('receiptModal');
-    document.getElementById('rDateTime').textContent = 'Date: ' + new Date().toLocaleString();
-    document.getElementById('rSupplier').textContent = sup ? sup.name : (document.getElementById('supplierSelect').value || 'Walk-in / Direct');
-    document.getElementById('rContact').textContent = sup ? sup.contact : 'N/A';
-    document.getElementById('rPhone').textContent = sup ? sup.phone : 'N/A';
-    document.getElementById('rRef').textContent = document.getElementById('referenceInput').value || 'N/A';
-    document.getElementById('rReceivedBy').textContent = API.getUserName() || 'Admin';
-    document.getElementById('rItems').innerHTML = receivingItems.map(function(x){
-        return '<tr><td style="text-align:left;">'+x.name+'</td><td>'+(x.qty||0)+'</td><td>&#8358;'+(x.cost_price||0).toFixed(0)+'</td><td>&#8358;'+((x.cost_price||0)*(x.qty||0)).toFixed(0)+'</td></tr>';
-    }).join('');
-    var total = receivingItems.reduce(function(s,x){ return s + ((x.cost_price||0)*(x.qty||0)); }, 0);
-    document.getElementById('rTotal').textContent = '&#8358;'+total.toLocaleString();
-    modal.classList.add('active');
-}
-
-function closeReceipt(){ document.getElementById('receiptModal').classList.remove('active'); }
-
-function toggleUserMenu(e){
-    e.stopPropagation();
-    var d = document.getElementById('userDropdown');
-    if(d){ d.classList.toggle('active'); }
-}
-
-function switchToAdmin(){
-    document.getElementById('currentUserName').textContent = 'Admin User';
-    document.getElementById('dropdownUserName').textContent = 'Admin User';
-    showToast('Switched to Admin User');
-    closeUserMenu();
-}
-
-function logout() {
-    if (confirm('Are you sure you want to logout?')) {
-        API.logout();
-        window.location.href = 'login.html';
-    }
-}
-
 document.addEventListener('click', function(e) {
-    var dropdown = document.getElementById('userDropdown');
-    var userMenu = document.querySelector('.user-menu');
-    if(dropdown && dropdown.classList.contains('active') && userMenu && !userMenu.contains(e.target)){
-        dropdown.classList.remove('active');
+    var dd = $id('searchSelect');
+    if (dd && !dd.contains(e.target) && e.target.id !== 'searchInput') {
+        dd.remove();
     }
 });
-
-window.addEventListener('DOMContentLoaded', async function() {
-    if (!API.isLoggedIn()) { window.location.href = 'login.html'; return; }
-    await init();
+function updateReceiving() {
+    var b = $id('receivingBody');
+    if (!receivingItems.length) {
+        b.innerHTML = '<tr><td colspan="7" class="empty-state">No items added. Search or click All Products to add.</td></tr>';
+        $id('totalItems').textContent = '0'; $id('totalCost').textContent = '₦0.00'; return;
+    }
+    var totalQty = 0, totalCost = 0, h = '';
+    receivingItems.forEach(function(x, i) {
+        var ct = (productCost(x) * (x.qty || 1)).toFixed(2);
+        totalQty += (x.qty || 0); totalCost += productCost(x) * (x.qty || 1);
+        var pkgOpts = ['pkt', 'sachet', 'btt', 'ctn', 'box'].map(function(k) {
+            return '<option value="' + k + '"' + (x.pkgType === k ? ' selected' : '') + '>' + k.charAt(0).toUpperCase() + k.slice(1) + '</option>';
+        }).join('');
+        h += '<tr><td><strong>' + POS.esc(x.name) + '</strong><br><small class="muted">' + POS.esc(x.sku || '') + '</small></td>' +
+            '<td><select onchange="updateItem(' + i + ',\'pkgType\',this.value)">' + pkgOpts + '</select></td>' +
+            '<td><input type="number" min="0" value="' + (x.qty || 0) + '" onchange="updateItem(' + i + ',\'qty\',this.value)" class="form-control" style="padding:4px;"></td>' +
+            '<td><input type="number" min="0" step="0.01" value="' + x.cost_price.toFixed(2) + '" onchange="updateItem(' + i + ',\'cost_price\',this.value)" class="form-control" style="padding:4px;"></td>' +
+            '<td><input type="date" value="' + (x.expiry || '') + '" onchange="updateItem(' + i + ',\'expiry\',this.value)" class="form-control" style="padding:4px;"></td>' +
+            '<td style="font-weight:600;">' + POS.formatCurrency(ct) + '</td>' +
+            '<td><button onclick="removeItem(' + i + ')" class="icon-btn delete" style="padding:4px 8px;"><i class="fas fa-times"></i></button></td></tr>';
+    });
+    b.innerHTML = h;
+    $id('totalItems').textContent = totalQty;
+    $id('totalCost').textContent = POS.formatCurrency(totalCost);
+}
+function updateItem(i, field, val) {
+    receivingItems[i][field] = (field === 'qty' || field === 'cost_price') ? (parseFloat(val) || 0) : val;
+    updateReceiving();
+}
+function removeItem(i) { receivingItems.splice(i, 1); updateReceiving(); }
+function suspendReceiving() {
+    if (receivingItems.length === 0) { POS.showToast('Nothing to suspend', true); return; }
+    var session = {
+        id: 'REC-SUSP-' + Date.now(),
+        items: JSON.parse(JSON.stringify(receivingItems)),
+        supplierId: $id('supplierSelect').value,
+        ref: $id('referenceInput').value,
+        date: $id('receivingDate').value,
+        suspendedAt: new Date().toISOString()
+    };
+    suspendedList.unshift(session);
+    try { localStorage.setItem(SUSPENDED_KEY, JSON.stringify(suspendedList)); } catch(e) {}
+    receivingItems = [];
+    updateReceiving();
+    POS.showToast('Receiving suspended');
+}
+function clearReceiving() {
+    if (!confirm('Clear all items?')) return;
+    receivingItems = []; updateReceiving();
+}
+async function saveToInventory() {
+    if (receivingItems.length === 0) { POS.showToast('No items to receive', true); return; }
+    var sid = $id('supplierSelect').value;
+    var sup = suppliers.find(function(x) { return String(x.id) === String(sid); });
+    var record = {
+        date: $id('receivingDate').value,
+        ref: $id('referenceInput').value || 'N/A',
+        supplier: sid,
+        items: JSON.parse(JSON.stringify(receivingItems)),
+        total: receivingItems.reduce(function(s, x) { return s + (productCost(x) * (x.qty || 1)); }, 0),
+        status: 'completed'
+    };
+    receivingHistory.unshift(record);
+    receivingItems.forEach(function(item) {
+        var p = products.find(function(x) { return x.id == item.id; });
+        if (p) p.stock = (p.stock || 0) + item.qty;
+    });
+    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(receivingHistory)); } catch(e) {}
+    try { localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products)); } catch(e) {}
+    POS.showToast('Confirmed - inventory updated');
+    setTimeout(function() { location.reload(); }, 1200);
+}
+function renderHistory() {
+    var tbody = $id('historyBody');
+    tbody.innerHTML = receivingHistory.slice(0, 20).map(function(r, i) {
+        return '<tr><td>' + POS.formatDate(r.date) + '</td><td>' + POS.esc(r.ref) + '</td><td>' + (r.supplier ? 'Supplier #' + r.supplier : 'N/A') + '</td><td>' + (r.items.reduce(function(s, x) { return s + (x.qty || 0); }, 0)) + '</td><td>' + POS.formatCurrency(r.total) + '</td><td><button class="btn btn-sm btn-info" onclick="viewHistoryItem(' + i + ')"><i class="fas fa-eye"></i> View</button></td></tr>';
+    }).join('') || '<tr><td colspan="6" class="empty-state">No history yet.</td></tr>';
+}
+function loadSuspended() {
+    try { suspendedList = JSON.parse(localStorage.getItem(SUSPENDED_KEY) || '[]'); } catch(e) { suspendedList = []; }
+}
+function saveSuspended() {
+    try { localStorage.setItem(SUSPENDED_KEY, JSON.stringify(suspendedList)); } catch(e) {}
+}
+function openSuspendedModal() {
+    loadSuspended();
+    renderSuspendedTable();
+    $id('suspendedPanel').style.display = 'block';
+}
+function closeSuspendedPanel() {
+    $id('suspendedPanel').style.display = 'none';
+}
+function renderSuspendedTable() {
+    var tbody = $id('suspendedBody');
+    if (!suspendedList.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No suspended receivings.</td></tr>';
+        return;
+    }
+    tbody.innerHTML = suspendedList.map(function(s, i) {
+        var sup = suppliers.find(function(x) { return String(x.id) === String(s.supplierId); });
+        var totalItems = s.items.reduce(function(sum, x) { return sum + (x.qty || 0); }, 0);
+        var totalCost = s.items.reduce(function(sum, x) { return sum + (productCost(x) * (x.qty || 0)); }, 0);
+        return '<tr><td>' + POS.formatDate(s.date) + '</td><td>' + POS.esc(s.ref || 'N/A') + '</td><td>' + POS.esc(sup ? sup.name : 'Unknown') + '</td><td>' + totalItems + '</td><td>' + POS.formatCurrency(totalCost) + '</td><td><button class="btn btn-sm btn-success" onclick="resumeSuspended(' + i + ')"><i class="fas fa-play"></i> Resume</button> <button class="btn btn-sm btn-danger" onclick="deleteSuspended(' + i + ')"><i class="fas fa-trash"></i></button></td></tr>';
+    }).join('');
+}
+function resumeSuspended(i) {
+    if (!confirm('Resume this suspended receiving? Current items will be replaced.')) return;
+    var s = suspendedList[i];
+    receivingItems = JSON.parse(JSON.stringify(s.items));
+    $id('supplierSelect').value = s.supplierId || '';
+    $id('referenceInput').value = s.ref || '';
+    $id('receivingDate').value = s.date || '';
+    suspendedList.splice(i, 1);
+    saveSuspended();
+    updateReceiving();
+    closeSuspendedPanel();
+    POS.showToast('Suspended receiving resumed');
+}
+function deleteSuspended(i) {
+    if (!confirm('Delete this suspended receiving?')) return;
+    suspendedList.splice(i, 1);
+    saveSuspended();
+    renderSuspendedTable();
+    POS.showToast('Deleted');
+}
+function viewHistoryItem(i) {
+    var r = receivingHistory[i];
+    var items = r.items.map(function(x) {
+        return '<tr><td>' + POS.esc(x.name) + '</td><td>' + (x.qty || 0) + '</td><td>' + POS.formatCurrency(x.cost_price) + '</td><td>' + POS.formatCurrency(x.cost_price * (x.qty || 0)) + '</td></tr>';
+    }).join('');
+    alert('Items:\n' + r.items.map(function(x) { return x.name + ' x' + x.qty; }).join('\n'));
+}
+document.addEventListener('DOMContentLoaded', function() {
+    if (!POS.requireAuth()) return;
+    POS.renderSidebar();
+    POS.renderUserMenu();
+    loadSuspended();
+    init();
 });
 </script>
 </body>

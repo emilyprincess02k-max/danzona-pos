@@ -14,8 +14,8 @@ from flask import Flask, request, jsonify, g, send_file
 from functools import wraps
 
 app = Flask(__name__)
-app.config['DB_PATH'] = 'danzona_pos.db'
-app.config['SECRET_KEY'] = 'danzona-pharm-2026-secret'
+app.config['DB_PATH'] = os.environ.get('DB_PATH', 'danzona_pos.db')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'change-me-set-a-real-secret-key')
 
 # ---------- Database ----------
 
@@ -565,7 +565,21 @@ def delete_product(pid):
 @app.route('/api/sales', methods=['GET'])
 @require_auth
 def get_sales():
-    return table_response('sales', ' ORDER BY date DESC')
+    db = get_db()
+    rows = db.execute(
+        'SELECT * FROM sales WHERE pharmacy_id = ? ORDER BY date DESC',
+        (g.pharmacy_id,)
+    ).fetchall()
+    result = []
+    for r in rows:
+        row = dict(r)
+        if row.get('items') and isinstance(row['items'], str):
+            try:
+                row['items'] = json.loads(row['items'])
+            except Exception:
+                row['items'] = []
+        result.append(row)
+    return jsonify(result)
 
 @app.route('/api/sales', methods=['POST'])
 @require_auth

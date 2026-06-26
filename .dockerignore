@@ -1,0 +1,7 @@
+.git
+.vscode
+*.pyc
+__pycache__
+danzona-pos-frontend.zip
+proxy_server.py
+inspect_db.py

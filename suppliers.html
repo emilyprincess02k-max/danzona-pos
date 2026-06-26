@@ -3,219 +3,104 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Suppliers - DANZONA PHARM</title>
+<title>Suppliers - SHEDS POS</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="common.css">
 <script src="api.js"></script>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif;}
-body{background:#f2f2f2;min-height:100vh;display:flex;}
-.sidebar{width:260px;background:#064e3b;color:#e2e8f0;height:100vh;overflow-y:auto;flex-shrink:0;box-shadow:2px 0 10px rgba(0,0,0,.1);}
-.sidebar-header{background:#043e2c;padding:20px 25px;border-bottom:1px solid #059669;}
-.sidebar h1{font-size:22px;color:#10b981;margin:0;font-weight:600;}
-.sidebar ul{list-style:none;padding:12px 0;margin:0;}
-.sidebar ul li{padding:11px 25px;display:flex;align-items:center;gap:12px;cursor:pointer;border-left:3px solid transparent;transition:all .15s;font-size:13px;font-weight:600;color:#94a3b8;}
-.sidebar ul li:hover{background:#059669;border-left-color:#10b981;color:#fff;}
-.sidebar ul li.active{background:#059669;border-left-color:#10b981;color:#fff;}
-.main-content{flex:1;display:flex;flex-direction:column;min-width:0;}
-.header{background:#10b981;color:white;padding:15px 25px;display:flex;justify-content:space-between;align-items:center;}
-.header h2{font-size:20px;margin:0;}
-.content{padding:20px;flex:1;}
-.suppliers-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:15px;}
-.suppliers-header h2{margin:0;}
-.add-supplier-btn{background:#10b981;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:8px;}
-.add-supplier-btn:hover{background:#059669;}
-.suppliers-table{width:100%;border-collapse:collapse;background:white;border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.08);font-size:14px;}
-.suppliers-table th,.suppliers-table td{padding:14px 16px;text-align:left;border-bottom:1px solid #f0f0f0;vertical-align:middle;}
-.suppliers-table th{background:#f8fafc;font-weight:700;color:#475569;white-space:nowrap;}
-.suppliers-table tr:hover{background-color:#f8fafc;}
-.badge{padding:5px 10px;border-radius:20px;font-size:12px;font-weight:600;}
-.badge-active{background:#dcfce7;color:#166534;}
-.badge-inactive{background:#fee2e2;color:#991b1b;}
-.action-btns{display:flex;gap:6px;}
-.action-btn{padding:7px 11px;border:none;border-radius:5px;cursor:pointer;font-size:13px;}
-.view-btn{background:#10b981;color:white;}.view-btn:hover{background:#059669;}
-.edit-btn{background:#3b82f6;color:white;}.edit-btn:hover{background:#2563eb;}
-.delete-btn{background:#ef4444;color:white;}.delete-btn:hover{background:#dc2626;}
-.toast{position:fixed;top:20px;right:20px;background:#064e3b;color:#fff;padding:12px 20px;border-radius:8px;display:none;z-index:2000;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.15);}
-.toast.error{background:#dc2626;}
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1050;align-items:center;justify-content:center;}
-.modal-overlay.open{display:flex;}
-.modal{background:white;border-radius:12px;padding:25px;width:94%;max-width:560px;box-shadow:0 20px 60px rgba(0,0,0,.2);}
-.modal h3{font-size:17px;font-weight:700;margin-bottom:16px;color:#1a202c;}
-.form-group{margin-bottom:14px;}
-.form-group label{display:block;font-weight:600;margin-bottom:5px;color:#374151;font-size:13px;}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;}
-.btn-row{display:flex;gap:10px;margin-top:20px;}
-.btn-row button{flex:1;padding:10px;border:none;border-radius:6px;font-weight:600;cursor:pointer;font-size:14px;}
-.kpi-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-bottom:20px;}
-.kpi-card{background:white;border-radius:10px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
-.kpi-label{font-size:11px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
-.kpi-value{font-size:26px;font-weight:800;color:#1a202c;margin-top:4px;}
-.detail-section{margin-bottom:14px;}
-.detail-section label{font-weight:700;color:#64748b;font-size:12px;text-transform:uppercase;}
-.detail-section div{font-size:14px;color:#1a202c;padding:4px 0;}
-@media(max-width:768px){.sidebar{display:none;}.main-content{margin:0;}.suppliers-header{flex-direction:column;}}
-</style>
+<script src="common.js"></script>
 </head>
 <body>
-<div class="sidebar">
-<div class="sidebar-header"><h1><i class="fas fa-truck"></i> POS</h1></div>
-<ul>
-<li onclick="navigateTo('dashboard.html')"><i class="fas fa-home"></i> Dashboard</li>
-<li onclick="navigateTo('sales.html')"><i class="fas fa-shopping-cart"></i> Sales</li>
-<li onclick="navigateTo('variations.html')"><i class="fas fa-plus-circle"></i> Add Product</li>
-<li onclick="navigateTo('inventory.html')"><i class="fas fa-boxes"></i> Inventory</li>
-<li onclick="navigateTo('customers.html')"><i class="fas fa-users"></i> Customers</li>
-<li class="active" onclick="navigateTo('suppliers.html')"><i class="fas fa-truck"></i> Suppliers</li>
-<li onclick="navigateTo('reports.html')"><i class="fas fa-chart-bar"></i> Reports</li>
-<li onclick="navigateTo('receiving.html')"><i class="fas fa-file-import"></i> Receiving</li>
-<li onclick="navigateTo('expenses.html')"><i class="fas fa-receipt"></i> Expenses</li>
-<li onclick="navigateTo('employees.html')"><i class="fas fa-user-tie"></i> Employees</li>
-<li onclick="navigateTo('appointments.html')"><i class="fas fa-calendar"></i> Appointments</li>
-<li onclick="navigateTo('giftcards.html')"><i class="fas fa-gift"></i> Gift Cards</li>
-<li onclick="navigateTo('invoices.html')"><i class="fas fa-file-invoice"></i> Invoices</li>
-<li onclick="navigateTo('deliveries.html')"><i class="fas fa-truck-loading"></i> Deliveries</li>
-<li onclick="navigateTo('payments.html')"><i class="fas fa-credit-card"></i> Payments</li>
-<li onclick="navigateTo('locations.html')"><i class="fas fa-store"></i> Locations</li>
-<li onclick="navigateTo('messages.html')"><i class="fas fa-envelope"></i> Messages</li>
-<li onclick="navigateTo('config.html')"><i class="fas fa-cog"></i> Store Config</li>
-<li onclick="navigateTo('login.html')"><i class="fas fa-sign-out-alt"></i> Logout</li>
-</ul>
-</div>
+<div class="sidebar" id="sidebar"></div>
 <div class="main-content">
-<div class="header"><h2><i class="fas fa-truck"></i> Suppliers</h2><span style="font-weight:500;" id="pharmacyName"><i class="fas fa-clinic-medical"></i> Loading...</span></div>
-<div class="content">
-<div class="kpi-bar">
-<div class="kpi-card"><div class="kpi-label">Total Suppliers</div><div class="kpi-value" id="kpiTotal">0</div></div>
-<div class="kpi-card"><div class="kpi-label">Active</div><div class="kpi-value text-success" id="kpiActive">0</div></div>
-</div>
-<div class="suppliers-header">
-<h2>All Suppliers</h2>
-<div style="display:flex;gap:10px;flex-wrap:wrap;">
-<input type="text" id="searchInput" placeholder="Search suppliers..." style="padding:9px 14px;border:1px solid #ddd;border-radius:6px;font-size:14px;min-width:220px;" oninput="searchSuppliers(this.value)">
-<select id="statusFilter" class="form-select" style="width:auto;padding:9px 14px;" onchange="applyFilter()"><option value="all">All Status</option><option value="active">Active</option><option value="inactive">Inactive</option></select>
-<button class="add-supplier-btn" onclick="openAddModal()"><i class="fas fa-plus"></i> Add Supplier</button>
-<button onclick="exportSuppliersCSV()" style="background:#4a5568;color:white;border:none;padding:9px 14px;border-radius:6px;cursor:pointer;"><i class="fas fa-file-export"></i> Export CSV</button>
-<button onclick="printSuppliers()" style="background:#6b7280;color:white;border:none;padding:9px 14px;border-radius:6px;cursor:pointer;"><i class="fas fa-print"></i> Print</button>
-</div>
-</div>
-<div style="overflow-x:auto;">
-<table class="suppliers-table">
-<thead><tr><th>Name</th><th>Contact Person</th><th>Phone</th><th>Email</th><th>Address</th><th>Status</th><th>Actions</th></tr></thead>
-<tbody id="suppliersTableBody"></tbody>
-</table>
-</div>
-</div>
+  <div class="header"><h2><i class="fas fa-truck"></i> Suppliers</h2><div id="userMenu"></div><div class="header-clock" id="topClock"></div></div>
+  <div class="content">
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-label"><i class="fas fa-truck"></i> Suppliers</div><div class="kpi-value" id="kpiTotal">0</div><div class="kpi-sub">Supplier network</div></div>
+      <div class="kpi-card"><div class="kpi-label"><i class="fas fa-circle-check"></i> Active</div><div class="kpi-value" id="kpiActive">0</div><div class="kpi-sub">Ready to order</div></div>
+      <div class="kpi-card"><div class="kpi-label"><i class="fas fa-star"></i> Avg Rating</div><div class="kpi-value" id="kpiRating">0.0</div><div class="kpi-sub">Quality score</div></div>
+      <div class="kpi-card"><div class="kpi-label"><i class="fas fa-file-invoice-dollar"></i> Outstanding</div><div class="kpi-value" id="kpiOutstanding">?0.00</div><div class="kpi-sub">Supplier balances</div></div>
+    </div>
+    <div class="page-head">
+      <div><h3>Supplier Performance & Purchasing</h3><p>Manage supplier details, ratings, purchase orders, payments, documents and communication history.</p></div>
+      <div class="actions"><button class="btn btn-primary" onclick="openSupplierModal()"><i class="fas fa-plus"></i> Add Supplier</button><button class="btn btn-outline" onclick="openImport()"><i class="fas fa-file-import"></i> Import CSV</button></div>
+    </div>
+    <div class="panel">
+      <div class="toolbar">
+        <input id="searchInput" class="search-input" placeholder="Search supplier, contact, product or email..." oninput="renderSuppliers()">
+        <select id="statusFilter" class="form-select" onchange="renderSuppliers()"><option value="all">All Status</option><option value="active">Active</option><option value="inactive">Inactive</option></select>
+        <button class="btn btn-info" onclick="exportSuppliers()"><i class="fas fa-file-export"></i> Export CSV</button>
+        <button class="btn btn-secondary" onclick="printSuppliers()"><i class="fas fa-print"></i> Print</button>
+        <button class="btn btn-purple" onclick="openCompareModal()"><i class="fas fa-balance-scale"></i> Compare</button>
+      </div>
+    </div>
+    <div class="table-panel">
+      <div class="table-top"><strong><i class="fas fa-list"></i> Supplier Directory</strong><span id="selectedCount">Select suppliers to compare</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th><input id="compareAll" type="checkbox" onchange="toggleCompareAll(this.checked)" title="Select for comparison"></th><th>Supplier</th><th>Contact</th><th>Phone</th><th>Email</th><th>Rating</th><th>Outstanding</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="suppliersBody"><tr><td colspan="9" class="empty-state">Loading suppliers...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
 <div class="toast" id="toast"></div>
+<input type="file" id="importFile" accept=".csv" style="display:none" onchange="importSuppliers(event)">
 <div class="modal-overlay" id="supplierModal">
-<div class="modal">
-<h3 id="modalTitle"><i class="fas fa-plus"></i> Add Supplier</h3>
-<div class="form-row" style="grid-template-columns:1fr 1fr;gap:14px;">
-<div class="form-group"><label>Supplier Name *</label><input type="text" id="sf_name" placeholder="e.g. Emzor Pharmaceuticals"></div>
-<div class="form-group"><label>Contact Person</label><input type="text" id="sf_contact" placeholder="e.g. John Doe"></div>
-<div class="form-group"><label>Phone</label><input type="tel" id="sf_phone" placeholder="+234 ..."></div>
-<div class="form-group"><label>Email</label><input type="email" id="sf_email" placeholder="email@example.com"></div>
-</div>
-<div class="form-group"><label>Address</label><textarea id="sf_address" rows="2" placeholder="Full address"></textarea></div>
-<div class="form-group"><label>Status</label><select id="sf_status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
-<input type="hidden" id="sf_editId" value="">
-<div class="btn-row"><button class="btn btn-secondary" onclick="closeModal('supplierModal')">Cancel</button><button class="btn btn-primary" onclick="saveSupplier()">Save Supplier</button></div>
-</div>
+  <div class="modal modal-lg">
+    <div class="modal-header"><h3 id="supplierModalTitle">Add Supplier</h3><button class="modal-close" onclick="POS.closeModal('supplierModal')">&times;</button></div>
+    <input type="hidden" id="supplierId">
+    <div class="form-row">
+      <div class="form-group"><label class="required">Supplier Name</label><input id="sf_name" class="form-control" placeholder="Supplier name"></div>
+      <div class="form-group"><label>Contact Person</label><input id="sf_contact" class="form-control" placeholder="Contact name"></div>
+      <div class="form-group"><label>Phone</label><input id="sf_phone" class="form-control" placeholder="+234 ..."></div>
+      <div class="form-group"><label>Email</label><input id="sf_email" class="form-control" type="email" placeholder="email@example.com"></div>
+      <div class="form-group"><label>Status</label><select id="sf_status" class="form-select"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+      <div class="form-group"><label>Rating</label><input id="sf_rating" class="form-control" type="number" min="0" max="5" step="0.1" placeholder="0 to 5"></div>
+      <div class="form-group"><label>Lead Time Days</label><input id="sf_lead" class="form-control" type="number" min="0" step="0.1" placeholder="Average days"></div>
+      <div class="form-group"><label>Avg Unit Cost</label><input id="sf_cost" class="form-control" type="number" min="0" step="0.01" placeholder="?"></div>
+      <div class="form-group full"><label>Address</label><input id="sf_address" class="form-control" placeholder="Address"></div>
+      <div class="form-group full"><label>Products Supplied</label><input id="sf_products" class="form-control" placeholder="Comma separated product names"></div>
+      <div class="form-group full"><label>Notes</label><textarea id="sf_notes" class="form-control" placeholder="Internal supplier notes"></textarea></div>
+    </div>
+    <div class="modal-actions"><button class="btn btn-secondary" onclick="POS.closeModal('supplierModal')">Cancel</button><button class="btn btn-success" onclick="saveSupplier()">Save Supplier</button></div>
+  </div>
 </div>
 <div class="modal-overlay" id="detailModal">
-<div class="modal" style="max-width:500px;">
-<h3><i class="fas fa-truck"></i> Supplier Details</h3>
-<div id="detailContent"></div>
-<div class="btn-row"><button class="btn btn-secondary" onclick="closeModal('detailModal')">Close</button><button class="btn btn-primary" id="detailEditBtn" onclick="">Edit</button><button class="btn btn-danger" id="detailDelBtn" onclick="">Delete</button></div>
-</div>
+  <div class="modal modal-xl">
+    <div class="modal-header"><h3>Supplier Details</h3><button class="modal-close" onclick="POS.closeModal('detailModal')">&times;</button></div>
+    <div id="detailContent"></div>
+    <div class="tabs" style="margin-top:16px"><button class="tab-btn active" onclick="switchDetail('po',this)">POs</button><button class="tab-btn" onclick="switchDetail('pay',this)">Payments</button><button class="tab-btn" onclick="switchDetail('docs',this)">Documents</button><button class="tab-btn" onclick="switchDetail('comm',this)">Communication</button></div>
+    <div id="po" class="tab-content active"><div class="form-row"><div class="form-group"><label>PO Number</label><input id="po_number" class="form-control"></div><div class="form-group"><label>Amount</label><input id="po_amount" class="form-control" type="number" min="0" step="0.01"></div><div class="form-group"><label>Status</label><select id="po_status" class="form-select"><option value="draft">Draft</option><option value="sent">Sent</option><option value="partial">Partial</option><option value="completed">Completed</option></select></div><div class="form-group"><label>Items</label><input id="po_items" class="form-control"></div></div><button class="btn btn-primary" onclick="addPO()">Add Purchase Order</button><div id="poTable" style="margin-top:14px"></div></div>
+    <div id="pay" class="tab-content"><div class="form-row"><div class="form-group"><label>Amount</label><input id="pay_amount" class="form-control" type="number" min="0" step="0.01"></div><div class="form-group"><label>Method</label><select id="pay_method" class="form-select"><option>Bank Transfer</option><option>Cash</option><option>Cheque</option><option>POS</option></select></div><div class="form-group"><label>Status</label><select id="pay_status" class="form-select"><option value="paid">Paid</option><option value="partial">Partial</option><option value="outstanding">Outstanding</option></select></div><div class="form-group"><label>Reference</label><input id="pay_reference" class="form-control"></div></div><button class="btn btn-primary" onclick="addPayment()">Add Payment</button><div id="payTable" style="margin-top:14px"></div></div>
+    <div id="docs" class="tab-content"><div class="form-row"><div class="form-group"><label>Type</label><select id="doc_type" class="form-select"><option>Agreement</option><option>Invoice</option><option>Certificate</option><option>License</option><option>Receipt</option></select></div><div class="form-group"><label>File Name</label><input id="doc_name" class="form-control"></div><div class="form-group"><label>Link</label><input id="doc_link" class="form-control"></div></div><button class="btn btn-primary" onclick="addDocument()">Add Document</button><div id="docTable" style="margin-top:14px"></div></div>
+    <div id="comm" class="tab-content"><div class="form-row"><div class="form-group"><label>Channel</label><select id="comm_channel" class="form-select"><option>Email</option><option>Phone</option><option>WhatsApp</option><option>SMS</option><option>Visit</option></select></div><div class="form-group"><label>Subject</label><input id="comm_subject" class="form-control"></div><div class="form-group full"><label>Notes</label><textarea id="comm_notes" class="form-control"></textarea></div></div><button class="btn btn-primary" onclick="addCommunication()">Add Communication</button><div id="commTable" style="margin-top:14px"></div></div>
+  </div>
 </div>
 <script>
-var allSuppliers=[],viewingId=null,editingId=null;
+var suppliers=[],currentList=[],compareIds=[],viewingId=null,STORAGE_KEY='SHEDS_supplier_enrichment_v2',SUPPLIERS_KEY='danzona_suppliers',enrichment=loadEnrichment();
 function $(id){return document.getElementById(id);}
-function formatCurrency(v){return '\u20A6'+(parseFloat(v)||0).toLocaleString('en-NG');}
-function navigateTo(p){window.location.href=p;}
-function showToast(msg,isError){var t=$('toast');t.textContent=msg;t.className='toast'+(isError?' error':'');t.style.display='block';setTimeout(function(){t.style.display='none';},3000);}
-function openModal(id){$(id).classList.add('open');}
-function closeModal(id){$(id).classList.remove('open');}
-
-async function loadSuppliers(){
-    try{var res=await API.getSuppliers();allSuppliers=res||[];updateKPIs();renderSuppliers(allSuppliers);$('pharmacyName').innerHTML='<i class="fas fa-clinic-medical"></i> '+(API.getPharmacyName?API.getPharmacyName():'Pharmacy');}
-    catch(e){showToast('Failed to load suppliers: '+e.message,true);allSuppliers=[];$('suppliersTableBody').innerHTML='<tr><td colspan="7" style="text-align:center;color:#999;">Failed to load suppliers</td></tr>';}
-}
-function updateKPIs(){$('kpiTotal').textContent=allSuppliers.length;$('kpiActive').textContent=allSuppliers.filter(function(s){return s.status==='active';}).length;}
-function renderSuppliers(list){
-    var tbody=$('suppliersTableBody');if(!tbody)return;
-    if(!list.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#999;">No suppliers found</td></tr>';return;}
-    var html='';
-    list.forEach(function(s){
-        html+='<tr><td><strong>'+(s.name||'N/A')+'</strong></td><td>'+(s.contact_person||'-')+'</td><td>'+(s.phone||'-')+'</td><td>'+(s.email||'-')+'</td><td>'+(s.address||'-')+'</td><td><span class="badge '+((s.status==='active'?'badge-active':'badge-inactive'))+'">'+(s.status||'unknown')+'</span></td><td class="action-btns"><button class="action-btn view-btn" onclick="viewSupplier('+s.id+')" title="View"><i class="fas fa-eye"></i></button><button class="action-btn edit-btn" onclick="editSupplier('+s.id+')" title="Edit"><i class="fas fa-edit"></i></button><button class="action-btn delete-btn" onclick="deleteSupplier('+s.id+')" title="Delete"><i class="fas fa-trash"></i></button></td></tr>';
-    });
-    tbody.innerHTML=html;
-}
-function openAddModal(){editingId=null;$('modalTitle').innerHTML='<i class="fas fa-plus"></i> Add Supplier';['sf_name','sf_contact','sf_phone','sf_email','sf_address'].forEach(function(id){$(''+id).value='';});$('sf_status').value='active';$('sf_editId').value='';openModal('supplierModal');setTimeout(function(){$('sf_name').focus();},200);}
-function editSupplier(id){var s=allSuppliers.find(function(x){return x.id===id;});if(!s)return;editingId=id;$('modalTitle').innerHTML='<i class="fas fa-edit"></i> Edit Supplier';$('sf_name').value=s.name||'';$('sf_contact').value=s.contact_person||'';$('sf_phone').value=s.phone||'';$('sf_email').value=s.email||'';$('sf_address').value=s.address||'';$('sf_status').value=s.status||'active';$('sf_editId').value=id;openModal('supplierModal');}
-function searchSuppliers(q){var qq=q.toLowerCase();var base=allSuppliers.filter(function(s){return(s.name||'').toLowerCase().indexOf(qq)>-1||(s.phone||'').toLowerCase().indexOf(qq)>-1||(s.email||'').toLowerCase().indexOf(qq)>-1;});applyFilter(base);}
-function applyFilter(base){
-if(!base)base=allSuppliers.slice();
-var st=$('statusFilter').value;
-if(st!=='all')base=base.filter(function(s){return s.status===st;});
-renderSuppliers(base);
-}
-async function saveSupplier(){
-var name=$('sf_name').value.trim();
-if(!name){showToast('Supplier name required',true);return;}
-var data={name:name,contact_person:$('sf_contact').value.trim(),phone:$('sf_phone').value.trim(),email:$('sf_email').value.trim(),address:$('sf_address').value.trim(),status:$('sf_status').value};
-try{
-if(editingId){var res=await API.updateSupplier(parseInt(editingId),data);showToast('Supplier updated');}
-else{var res=await API.saveSupplier(data);showToast('Supplier created');allSuppliers.unshift(res);}
-closeModal('supplierModal');loadSuppliers();
-}catch(e){showToast('Save failed: '+e.message,true);}
-}
-async function deleteSupplier(id){
-if(!confirm('Delete this supplier?'))return;
-try{await API.deleteSupplier(id);showToast('Supplier deleted');allSuppliers=allSuppliers.filter(function(s){return s.id!==id;});loadSuppliers();}
-catch(e){showToast('Delete failed: '+e.message,true);}
-}
-function viewSupplier(id){
-    var s=allSuppliers.find(function(x){return x.id===id;});if(!s)return;viewingId=id;
-    var html='<div class="detail-section"><label>Name</label><div><strong>'+(s.name||'N/A')+'</strong></div></div>';
-    html+='<div class="detail-section"><label>Contact Person</label><div>'+(s.contact_person||'-')+'</div></div>';
-    html+='<div class="detail-section"><label>Phone</label><div>'+(s.phone||'-')+'</div></div>';
-    html+='<div class="detail-section"><label>Email</label><div>'+(s.email||'-')+'</div></div>';
-    html+='<div class="detail-section"><label>Address</label><div>'+(s.address||'-')+'</div></div>';
-    html+='<div class="detail-section"><label>Status</label><div><span class="badge '+((s.status==='active'?'badge-active':'badge-inactive'))+'">'+(s.status||'unknown')+'</span></div></div>';
-    html+='<div class="detail-section"><label>Created</label><div>'+(s.created_at||'N/A')+'</div></div>';
-    $('detailEditBtn').onclick=function(){closeModal('detailModal');editSupplier(id);};
-    $('detailDelBtn').onclick=function(){closeModal('detailModal');deleteSupplier(id);};
-    $('detailContent').innerHTML=html;
-    openModal('detailModal');
-}
-function exportSuppliersCSV(){
-    var data=allSuppliers.filter(function(s){return(s.status==='active' || s.status==='inactive');});
-    if(data.length===0){showToast('No suppliers to export',true);return;}
-    var csv='Name,Contact Person,Phone,Email,Address,Status,Created\n';
-    data.forEach(function(s){csv+='"'+s.name+'","'+(s.contact_person||'')+'","'+(s.phone||'')+'","'+(s.email||'')+'","'+(s.address||'')+'","'+(s.status||'')+'","'+(s.created_at||'')+'"\n';});
-    var blob=new Blob([csv],{type:'text/csv'});
-    var url=URL.createObjectURL(blob);
-    var a=document.createElement('a');
-    a.href=url;
-    a.download='suppliers_'+new Date().toISOString().split('T')[0]+'.csv';
-    a.click();
-    URL.revokeObjectURL(url);
-    showToast('Suppliers exported!');
-}
-function printSuppliers(){
-    var printContent='<h2 style="text-align:center;">Suppliers Report - DANZONA PHARM</h2><p style="text-align:center;color:#666;">Generated: '+new Date().toLocaleDateString()+'</p><table border="1" cellpadding="8" style="width:100%;border-collapse:collapse;margin-top:20px;"><thead><tr><th>Name</th><th>Contact</th><th>Phone</th><th>Email</th><th>Status</th></tr></thead><tbody>';
-    allSuppliers.forEach(function(s){printContent+='<tr><td>'+s.name+'</td><td>'+(s.contact_person||'')+'</td><td>'+(s.phone||'')+'</td><td>'+(s.email||'')+'</td><td>'+s.status+'</td></tr>';});
-    printContent+='</tbody></table>';
-    var win=window.open('','', 'width=900,height=650');
-    win.document.write('<html><head><title>Print Suppliers</title><style>body{font-family:Arial;} th,td{border:1px solid #ddd;padding:8px;text-align:left;} th{background:#f8f9fa;}</style></head><body>'+printContent+'</body></html>');
-    win.document.close();
-    win.focus();
-    win.print();
-}
-document.addEventListener('DOMContentLoaded',function(){if(!API.isLoggedIn()){window.location.href='login.html';return;}loadSuppliers();});
+function esc(v){return POS.esc(v)}function num(v,f){var n=parseFloat(v);return isNaN(n)?(f||0):n}function today(){return POS.today()}function enrich(s){var e=enrichment[String(s.id)]||{};var m=Object.assign({},s,e);m.purchaseOrders=Array.isArray(m.purchaseOrders)?m.purchaseOrders:[];m.payments=Array.isArray(m.payments)?m.payments:[];m.documents=Array.isArray(m.documents)?m.documents:[];m.communications=Array.isArray(m.communications)?m.communications:[];m.purchaseProducts=Array.isArray(m.purchaseProducts)?m.purchaseProducts:(m.products_supplied||'').split(/[;,]/).map(function(x){return x.trim()}).filter(Boolean);m.performance=m.performance||{};return m}function saveEnrich(){localStorage.setItem(STORAGE_KEY,JSON.stringify(enrichment))}function loadEnrich(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}')}catch(e){return {}}}function outstanding(s){return (s.payments||[]).reduce(function(sum,p){var st=String(p.status||'').toLowerCase();return sum+(st==='paid'?0:num(p.amount));},0)}function rating(s){return num(s.rating||s.performance.qualityRating,0)}function updateKPIs(){var active=suppliers.filter(function(s){return s.status==='active'}).length;var out=suppliers.reduce(function(sum,s){return sum+outstanding(s)},0);var avg=suppliers.length?suppliers.reduce(function(sum,s){return sum+rating(s)},0)/suppliers.length:0;$('kpiTotal').textContent=suppliers.length;$('kpiActive').textContent=active;$('kpiRating').textContent=avg.toFixed(1);$('kpiOutstanding').textContent=POS.formatCurrency(out)}function renderSuppliers(){var q=$('searchInput').value.toLowerCase();var st=$('statusFilter').value;currentList=suppliers.filter(function(s){var text=[s.name,s.contact_person,s.contactPerson,s.phone,s.email,s.address,(s.purchaseProducts||[]).join(' ')].join(' ').toLowerCase();return (!q||text.indexOf(q)>-1)&&(st==='all'||s.status===st)});$('selectedCount').textContent=compareIds.length+' selected for comparison';var body=$('suppliersBody');if(!currentList.length){body.innerHTML='<tr><td colspan="9" class="empty-state">No suppliers found.</td></tr>';return;}body.innerHTML=currentList.map(function(s){var checked=compareIds.indexOf(String(s.id))>-1?'checked':'';return '<tr><td><input type="checkbox" '+checked+' onchange="toggleCompare('+JSON.stringify(s.id)+')"></td><td><strong>'+esc(s.name)+'</strong><br><small class="muted">'+esc((s.purchaseProducts||[]).slice(0,3).join(', '))+'</small></td><td>'+esc(s.contact_person||s.contactPerson||'-')+'</td><td>'+esc(s.phone||'-')+'</td><td>'+esc(s.email||'-')+'</td><td>'+rating(s).toFixed(1)+'/5</td><td>'+POS.formatCurrency(outstanding(s))+'</td><td>'+POS.statusBadge(s.status)+'</td><td class="action-btns"><button class="icon-btn view" onclick="openDetail('+JSON.stringify(s.id)+')"><i class="fas fa-eye"></i> View</button><button class="icon-btn edit" onclick="openSupplierModal('+JSON.stringify(s.id)+')"><i class="fas fa-edit"></i></button><button class="icon-btn delete" onclick="deleteSupplier('+JSON.stringify(s.id)+')"><i class="fas fa-trash"></i></button></td></tr>'}).join('');$('compareAll').checked=compareIds.length===suppliers.length&&suppliers.length>0;}
+function openSupplierModal(id){var s=id?suppliers.find(function(x){return String(x.id)===String(id)}):null;$('supplierId').value=s?s.id:'';$('supplierModalTitle').textContent=s?'Edit Supplier':'Add Supplier';['sf_name','sf_contact','sf_phone','sf_email','sf_address','sf_products','sf_notes','sf_lead','sf_cost'].forEach(function(x){$(x).value=''});$('sf_rating').value='';$('sf_status').value='active';if(s){$('sf_name').value=s.name||'';$('sf_contact').value=s.contact_person||s.contactPerson||'';$('sf_phone').value=s.phone||'';$('sf_email').value=s.email||'';$('sf_address').value=s.address||'';$('sf_status').value=s.status||'active';$('sf_rating').value=s.rating||'';$('sf_lead').value=s.performance?s.performance.leadTime:'';$('sf_cost').value=s.performance?s.performance.avgUnitCost:'';$('sf_products').value=(s.purchaseProducts||[]).join(', ');$('sf_notes').value=s.notes||''}POS.openModal('supplierModal')}
+async function saveSupplier(){var name=$('sf_name').value.trim();if(!name){POS.showToast('Supplier name is required',true);return;}var data={name:name,contact_person:$('sf_contact').value.trim(),contactPerson:$('sf_contact').value.trim(),phone:$('sf_phone').value.trim(),email:$('sf_email').value.trim(),address:$('sf_address').value.trim(),status:$('sf_status').value,products_supplied:$('sf_products').value.trim()};var patch={rating:num($('sf_rating').value),performance:{leadTime:num($('sf_lead').value,''),avgUnitCost:num($('sf_cost').value,'')},purchaseProducts:($('sf_products').value||'').split(/[;,]/).map(function(x){return x.trim()}).filter(Boolean),notes:$('sf_notes').value.trim()};try{var id=$('supplierId').value;if(id){await API.updateSupplier(id,data);enrichment[String(id)]=Object.assign({},enrichment[String(id)]||{},patch);POS.showToast('Supplier updated');}else{var created=await API.saveSupplier(data);var newId=created.id||created._id;enrichment[String(newId)]=patch;POS.showToast('Supplier created');}POS.closeModal('supplierModal');await loadSuppliers();}catch(e){var id=$('supplierId').value;var localSuppliers=loadLocalSuppliers();if(id){var idx=localSuppliers.findIndex(function(s){return String(s.id)===String(id)});if(idx>-1){Object.assign(localSuppliers[idx],data);localSuppliers[idx]._patch=patch;}else{localSuppliers.push(Object.assign({},data,{id:id},patch));}}else{var newId='SUP-'+Date.now();localSuppliers.unshift(Object.assign({},data,{id:newId},patch));}localStorage.setItem(SUPPLIERS_KEY,JSON.stringify(localSuppliers));POS.showToast('Supplier saved locally');POS.closeModal('supplierModal');await loadSuppliers();}}
+async function deleteSupplier(id){if(!confirm('Delete this supplier?'))return;try{await API.deleteSupplier(id);}catch(e){}var localSuppliers=loadLocalSuppliers();localSuppliers=localSuppliers.filter(function(s){return String(s.id)!==String(id)});localStorage.setItem(SUPPLIERS_KEY,JSON.stringify(localSuppliers));delete enrichment[String(id)];saveEnrich();await loadSuppliers();POS.showToast('Supplier deleted');}
+function openDetail(id){viewingId=id;var s=enrich(suppliers.find(function(x){return String(x.id)===String(id)}));if(!s)return;var perf=s.performance||{};$('detailContent').innerHTML='<div class="kpi-grid"><div class="kpi-card"><div class="kpi-label">Name</div><div class="kpi-value">'+esc(s.name)+'</div></div><div class="kpi-card"><div class="kpi-label">Contact</div><div class="kpi-value">'+esc(s.contact_person||s.contactPerson||'-')+'</div></div><div class="kpi-card"><div class="kpi-label">Rating</div><div class="kpi-value">'+rating(s).toFixed(1)+'/5</div></div><div class="kpi-card"><div class="kpi-label">Outstanding</div><div class="kpi-value">'+POS.formatCurrency(outstanding(s))+'</div></div></div><div class="form-row"><div class="panel" style="margin:0"><h3>Performance</h3><p class="muted">Lead time: <strong>'+esc(perf.leadTime||'-')+' days</strong></p><p class="muted">Average unit cost: <strong>'+POS.formatCurrency(perf.avgUnitCost||0)+'</strong></p></div><div class="panel" style="margin:0"><h3>Contact</h3><p class="muted">Phone: <strong>'+esc(s.phone||'-')+'</strong></p><p class="muted">Email: <strong>'+esc(s.email||'-')+'</strong></p><p class="muted">Address: <strong>'+esc(s.address||'-')+'</strong></p></div></div>';renderDetailTables(s);POS.openModal('detailModal')}
+function switchDetail(name,btn){document.querySelectorAll('#detailModal .tab-btn').forEach(function(b){b.classList.remove('active')});document.querySelectorAll('#detailModal .tab-content').forEach(function(c){c.classList.remove('active')});btn.classList.add('active');$(name).classList.add('active')}
+function renderDetailTables(s){$('poTable').innerHTML='<h4>Purchase Orders</h4>'+(s.purchaseOrders||[]).map(function(p){return '<div class="mini-item"><strong>'+esc(p.poNumber||p.po_number||'-')+'</strong><small>'+POS.formatDate(p.poDate||p.po_date)+' | '+POS.formatCurrency(p.amount)+' | '+esc(p.status||'draft')+'</small></div>'}).join('')||'<p class="muted">No purchase orders yet.</p>';$('payTable').innerHTML='<h4>Payments</h4>'+(s.payments||[]).map(function(p){return '<div class="mini-item"><strong>'+POS.formatCurrency(p.amount)+'</strong><small>'+esc(p.method||'-')+' | '+esc(p.status||'-')+' | '+esc(p.reference||'')+'</small></div>'}).join('')||'<p class="muted">No payments yet.</p>';$('docTable').innerHTML='<h4>Documents</h4>'+(s.documents||[]).map(function(d){return '<div class="mini-item"><strong>'+esc(d.fileName||d.name||'Document')+'</strong><small>'+esc(d.type||d.docType||'')+' | '+esc(d.docLink||d.link||'')+'</small></div>'}).join('')||'<p class="muted">No documents yet.</p>';$('commTable').innerHTML='<h4>Communication Log</h4>'+(s.communications||[]).map(function(c){return '<div class="mini-item"><strong>'+esc(c.subject||'-')+'</strong><small>'+esc(c.channel||'-')+' | '+esc(c.notes||'')+'</small></div>'}).join('')||'<p class="muted">No communication logged yet.</p>'}
+function addPO(){var s=enrich(suppliers.find(function(x){return String(x.id)===String(viewingId)}));if(!s)return;s.purchaseOrders=s.purchaseOrders||[];s.purchaseOrders.push({poNumber:$('po_number').value.trim()||'PO-'+Date.now(),amount:num($('po_amount').value),status:$('po_status').value,items:$('po_items').value.trim()});enrichment[String(viewingId)]=Object.assign({},enrichment[String(viewingId)]||{},{purchaseOrders:s.purchaseOrders});saveEnrich();renderDetailTables(s);POS.showToast('Purchase order added')}
+function addPayment(){var s=enrich(suppliers.find(function(x){return String(x.id)===String(viewingId)}));if(!s)return;s.payments=s.payments||[];s.payments.push({amount:num($('pay_amount').value),method:$('pay_method').value,status:$('pay_status').value,reference:$('pay_reference').value.trim()});enrichment[String(viewingId)]=Object.assign({},enrichment[String(viewingId)]||{},{payments:s.payments});saveEnrich();updateKPIs();renderDetailTables(s);POS.showToast('Payment added')}
+function addDocument(){var s=enrich(suppliers.find(function(x){return String(x.id)===String(viewingId)}));if(!s)return;s.documents=s.documents||[];s.documents.push({type:$('doc_type').value,fileName:$('doc_name').value.trim(),docLink:$('doc_link').value.trim()});enrichment[String(viewingId)]=Object.assign({},enrichment[String(viewingId)]||{},{documents:s.documents});saveEnrich();renderDetailTables(s);POS.showToast('Document added')}
+function addCommunication(){var s=enrich(suppliers.find(function(x){return String(x.id)===String(viewingId)}));if(!s)return;s.communications=s.communications||[];s.communications.push({channel:$('comm_channel').value,subject:$('comm_subject').value.trim(),notes:$('comm_notes').value.trim()});enrichment[String(viewingId)]=Object.assign({},enrichment[String(viewingId)]||{},{communications:s.communications});saveEnrich();renderDetailTables(s);POS.showToast('Communication logged')}
+function toggleCompare(id){id=String(id);if(compareIds.indexOf(id)>-1){compareIds=compareIds.filter(function(x){return x!==id})}else{if(compareIds.length>=3){POS.showToast('Select up to 3 suppliers',true);return}compareIds.push(id)}renderSuppliers()}function toggleCompareAll(checked){compareIds=checked?suppliers.slice(0,3).map(function(s){return String(s.id)}):[];renderSuppliers()}function openCompareModal(){if(compareIds.length<2){POS.showToast('Select 2 or 3 suppliers first',true);return}var rows=[['Rating',function(s){return rating(s).toFixed(1)+'/5'}],['Outstanding',function(s){return POS.formatCurrency(outstanding(s))}],['Lead Time',function(s){return (s.performance&&s.performance.leadTime?s.performance.leadTime:'-')+' days'}],['Avg Cost',function(s){return POS.formatCurrency(s.performance?s.performance.avgUnitCost:0)}]];var suppliersToCompare=compareIds.map(function(id){return enrich(suppliers.find(function(s){return String(s.id)===id}))}).filter(Boolean);var html='<table><thead><tr><th>Metric</th>';suppliersToCompare.forEach(function(s){html+='<th>'+esc(s.name)+'</th>'});html+='</tr></thead><tbody>';rows.forEach(function(row){html+='<tr><td><strong>'+row[0]+'</strong></td>';suppliersToCompare.forEach(function(s){html+='<td>'+row[1](s)+'</td>'});html+='</tr>'});html+='</tbody></table>';alert(html.replace(/<[^>]+>/g,'\n'))}
+function exportSuppliers(){var rows=filteredSuppliers();if(!rows.length){POS.showToast('No suppliers to export',true);return;}POS.exportCSV('SHEDS_suppliers_'+POS.today()+'.csv',['Name','Contact','Phone','Email','Status','Rating','Outstanding','Products'],rows.map(function(s){return {Name:s.name,Contact:s.contact_person||s.contactPerson||'',Phone:s.phone||'',Email:s.email||'',Status:s.status,Rating:rating(s),Outstanding:outstanding(s),Products:(s.purchaseProducts||[]).join('; ')}}))}
+function filteredSuppliers(){return currentList.length?currentList:suppliers}
+function printSuppliers(){var rows=filteredSuppliers();POS.printTable('SHEDS POS Supplier Report',['Name','Contact','Phone','Email','Rating','Outstanding','Status'],rows.map(function(s){return {Name:s.name,Contact:s.contact_person||s.contactPerson||'',Phone:s.phone||'',Email:s.email||'',Rating:rating(s),Outstanding:POS.formatCurrency(outstanding(s)),Status:s.status}}))}
+function openImport(){$('importFile').click()}function importSuppliers(e){var file=e.target.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(ev){parseCSV(ev.target.result)};reader.readAsText(file)}function parseCSV(text){var lines=text.split(/\r?\n/).filter(function(l){return l.trim()});var headers=lines[0].split(',').map(function(h){return h.trim()});for(var i=1;i<lines.length;i++){var cols=lines[i].split(',');var obj={};headers.forEach(function(h,j){obj[h]=cols[j]||''});var data={name:obj.Name||obj['Supplier Name']||obj.name,contact_person:obj['Contact Person']||obj.contact_person,phone:obj.Phone||obj.phone,email:obj.Email||obj.email,address:obj.Address||obj.address,status:String(obj.Status||'active').toLowerCase()==='inactive'?'inactive':'active'};if(data.name)API.saveSupplier(data).then(function(created){var id=created.id||created._id;enrichment[String(id)]={purchaseProducts:(obj.Products||'').split(/[;,]/).map(function(x){return x.trim()}).filter(Boolean),rating:num(obj.Rating||obj['Average Rating'])};saveEnrich()}).catch(function(err){POS.showToast('Import row failed: '+err.message,true)})}POS.showToast('Import started');$('importFile').value='';loadSuppliers()}
+function loadLocalSuppliers(){try{return JSON.parse(localStorage.getItem(SUPPLIERS_KEY)||'[]');}catch(e){return []}}
+async function loadSuppliers(){try{var res=await API.getSuppliers()||[];suppliers=res.map(enrich);}catch(e){suppliers=loadLocalSuppliers().map(enrich);}if(!suppliers.length){suppliers=[{id:'SUP-1',name:'Default Supplier',contact_person:'Contact',phone:'08000000000',email:'supplier@example.com',address:'Lafia',status:'active',rating:4.0,performance:{leadTime:3,avgUnitCost:1000},products_supplied:'Paracetamol,Amoxicillin'}].map(enrich);}updateKPIs();renderSuppliers()}
+document.addEventListener('DOMContentLoaded',function(){if(!POS.requireAuth())return;loadSuppliers();});
 </script>
 </body>
 </html>
+
+

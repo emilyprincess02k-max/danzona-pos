@@ -3,254 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Locations - DANZONA PHARM</title>
+    <title>Locations - SHEDS POS</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
-body{background:#f2f2f2;min-height:100vh;display:flex;}
-.sidebar{width:260px;background:#064e3b;color:#e2e8f0;height:100vh;overflow-y:auto;box-shadow:2px 0 10px rgba(0,0,0,0.1);flex-shrink:0;}
-.sidebar-header{background:#043e2c;padding:20px 25px;border-bottom:1px solid #059669;}
-.sidebar h1{font-size:22px;color:#10b981;margin:0;font-weight:600;}
-.sidebar ul{list-style:none;padding:15px 0;}
-.sidebar ul li{padding:12px 25px;display:flex;align-items:center;gap:12px;cursor:pointer;border-left:3px solid transparent;transition:all 0.2s ease;font-size:14px;}
-.sidebar ul li i{width:20px;text-align:center;font-size:16px;}
-.sidebar ul li:hover{background:#059669;border-left-color:#10b981;color:#ffffff;}
-.sidebar ul li.active{background:#059669;border-left-color:#10b981;color:#ffffff;}
-.main-content{flex:1;display:flex;flex-direction:column;}
-.header{background:#10b981;color:white;padding:15px 25px;display:flex;justify-content:space-between;align-items:center;}
-.header h2{font-size:20px;}
-.content{flex:1;padding:20px;}
-.notification-toast{position:fixed;top:20px;right:20px;background:#48bb78;color:white;padding:1rem 1.5rem;border-radius:5px;display:none;z-index:1000;}
-.locations-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:15px;}
-.locations-header h2{margin:0;}
-.add-location-btn{background:#10b981;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;font-size:16px;}
-.add-location-btn:hover{background:#059669;}
-.locations-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;}
-.location-card{background:white;border-radius:10px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,0.1);}
-.location-card h3{color:#2c3e50;margin-bottom:15px;border-bottom:1px solid #eee;padding-bottom:10px;}
-.location-info{margin-bottom:10px;font-size:14px;}
-.location-info i{width:20px;color:#4da3ff;margin-right:8px;}
-.location-status{padding:4px 8px;border-radius:4px;font-size:12px;font-weight:500;}
-.location-status.active{background:#dcfce7;color:#166534;}
-.location-status.inactive{background:#f3f4f6;color:#6b7280;}
-.location-actions{margin-top:15px;display:flex;gap:10px;}
-.loc-btn{padding:8px 12px;border:none;border-radius:4px;cursor:pointer;font-size:14px;}
-.edit-loc-btn{background:#3b82f6;color:white;}
-.delete-loc-btn{background:#ef4444;color:white;}
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center;}
-.modal.active{display:flex;}
-.modal-content{background:white;border-radius:10px;padding:25px;max-width:500px;width:90%;max-height:90vh;overflow-y:auto;}
-.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid #eee;}
-.modal-header h3{margin:0;color:#2c3e50;}
-.close-modal{background:none;border:none;font-size:24px;cursor:pointer;color:#718096;}
-.modal .form-group{margin-bottom:15px;}
-.modal .form-group label{display:block;margin-bottom:5px;font-weight:500;color:#4a5568;}
-.modal .form-group input,.modal .form-group select{width:100%;padding:10px;border:1px solid #ddd;border-radius:5px;font-size:14px;}
-.modal .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;}
-.modal .btn{padding:10px 20px;border:none;border-radius:5px;cursor:pointer;font-weight:500;}
-.modal .btn-primary{background:#3b82f6;color:#fff;}
-.modal .btn-secondary{background:#e2e8f0;color:#2d3748;}
-.loading-spinner{text-align:center;padding:20px;color:#718096;}
-</style>
-<script src="api.js"></script>
-<script>
-function navigateTo(page){window.location.href=page;}
-</script>
+    <link rel="stylesheet" href="common.css">
+    <script src="api.js"></script>
+    <script src="common.js"></script>
 </head>
 <body>
-<div class="sidebar">
-    <div class="sidebar-header">
-        <h1>POS</h1>
-    </div>
-    <ul>
-        <li onclick="navigateTo('dashboard.html')"><i class="fas fa-home"></i> Dashboard</li>
-        <li onclick="navigateTo('sales.html')"><i class="fas fa-shopping-cart"></i> Sales</li>
-        <li onclick="navigateTo('variations.html')"><i class="fas fa-plus-circle"></i> Add New Product</li>
-        <li onclick="navigateTo('inventory.html')"><i class="fas fa-boxes"></i> Inventory</li>
-        <li onclick="navigateTo('customers.html')"><i class="fas fa-users"></i> Customers</li>
-        <li onclick="navigateTo('suppliers.html')"><i class="fas fa-truck"></i> Suppliers</li>
-        <li onclick="navigateTo('reports.html')"><i class="fas fa-chart-bar"></i> Reports</li>
-        <li onclick="navigateTo('receiving.html')"><i class="fas fa-file-import"></i> Receiving</li>
-        <li onclick="navigateTo('deliveries.html')"><i class="fas fa-truck-loading"></i> Deliveries</li>
-        <li onclick="navigateTo('expenses.html')"><i class="fas fa-receipt"></i> Expenses</li>
-        <li onclick="navigateTo('employees.html')"><i class="fas fa-user-tie"></i> Employees</li>
-        <li onclick="navigateTo('appointments.html')"><i class="fas fa-calendar"></i> Appointments</li>
-        <li onclick="navigateTo('giftcards.html')"><i class="fas fa-gift"></i> Gift Cards</li>
-        <li onclick="navigateTo('config.html')"><i class="fas fa-cog"></i> Store Config</li>
-        <li onclick="navigateTo('invoices.html')"><i class="fas fa-file-invoice"></i> Invoices</li>
-        <li class="active" onclick="navigateTo('locations.html')"><i class="fas fa-store"></i> Locations</li>
-        <li onclick="navigateTo('messages.html')"><i class="fas fa-envelope"></i> Messages</li>
-        <li onclick="navigateTo('payments.html')"><i class="fas fa-credit-card"></i> Payments</li>
-        <li onclick="navigateTo('login.html')"><i class="fas fa-sign-out-alt"></i> Logout</li>
-    </ul>
-</div>
+<div class="sidebar" id="sidebar"></div>
 <div class="main-content">
-    <div class="header"><h2>Locations</h2><span id="pharmacyNameDisplay" style="font-weight:500;">Loading...</span></div>
-    <div class="content">
-    <div class="locations-header">
-        <h2>Store Locations</h2>
-        <button class="add-location-btn" onclick="showAddLocationForm()">
-            <i class="fas fa-plus"></i> Add Location
-        </button>
+    <div class="header">
+        <h2><i class="fas fa-store"></i> Locations</h2>
+        <div id="userMenu"></div>
+        <div class="header-clock" id="topClock"></div>
     </div>
-    <div class="locations-grid" id="locationsGrid"><div class="loading-spinner">Loading...</div></div>
-    <div class="modal" id="locationModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modalTitle">Add Location</h3>
-                <button class="close-modal" onclick="closeModal()">&times;</button>
+    <div class="content">
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label"><i class="fas fa-store"></i> Total Locations</div>
+                <div class="kpi-value" id="kpiTotal">0</div>
+                <div class="kpi-sub">Store branches</div>
             </div>
-            <div class="form-group">
-                <label>Location Name *</label>
-                <input type="text" id="locName" placeholder="Enter location name">
+            <div class="kpi-card">
+                <div class="kpi-label"><i class="fas fa-circle-check"></i> Active</div>
+                <div class="kpi-value" style="color:#10b981;" id="kpiActive">0</div>
+                <div class="kpi-sub">Operating</div>
             </div>
-            <div class="form-group">
-                <label>Address *</label>
-                <input type="text" id="locAddress" placeholder="Enter address">
+            <div class="kpi-card">
+                <div class="kpi-label"><i class="fas fa-times-circle"></i> Inactive</div>
+                <div class="kpi-value" style="color:#ef4444;" id="kpiInactive">0</div>
+                <div class="kpi-sub">Closed</div>
             </div>
-            <div class="form-group">
-                <label>Phone *</label>
-                <input type="tel" id="locPhone" placeholder="Enter phone number">
+        </div>
+        <div class="page-head">
+            <div>
+                <h3>Store Locations</h3>
+                <p>Manage all pharmacy branch locations.</p>
             </div>
-            <div class="form-group">
-                <label>Manager *</label>
-                <input type="text" id="locManager" placeholder="Enter manager name">
-            </div>
-            <div class="form-group">
-                <label>Status</label>
-                <select id="locStatus">
+            <button class="btn btn-primary" onclick="showAddLocationForm()"><i class="fas fa-plus"></i> Add Location</button>
+        </div>
+        <div class="panel">
+            <div class="toolbar">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search locations..." oninput="renderLocations()">
+                <select id="statusFilter" class="form-select" onchange="renderLocations()">
+                    <option value="all">All Status</option>
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
                 </select>
             </div>
-            <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                <button class="btn btn-primary" id="saveBtn" onclick="saveLocation()">Save Location</button>
+        </div>
+        <div id="locationModal" class="modal-overlay">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 id="modalTitle">Add Location</h3>
+                    <button class="modal-close" onclick="POS.closeModal('locationModal')">&times;</button>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="required">Location Name</label>
+                        <input type="text" id="locName" class="form-control" placeholder="Enter location name">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="tel" id="locPhone" class="form-control" placeholder="Enter phone number">
+                    </div>
+                    <div class="form-group full">
+                        <label class="required">Address</label>
+                        <input type="text" id="locAddress" class="form-control" placeholder="Enter address">
+                    </div>
+                    <div class="form-group">
+                        <label>Manager</label>
+                        <input type="text" id="locManager" class="form-control" placeholder="Enter manager name">
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="locStatus" class="form-select">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="POS.closeModal('locationModal')">Cancel</button>
+                    <button class="btn btn-success" id="saveBtn" onclick="saveLocation()">Save Location</button>
+                </div>
+            </div>
+        </div>
+        <div class="table-panel" id="tableView" style="display:none;">
+            <div class="table-top"><strong><i class="fas fa-list"></i> Location Directory</strong><span id="locCount">0 locations</span></div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Address</th>
+                            <th>Phone</th>
+                            <th>Manager</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="locationsBody"><tr><td colspan="6" class="empty-state">Loading...</td></tr></tbody>
+                </table>
             </div>
         </div>
     </div>
-    </div>
-    <div class="notification-toast" id="toast">Action completed!</div>
 </div>
+<div class="toast" id="toast"></div>
 <script>
-function navigateTo(p){window.location.href=p;}
-function showToast(msg, isError){
-    var t=document.getElementById('toast');
-    t.textContent=msg;
-    t.style.background = isError ? '#f56565' : '#48bb78';
-    t.style.display='block';
-    setTimeout(function(){t.style.display='none';},3000);
-}
 var locations = [];
+var filteredLocations = [];
 var editId = null;
-
-function renderLocations(){
-    var grid=document.getElementById('locationsGrid');
-    if (!locations || locations.length === 0) {
-        grid.innerHTML = '<div class="loading-spinner">No locations found</div>';
+function $id(id) { return document.getElementById(id); }
+function updateKPIs() {
+    $id('kpiTotal').textContent = locations.length;
+    $id('kpiActive').textContent = locations.filter(function(l) { return l.status === 'active'; }).length;
+    $id('kpiInactive').textContent = locations.filter(function(l) { return l.status === 'inactive'; }).length;
+}
+function showAddLocationForm() {
+    editId = null;
+    $id('modalTitle').textContent = 'Add Location';
+    $id('saveBtn').textContent = 'Save Location';
+    $id('locName').value = '';
+    $id('locAddress').value = '';
+    $id('locPhone').value = '';
+    $id('locManager').value = '';
+    $id('locStatus').value = 'active';
+    $id('locationModal').classList.add('open');
+}
+async function saveLocation() {
+    var name = $id('locName').value.trim();
+    var address = $id('locAddress').value.trim();
+    var phone = $id('locPhone').value.trim();
+    var manager = $id('locManager').value.trim();
+    var status = $id('locStatus').value;
+    if (!name || !address) {
+        POS.showToast('Name and address are required', true);
         return;
     }
-    var html=locations.map(function(l){
-        return '<div class="location-card"><h3>'+l.name+'</h3><div class="location-info"><i class="fas fa-map-marker-alt"></i> '+l.address+'</div><div class="location-info"><i class="fas fa-phone"></i> '+l.phone+'</div><div class="location-info"><i class="fas fa-user"></i> Manager: '+l.manager+'</div><span class="location-status '+l.status+'">'+l.status+'</span><div class="location-actions"><button class="loc-btn edit-loc-btn" onclick="editLocation('+l.id+')"><i class="fas fa-edit"></i> Edit</button><button class="loc-btn delete-loc-btn" onclick="deleteLocation('+l.id+')"><i class="fas fa-trash"></i> Delete</button></div></div>';
-    }).join('');
-    grid.innerHTML=html;
-}
-function openModal(){document.getElementById('locationModal').classList.add('active');}
-function closeModal(){document.getElementById('locationModal').classList.remove('active');editId=null;}
-function showAddLocationForm(){
-    editId=null;
-    document.getElementById('modalTitle').textContent='Add Location';
-    document.getElementById('saveBtn').textContent='Save Location';
-    document.getElementById('locName').value='';
-    document.getElementById('locAddress').value='';
-    document.getElementById('locPhone').value='';
-    document.getElementById('locManager').value='';
-    document.getElementById('locStatus').value='active';
-    openModal();
-}
-function editLocation(id){
-    var loc=locations.find(function(l){return l.id==id;});
-    if(!loc){return;}
-    editId=id;
-    document.getElementById('modalTitle').textContent='Edit Location';
-    document.getElementById('saveBtn').textContent='Update Location';
-    document.getElementById('locName').value=loc.name;
-    document.getElementById('locAddress').value=loc.address;
-    document.getElementById('locPhone').value=loc.phone;
-    document.getElementById('locManager').value=loc.manager;
-    document.getElementById('locStatus').value=loc.status;
-    openModal();
-}
-async function saveLocation(){
-    var name=document.getElementById('locName').value.trim();
-    var address=document.getElementById('locAddress').value.trim();
-    var phone=document.getElementById('locPhone').value.trim();
-    var manager=document.getElementById('locManager').value.trim();
-    var status=document.getElementById('locStatus').value;
-    if(!name||!address||!phone||!manager){showToast('All fields are required', true);return;}
     try {
-        if(editId){
-            await API.put('/locations/' + editId, {name:name,address:address,phone:phone,manager:manager,status:status});
-            showToast('Location updated!');
-        }else{
-            var newId = locations.length > 0 ? Math.max(...locations.map(function(l){return l.id;})) + 1 : 1;
-            await API.saveLocation({id:newId,name:name,address:address,phone:phone,manager:manager,status:status});
-            showToast('Location added!');
+        if (editId) {
+            await API.updateLocation(editId, { name: name, address: address, phone: phone, manager: manager, status: status });
+            POS.showToast('Location updated!');
+        } else {
+            var newId = locations.length > 0 ? Math.max.apply(null, locations.map(function(l) { return l.id; })) + 1 : 1;
+            await API.saveLocation({ id: newId, name: name, address: address, phone: phone, manager: manager, status: status });
+            POS.showToast('Location added!');
         }
         await loadLocations();
-        closeModal();
+        POS.closeModal('locationModal');
     } catch (err) {
-        showToast(err.message || 'Failed to save location', true);
+        POS.showToast(err.message || 'Failed to save location', true);
     }
 }
-async function deleteLocation(id){
-    if(!confirm('Delete this location?')){return;}
+async function loadLocations() {
     try {
-        await API.delete('/locations/' + id);
-        showToast('Location deleted!');
-        await loadLocations();
-    } catch (err) {
-        showToast(err.message || 'Delete failed', true);
-    }
-}
-async function loadLocations(){
-    try {
-        locations = await API.getLocations();
-        renderLocations();
+        locations = await API.getLocations() || [];
+        filteredLocations = [...locations];
     } catch (err) {
         locations = [];
-        showToast('Failed to load locations', true);
-        renderLocations();
+        POS.showToast('Failed to load locations', true);
+    }
+    updateKPIs();
+    renderLocations();
+}
+function renderLocations() {
+    var q = $id('searchInput').value.toLowerCase();
+    var st = $id('statusFilter').value;
+    filteredLocations = locations.filter(function(l) {
+        var text = [(l.name || ''), (l.address || ''), (l.phone || ''), (l.manager || '')].join(' ').toLowerCase();
+        var matchesSearch = !q || text.indexOf(q) > -1;
+        var matchesStatus = st === 'all' || l.status === st;
+        return matchesSearch && matchesStatus;
+    });
+    $id('locCount').textContent = filteredLocations.length + ' locations';
+    var tbody = $id('locationsBody');
+    tbody.innerHTML = filteredLocations.map(function(l) {
+        return '<tr><td><strong>' + POS.esc(l.name || '') + '</strong></td><td>' + POS.esc(l.address || '') + '</td><td>' + POS.esc(l.phone || '') + '</td><td>' + POS.esc(l.manager || '') + '</td><td>' + POS.statusBadge(l.status || 'active') + '</td><td class="action-btns"><button class="icon-btn edit" onclick="editLocation(' + l.id + ')"><i class="fas fa-edit"></i></button><button class="icon-btn delete" onclick="deleteLocation(' + l.id + ')"><i class="fas fa-trash"></i></button></td></tr>';
+    }).join('') || '<tr><td colspan="6" class="empty-state">No locations found</td></tr>';
+}
+function editLocation(id) {
+    var loc = locations.find(function(l) { return l.id == id; });
+    if (!loc) return;
+    editId = id;
+    $id('modalTitle').textContent = 'Edit Location';
+    $id('saveBtn').textContent = 'Update Location';
+    $id('locName').value = loc.name || '';
+    $id('locAddress').value = loc.address || '';
+    $id('locPhone').value = loc.phone || '';
+    $id('locManager').value = loc.manager || '';
+    $id('locStatus').value = loc.status || 'active';
+    $id('locationModal').classList.add('open');
+}
+async function deleteLocation(id) {
+    if (!confirm('Delete this location?')) return;
+    try {
+        await API.deleteLocation(id);
+        POS.showToast('Location deleted!');
+        loadLocations();
+    } catch (err) {
+        POS.showToast(err.message || 'Delete failed', true);
     }
 }
-function updatePharmacyName() {
-    var pharmName = API.getPharmacyName() || 'DANZONA PHARM';
-    var display = document.getElementById('pharmacyNameDisplay');
-    if (display) display.textContent = pharmName;
-}
-function logout() {
-    if (confirm('Are you sure you want to logout?')) {
-        API.logout();
-        window.location.href = 'login.html';
-    }
-}
-
-document.addEventListener('DOMContentLoaded', async function() {
-    if (!API.isLoggedIn()) { 
-        var demo = getQueryParameter('demo');
-        if (demo !== '1') {
-            window.location.href = 'login.html'; 
-            return; 
-        }
-    }
-    updatePharmacyName();
-    await loadLocations();
+document.addEventListener('DOMContentLoaded', function() {
+    if (!POS.requireAuth()) return;
+    POS.renderSidebar();
+    POS.renderUserMenu();
+    loadLocations();
 });
-
-function getQueryParameter(name) {
-    var params = new URLSearchParams(window.location.search);
-    return params.get(name) || '0';
-}
 </script>
 </body>
 </html>

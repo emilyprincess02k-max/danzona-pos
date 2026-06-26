@@ -3,599 +3,348 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payments - DANZONA PHARM</title>
+    <title>Payments - SHEDS POS</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
-body{background:#f2f2f2;min-height:100vh;display:flex;}
-.sidebar{width:260px;background:#064e3b;color:#e2e8f0;height:100vh;overflow-y:auto;box-shadow:2px 0 10px rgba(0,0,0,0.1);flex-shrink:0;}
-.sidebar-header{background:#043e2c;padding:20px 25px;border-bottom:1px solid #059669;}
-.sidebar h1{font-size:22px;color:#10b981;margin:0;font-weight:600;}
-.sidebar ul{list-style:none;padding:15px 0;}
-.sidebar ul li{padding:12px 25px;display:flex;align-items:center;gap:12px;cursor:pointer;border-left:3px solid transparent;transition:all 0.2s ease;font-size:14px;}
-.sidebar ul li i{width:20px;text-align:center;font-size:16px;}
-.sidebar ul li:hover{background:#059669;border-left-color:#10b981;color:#ffffff;}
-.sidebar ul li.active{background:#059669;border-left-color:#10b981;color:#ffffff;}
-.main-content{flex:1;display:flex;flex-direction:column;}
-.header{background:#10b981;color:white;padding:15px 25px;display:flex;justify-content:space-between;align-items:center;}
-.header h2{font-size:20px;}
-.content{flex:1;padding:20px;}
-.notification-toast{position:fixed;top:20px;right:20px;background:#48bb78;color:white;padding:1rem 1.5rem;border-radius:5px;display:none;z-index:1000;}
-.payments-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;}
-.payments-header h2{margin:0;}
-.add-payment-btn{background:#4da3ff;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;font-size:16px;}
-.add-payment-btn:hover{background:#3b82f6;}
-.payments-table{width:100%;border-collapse:collapse;background:white;border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.1);}
-.payments-table th,.payments-table td{padding:15px;text-align:left;border-bottom:1px solid #eee;}
-.payments-table th{background-color:#f8f9fa;font-weight:600;}
-.payments-table tr:hover{background-color:#f5f5f5;}
-.payment-status{padding:4px 8px;border-radius:4px;font-size:14px;font-weight:500;}
-.payment-status.paid{background:#dcfce7;color:#166534;}
-.payment-status.pending{background:#fef3c7;color:#92400e;}
-.payment-status.overdue{background:#fee2e2;color:#991b1b;}
-.action-btns{display:flex;gap:8px;}
-.view-btn,.edit-btn,.delete-btn{padding:6px 12px;border:none;border-radius:4px;cursor:pointer;font-size:14px;}
-.edit-btn{background:#3b82f6;color:white;}
-.edit-btn:hover{background:#2563eb;}
-.delete-btn{background:#ef4444;color:white;}
-.delete-btn:hover{background:#dc2626;}
-.view-btn{background:#10b981;color:white;}
-.view-btn:hover{background:#059669;}
-.print-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:2000;justify-content:center;align-items:center;}
-.print-modal.active{display:flex;}
-.print-content{background:white;padding:25px;border-radius:10px;width:350px;}
-.print-content h3{margin-bottom:15px;color:#2c3e50;}
-.print-content p{margin:10px 0;}
-.print-content .amount{font-size:24px;font-weight:bold;color:#10b981;}
-.print-footer{text-align:center;margin-top:20px;}
-.print-btn{background:#10b981;color:white;border:none;padding:10px 20px;border-radius:5px;margin:5px;cursor:pointer;}
-.print-btn.secondary{background:#6b7280;}
-.receipt-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:2001;justify-content:center;align-items:center;}
-.receipt-modal.active{display:flex;}
-.receipt-content{background:white;min-width:300px;max-width:500px;padding:25px;border-radius:10px;}
-.receipt-content h3{margin-bottom:15px;color:#2c3e50;}
-.receipt-btn{background:#4da3ff;color:white;border:none;padding:10px 20px;margin:5px;cursor:pointer;border-radius:4px;}
-.receipt-btn.secondary{background:#6b7280;}
-.tabs{display:flex;gap:5px;margin-bottom:20px;flex-wrap:wrap;}
-.tab-btn{padding:12px 24px;border:none;border-radius:5px 5px 0 0;cursor:pointer;font-weight:500;background:#e2e8f0;color:#4a5568;display:flex;align-items:center;gap:8px;}
-.tab-btn.active{background:#4da3ff;color:white;}
-.tab-content{display:none;}
-.tab-content.active{display:block;}
-.user-menu{position:relative;cursor:pointer;padding:8px 12px;border-radius:5px;background:rgba(255,255,255,0.1);transition:background 0.2s;display:flex;align-items:center;gap:8px;}
-.user-menu:hover{background:rgba(255,255,255,0.2);}
-.user-dropdown{position:absolute;top:100%;right:0;margin-top:8px;background:white;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 10px 25px rgba(0,0,0,0.15);min-width:220px;z-index:1000;display:none;padding:8px;}
-.user-dropdown.active{display:block;animation:fadeIn 0.2s;}
-.user-info{padding:4px 0 8px;}
-.user-info strong{color:#2c3e50;}
-.user-info small{color:#718096;font-size:12px;}
-.user-dropdown a{display:flex;align-items:center;gap:10px;padding:10px 12px;color:#4a5568;text-decoration:none;border-radius:5px;transition:background 0.2s;font-size:14px;}
-.user-dropdown a:hover{background:#f0fdf4;color:#064e3b;}
-.user-dropdown a i{width:18px;text-align:center;color:#10b981;}
-@keyframes fadeIn{from{opacity:0;transform:translateY(-5px);}to{opacity:1;transform:translateY(0);}}
-.loading-spinner{text-align:center;padding:20px;color:#718096;}
-</style>
-<script src="api.js"></script>
-<script>
-function navigateTo(page){window.location.href=page;}
-</script>
+    <link rel="stylesheet" href="common.css">
+    <script src="api.js"></script>
+    <script src="common.js"></script>
 </head>
 <body>
-<div class="sidebar">
-    <div class="sidebar-header">
-        <h1>POS</h1>
-    </div>
-    <ul>
-        <li onclick="navigateTo('dashboard.html')"><i class="fas fa-home"></i> Dashboard</li>
-        <li onclick="navigateTo('sales.html')"><i class="fas fa-shopping-cart"></i> Sales</li>
-        <li onclick="navigateTo('variations.html')"><i class="fas fa-plus-circle"></i> Add New Product</li>
-        <li onclick="navigateTo('inventory.html')"><i class="fas fa-boxes"></i> Inventory</li>
-        <li onclick="navigateTo('customers.html')"><i class="fas fa-users"></i> Customers</li>
-        <li onclick="navigateTo('suppliers.html')"><i class="fas fa-truck"></i> Suppliers</li>
-        <li onclick="navigateTo('reports.html')"><i class="fas fa-chart-bar"></i> Reports</li>
-        <li onclick="navigateTo('receiving.html')"><i class="fas fa-file-import"></i> Receiving</li>
-        <li onclick="navigateTo('deliveries.html')"><i class="fas fa-truck-loading"></i> Deliveries</li>
-        <li onclick="navigateTo('expenses.html')"><i class="fas fa-receipt"></i> Expenses</li>
-        <li onclick="navigateTo('employees.html')"><i class="fas fa-user-tie"></i> Employees</li>
-        <li onclick="navigateTo('appointments.html')"><i class="fas fa-calendar"></i> Appointments</li>
-        <li onclick="navigateTo('giftcards.html')"><i class="fas fa-gift"></i> Gift Cards</li>
-        <li onclick="navigateTo('config.html')"><i class="fas fa-cog"></i> Store Config</li>
-        <li onclick="navigateTo('invoices.html')"><i class="fas fa-file-invoice"></i> Invoices</li>
-        <li onclick="navigateTo('locations.html')"><i class="fas fa-store"></i> Locations</li>
-        <li class="active" onclick="navigateTo('payments.html')"><i class="fas fa-credit-card"></i> Payments</li>
-        <li onclick="navigateTo('messages.html')"><i class="fas fa-envelope"></i> Messages</li>
-        <li onclick="navigateTo('login.html')"><i class="fas fa-sign-out-alt"></i> Logout</li>
-    </ul>
-</div>
+<div class="sidebar" id="sidebar"></div>
 <div class="main-content">
     <div class="header">
-        <h2>Payments</h2>
-        <div class="user-menu" onclick="toggleUserMenu(event)">
-            <span id="currentUserName">Loading...</span>
-            <i class="fas fa-chevron-down" style="margin-left:8px;font-size:12px;"></i>
-            <div class="user-dropdown" id="userDropdown">
-                <div class="user-info" id="userInfo">
-                    <strong id="dropdownUserName">Loading...</strong>
-                    <small id="dropdownUserRole">Role</small>
-                </div>
-                <hr style="margin:8px 0;">
-                <a href="#" onclick="navigateTo('config.html');closeUserMenu();"><i class="fas fa-cog"></i> Settings</a>
-                <a href="#" onclick="navigateTo('payments.html');closeUserMenu();"><i class="fas fa-credit-card"></i> Store Account Payment</a>
-                <a href="#" onclick="switchToAdmin();closeUserMenu();"><i class="fas fa-user-shield"></i> Switch to Admin</a>
-                <hr style="margin:8px 0;">
-                <a href="#" onclick="logout();"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            </div>
-        </div>
+        <h2><i class="fas fa-credit-card"></i> Payments</h2>
+        <div id="userMenu"></div>
+        <div class="header-clock" id="topClock"></div>
     </div>
     <div class="content">
-    <div class="tabs" style="margin-bottom:20px;">
-        <button class="tab-btn active" onclick="switchPaymentTab('record',this)"><i class="fas fa-plus"></i> Record Payment</button>
-        <button class="tab-btn" onclick="switchPaymentTab('outstanding',this)"><i class="fas fa-exclamation-triangle"></i> Outstanding Payments</button>
-        <button class="tab-btn" onclick="switchPaymentTab('history',this)"><i class="fas fa-history"></i> Payment History</button>
-    </div>
-
-    <div id="tab-record" class="tab-content active">
-    <div class="payments-header">
-        <h2>Record New Payment</h2>
-        <button class="add-payment-btn" onclick="showAddPaymentForm()">
-            <i class="fas fa-plus"></i> Add Payment
-        </button>
-    </div>
-    <div id="addPaymentForm" style="display:none;margin-bottom:20px;padding:20px;background:white;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.1);">
-        <h3 id="paymentFormTitle" style="margin-bottom:15px;">Record New Payment</h3>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;">
-            <div>
-                <label>Customer *</label>
-                <select id="customerSelect" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
-                    <option value="">Select Customer</option>
-                </select>
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label"><i class="fas fa-credit-card"></i> Total Payments</div>
+                <div class="kpi-value" id="kpiTotal">0</div>
+                <div class="kpi-sub">All records</div>
             </div>
-            <div>
-                <label>Supplier</label>
-                <select id="supplierSelect" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
-                    <option value="">Select Supplier</option>
-                </select>
+            <div class="kpi-card">
+                <div class="kpi-label"><i class="fas fa-check-circle"></i> Paid</div>
+                <div class="kpi-value" style="color:#10b981;" id="kpiPaid">0</div>
+                <div class="kpi-sub">Completed</div>
             </div>
-            <div>
-                <label>Invoice Number</label>
-                <input type="text" id="invoiceNumber" placeholder="Invoice reference" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+            <div class="kpi-card">
+                <div class="kpi-label"><i class="fas fa-clock"></i> Pending</div>
+                <div class="kpi-value" style="color:#f59e0b;" id="kpiPending">0</div>
+                <div class="kpi-sub">Awaiting</div>
             </div>
-            <div>
-                <label>Amount (₦)</label>
-                <input type="number" id="amount" min="0" step="0.01" placeholder="Enter amount" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
-            </div>
-            <div>
-                <label>Payment Method</label>
-                <select id="paymentMethod" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
-                    <option value="">Select Method</option>
-                    <option value="cash">Cash</option>
-                    <option value="bank_transfer">Bank Transfer</option>
-                    <option value="credit_card">Credit Card</option>
-                    <option value="debit_card">Debit Card</option>
-                    <option value="cheque">Cheque</option>
-                </select>
-            </div>
-            <div>
-                <label>Notes</label>
-                <textarea id="notes" placeholder="Add notes..." style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;height:70px;"></textarea>
+            <div class="kpi-card">
+                <div class="kpi-label"><i class="fas fa-coins"></i> Total Amount</div>
+                <div class="kpi-value" id="kpiAmount">?0.00</div>
+                <div class="kpi-sub">All payments</div>
             </div>
         </div>
-        <div style="margin-top:15px;text-align:right;">
-            <button onclick="hideAddPaymentForm()" style="background:#6b7280;color:white;border:none;padding:8px 16px;border-radius:4px;margin-right:10px;">Cancel</button>
-            <button onclick="addPayment()" style="background:#4da3ff;color:white;border:none;padding:8px 16px;border-radius:4px;">Record Payment</button>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchPaymentTab('record', this)"><i class="fas fa-plus"></i> Record Payment</button>
+            <button class="tab-btn" onclick="switchPaymentTab('outstanding', this)"><i class="fas fa-exclamation-triangle"></i> Outstanding</button>
+            <button class="tab-btn" onclick="switchPaymentTab('history', this)"><i class="fas fa-history"></i> Payment History</button>
         </div>
-    </div>
-
-    <div id="tab-outstanding" class="tab-content" style="display:none;">
-        <div class="payments-header">
-            <h2>Outstanding Payments</h2>
-            <button class="add-payment-btn" onclick="showOutstandingPayments()">
-                <i class="fas fa-sync"></i> Refresh
-            </button>
+        <div id="tab-record" class="tab-content active">
+            <div class="page-head">
+                <div>
+                    <h3>Record New Payment</h3>
+                    <p>Record payments from customers or to suppliers.</p>
+                </div>
+                <button class="btn btn-primary" onclick="showAddPaymentForm()"><i class="fas fa-plus"></i> Add Payment</button>
+            </div>
+            <div id="addPaymentForm" class="modal-overlay">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h3 id="paymentFormTitle">Record New Payment</h3>
+                        <button class="modal-close" onclick="POS.closeModal('addPaymentForm')">&times;</button>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Customer</label>
+                            <select id="customerSelect" class="form-select"><option value="">Select Customer</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Supplier</label>
+                            <select id="supplierSelect" class="form-select"><option value="">Select Supplier</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Invoice Number</label>
+                            <input type="text" id="invoiceNumber" class="form-control" placeholder="Invoice reference">
+                        </div>
+                        <div class="form-group">
+                            <label class="required">Amount (?)</label>
+                            <input type="number" id="amount" class="form-control" min="0" step="0.01" placeholder="Enter amount">
+                        </div>
+                        <div class="form-group">
+                            <label>Payment Method</label>
+                            <select id="paymentMethod" class="form-select">
+                                <option value="">Select Method</option>
+                                <option value="cash">Cash</option>
+                                <option value="bank_transfer">Bank Transfer</option>
+                                <option value="credit_card">Credit Card</option>
+                                <option value="debit_card">Debit Card</option>
+                                <option value="cheque">Cheque</option>
+                            </select>
+                        </div>
+                        <div class="form-group full">
+                            <label>Notes</label>
+                            <textarea id="notes" class="form-control" placeholder="Add notes..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="POS.closeModal('addPaymentForm')">Cancel</button>
+                        <button class="btn btn-success" onclick="addPayment()">Save Payment</button>
+                    </div>
+                </div>
+            </div>
+            <div class="table-panel">
+                <div class="table-top"><strong><i class="fas fa-list"></i> Payment Records</strong><span id="paymentCount">0 payments</span></div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Payment ID</th>
+                                <th>Party</th>
+                                <th>Invoice</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                                <th>Method</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentsTableBody"><tr><td colspan="8" class="empty-state">Loading...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-        <div id="outstandingPaymentsContainer" style="background:white;border-radius:10px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,0.1);">
-            <p class="loading-spinner">Click Refresh to load outstanding payments...</p>
+        <div id="tab-outstanding" class="tab-content">
+            <div class="page-head">
+                <div>
+                    <h3>Outstanding Payments</h3>
+                    <p>View and collect outstanding balances.</p>
+                </div>
+                <button class="btn btn-secondary" onclick="showOutstandingPayments()"><i class="fas fa-sync"></i> Refresh</button>
+            </div>
+            <div class="table-panel">
+                <div class="table-top"><strong><i class="fas fa-exclamation-triangle"></i> Outstanding Balances</strong></div>
+                <div class="table-wrap">
+                    <div id="outstandingPaymentsContainer" class="panel" style="margin:0;"><p class="empty-state">Click Refresh to load outstanding payments...</p></div>
+                </div>
+            </div>
         </div>
-    </div>
-
-    <div id="tab-history" class="tab-content" style="display:none;">
-        <div class="payments-header">
-            <h2>Payment History</h2>
-        </div>
-        <table class="payments-table">
-            <thead>
-                <tr>
-                    <th>Payment ID</th>
-                    <th>Customer/Supplier</th>
-                    <th>Invoice</th>
-                    <th>Amount</th>
-                    <th>Date</th>
-                    <th>Method</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="paymentsTableBody"><tr><td colspan="8" class="loading-spinner">Loading...</td></tr></tbody>
-        </table>
-    </div>
-
-    <div class="print-modal" id="printModal">
-        <div class="print-content">
-            <h3>Payment Receipt</h3>
-            <p><strong>Payment ID:</strong> <span id="printPaymentId"></span></p>
-            <p><strong>Party:</strong> <span id="printParty"></span></p>
-            <p><strong>Invoice:</strong> <span id="printInvoice"></span></p>
-            <p><strong>Method:</strong> <span id="printMethod"></span></p>
-            <p><strong>Date:</strong> <span id="printDate"></span></p>
-            <p class="amount">₦<span id="printAmount"></span></p>
-            <p><strong>Notes:</strong> <span id="printNotes"></span></p>
-            <div class="print-footer">
-                <button class="print-btn secondary" onclick="closePrintModal()"><i class="fas fa-times"></i> Close</button>
-                <button class="print-btn" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+        <div id="tab-history" class="tab-content">
+            <div class="table-panel">
+                <div class="table-top"><strong><i class="fas fa-history"></i> Payment History</strong><span id="historyCount">0 records</span></div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Payment ID</th>
+                                <th>Party</th>
+                                <th>Invoice</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                                <th>Method</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody"><tr><td colspan="6" class="empty-state">Loading...</td></tr></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-    <div class="notification-toast" id="toast">Action completed!</div>
 </div>
-</div>
-
+<div class="toast" id="toast"></div>
 <script>
-function showToast(msg, isError){
-    var t=document.getElementById('toast');
-    t.textContent=msg;
-    t.style.background = isError ? '#f56565' : '#48bb78';
-    t.style.display='block';
-    setTimeout(function(){t.style.display='none';},3000);
-}
-function switchPaymentTab(tabId, el){
-    document.querySelectorAll('.tab-btn').forEach(function(btn){btn.classList.remove('active');});
-    document.querySelectorAll('.tab-content').forEach(function(c){c.classList.remove('active');});
-    el.classList.add('active');
-    document.getElementById('tab-' + tabId).classList.add('active');
-    if (tabId === 'record') renderPayments();
-    if (tabId === 'outstanding') showOutstandingPayments();
-}
-
-async function loadCustomers(){
-    try {
-        var customers = await API.getCustomers();
-        var select = document.getElementById('customerSelect');
-        if (!select) return;
-        select.innerHTML = '<option value="">Select Customer</option>' + (customers || []).map(function(c){
-            return '<option value="'+c.id+'">'+(c.firstName||'')+' '+(c.lastName||'')+'</option>';
-        }).join('');
-    } catch (err) {
-        showToast('Failed to load customers', true);
-    }
-}
-async function loadSuppliers(){
-    try {
-        var suppliers = await API.getSuppliers();
-        var select = document.getElementById('supplierSelect');
-        if (!select) return;
-        select.innerHTML = '<option value="">Select Supplier</option>' + (suppliers || []).map(function(s){
-            return '<option value="'+s.id+'">'+s.name+'</option>';
-        }).join('');
-    } catch (err) {
-        showToast('Failed to load suppliers', true);
-    }
-}
-function showAddPaymentForm() {
-    editPaymentId = null;
-    document.getElementById('addPaymentForm').style.display = 'block';
-    document.getElementById('paymentFormTitle').textContent = 'Record New Payment';
-    loadCustomers(); loadSuppliers();
-    document.getElementById('invoiceNumber').value = '';
-    document.getElementById('amount').value = '';
-    document.getElementById('paymentMethod').value = '';
-    document.getElementById('notes').value = '';
-}
-function hideAddPaymentForm() {
-    document.getElementById('addPaymentForm').style.display = 'none';
-    editPaymentId = null;
-}
-
-async function addPayment() {
-    var customer = document.getElementById('customerSelect').value;
-    var supplier = document.getElementById('supplierSelect').value;
-    var invoice = document.getElementById('invoiceNumber').value;
-    var amount = parseFloat(document.getElementById('amount').value) || 0;
-    var method = document.getElementById('paymentMethod').value;
-    var notes = document.getElementById('notes').value;
-    if (!customer && !supplier || amount <= 0) { showToast('Please select customer/supplier and enter amount', true); return; }
-    try {
-        if (editPaymentId !== null) {
-            await API.updatePayment(editPaymentId, { customer: customer, supplier: supplier, invoice: invoice, amount: amount, method: method, notes: notes, status: 'paid' });
-            showToast('Payment updated!');
-        } else {
-            var newId = payments.length > 0 ? Math.max(...payments.map(py => py.id)) + 1 : 1;
-            var paymentId = 'PAY-' + String(newId).padStart(3, '0');
-            var date = new Date().toISOString().split('T')[0];
-            await API.savePayment({ id: newId, paymentId: paymentId, customer: customer, supplier: supplier, invoice: invoice, amount: amount, date: date, method: method, status: 'paid', notes: notes });
-            showToast('Payment recorded successfully!');
-        }
-        hideAddPaymentForm(); renderPayments();
-    } catch (err) {
-        showToast(err.message || 'Failed to save payment', true);
-    }
-}
-
 var payments = [];
 var customersCache = [];
 var suppliersCache = [];
-
+var filteredPayments = [];
+var editPaymentId = null;
+function $id(id) { return document.getElementById(id); }
+function updateKPIs() {
+    $id('kpiTotal').textContent = payments.length;
+    $id('kpiPaid').textContent = payments.filter(function(p) { return p.status === 'paid'; }).length;
+    $id('kpiPending').textContent = payments.filter(function(p) { return p.status !== 'paid'; }).length;
+    $id('kpiAmount').textContent = POS.formatCurrency(payments.reduce(function(s, p) { return s + (parseFloat(p.amount) || 0); }, 0));
+}
+function showAddPaymentForm() {
+    editPaymentId = null;
+    $id('addPaymentForm').classList.add('open');
+    $id('paymentFormTitle').textContent = 'Record New Payment';
+    loadCustomers(); loadSuppliers();
+    $id('invoiceNumber').value = '';
+    $id('amount').value = '';
+    $id('paymentMethod').value = '';
+    $id('notes').value = '';
+}
+async function loadCustomers() {
+    try {
+        customersCache = await API.getCustomers() || [];
+        $id('customerSelect').innerHTML = '<option value="">Select Customer</option>' + customersCache.map(function(c) {
+            return '<option value="' + c.id + '">' + POS.esc((c.firstName || '') + ' ' + (c.lastName || '')) + '</option>';
+        }).join('');
+    } catch (err) {}
+}
+async function loadSuppliers() {
+    try {
+        suppliersCache = await API.getSuppliers() || [];
+        $id('supplierSelect').innerHTML = '<option value="">Select Supplier</option>' + suppliersCache.map(function(s) {
+            return '<option value="' + s.id + '">' + POS.esc(s.name || '') + '</option>';
+        }).join('');
+    } catch (err) {}
+}
+async function addPayment() {
+    var customer = $id('customerSelect').value;
+    var supplier = $id('supplierSelect').value;
+    var invoice = $id('invoiceNumber').value;
+    var amount = parseFloat($id('amount').value) || 0;
+    var method = $id('paymentMethod').value;
+    var notes = $id('notes').value;
+    if (!customer && !supplier || amount <= 0) {
+        POS.showToast('Please select customer/supplier and enter amount', true);
+        return;
+    }
+    try {
+        if (editPaymentId !== null) {
+            await API.updatePayment(editPaymentId, { customer: customer, supplier: supplier, invoice: invoice, amount: amount, method: method, notes: notes, status: 'paid' });
+            POS.showToast('Payment updated!');
+        } else {
+            var newId = payments.length > 0 ? Math.max.apply(null, payments.map(function(p) { return p.id; })) + 1 : 1;
+            var paymentId = 'PAY-' + String(newId).padStart(3, '0');
+            var date = new Date().toISOString().split('T')[0];
+            await API.savePayment({ id: newId, paymentId: paymentId, customer: customer, supplier: supplier, invoice: invoice, amount: amount, date: date, method: method, status: 'paid', notes: notes });
+            POS.showToast('Payment recorded successfully!');
+        }
+        POS.closeModal('addPaymentForm');
+        renderPayments();
+    } catch (err) {
+        POS.showToast(err.message || 'Failed to save payment', true);
+    }
+}
 async function renderPayments() {
     try {
-        payments = await API.getPayments();
-        customersCache = await API.getCustomers();
-        suppliersCache = await API.getSuppliers();
+        payments = await API.getPayments() || [];
+        customersCache = await API.getCustomers() || [];
+        suppliersCache = await API.getSuppliers() || [];
     } catch (err) {
         payments = [];
-        showToast('Failed to load payments', true);
+        POS.showToast('Failed to load payments', true);
     }
-    var tbody = document.getElementById('paymentsTableBody');
-    if (!tbody) return;
+    updateKPIs();
+    $id('paymentCount').textContent = payments.length + ' payments';
+    $id('historyCount').textContent = payments.length + ' records';
+    var tbody = $id('paymentsTableBody');
+    var hbody = $id('historyTableBody');
     var methodLabels = { cash: 'Cash', bank_transfer: 'Bank Transfer', credit_card: 'Credit Card', debit_card: 'Debit Card', cheque: 'Cheque', giftcard: 'Gift Card' };
     var getPartyName = function(p) {
         if (p.customer) {
-            var cust = customersCache.find(function(c) { return c.id == p.customer; });
-            return cust ? (cust.firstName || '') + ' ' + (cust.lastName || '') : 'Customer #' + p.customer;
+            var cust = customersCache.find(function(c) { return String(c.id) === String(p.customer); });
+            return cust ? POS.esc((cust.firstName || '') + ' ' + (cust.lastName || '')) : 'Customer #' + p.customer;
         }
         if (p.supplier) {
-            var sup = suppliersCache.find(function(s) { return s.id == p.supplier; });
-            return sup ? sup.name : 'Supplier #' + p.supplier;
+            var sup = suppliersCache.find(function(s) { return String(s.id) === String(p.supplier); });
+            return sup ? POS.esc(sup.name) : 'Supplier #' + p.supplier;
         }
         return 'N/A';
     };
     tbody.innerHTML = payments.map(function(p) {
-        var party = getPartyName(p);
-        return '<tr><td>' + p.paymentId + '</td><td>' + party + '</td><td>' + (p.invoice||'N/A') + '</td><td>₦' + (p.amount||0).toFixed(2) + '</td><td>' + p.date + '</td><td>' + (methodLabels[p.method]||p.method) + '</td><td><span class="payment-status ' + p.status + '">' + (p.status === 'paid' ? 'Paid' : (p.status === 'pending' ? 'Pending' : 'Overdue')) + '</span></td><td class="action-btns"><button class="view-btn" onclick="viewPayment(' + p.id + ')">View</button><button class="edit-btn" onclick="editPayment(' + p.id + ')">Edit</button><button class="delete-btn" onclick="deletePayment(' + p.id + ')">Delete</button></td></tr>';
+        return '<tr><td>' + POS.esc(p.paymentId || '') + '</td><td>' + getPartyName(p) + '</td><td>' + POS.esc(p.invoice || 'N/A') + '</td><td>' + POS.formatCurrency(p.amount || 0) + '</td><td>' + POS.formatDate(p.date) + '</td><td>' + POS.esc(methodLabels[p.method] || p.method) + '</td><td>' + POS.statusBadge(p.status || 'paid') + '</td><td class="action-btns"><button class="icon-btn view" onclick="viewPayment(' + p.id + ')"><i class="fas fa-eye"></i></button><button class="icon-btn edit" onclick="editPayment(' + p.id + ')"><i class="fas fa-edit"></i></button><button class="icon-btn delete" onclick="deletePayment(' + p.id + ')"><i class="fas fa-trash"></i></button></td></tr>';
+    }).join('');
+    hbody.innerHTML = payments.map(function(p) {
+        return '<tr><td>' + POS.esc(p.paymentId || '') + '</td><td>' + getPartyName(p) + '</td><td>' + POS.esc(p.invoice || 'N/A') + '</td><td>' + POS.formatCurrency(p.amount || 0) + '</td><td>' + POS.formatDate(p.date) + '</td><td>' + POS.esc(methodLabels[p.method] || p.method) + '</td></tr>';
     }).join('');
 }
-
 function viewPayment(id) {
-    var p = payments.find(py => py.id == id);
+    var p = payments.find(function(py) { return py.id == id; });
     if (!p) return;
-    var getPartyName = function(payment) {
-        if (payment.customer) {
-            var cust = customersCache.find(function(c) { return c.id == payment.customer; });
-            return cust ? (cust.firstName || '') + ' ' + (cust.lastName || '') : 'Customer #' + payment.customer;
-        }
-        if (payment.supplier) {
-            var sup = suppliersCache.find(function(s) { return s.id == payment.supplier; });
-            return sup ? sup.name : 'Supplier #' + payment.supplier;
-        }
-        return 'N/A';
-    };
-    document.getElementById('printPaymentId').textContent = p.paymentId;
-    document.getElementById('printParty').textContent = getPartyName(p);
-    document.getElementById('printInvoice').textContent = p.invoice || 'N/A';
-    document.getElementById('printMethod').textContent = { cash: 'Cash', bank_transfer: 'Bank Transfer', credit_card: 'Credit Card', debit_card: 'Debit Card', cheque: 'Cheque', giftcard: 'Gift Card' }[p.method] || p.method;
-    document.getElementById('printDate').textContent = p.date;
-    document.getElementById('printAmount').textContent = (p.amount||0).toFixed(2);
-    document.getElementById('printNotes').textContent = p.notes || 'None';
-    document.getElementById('printModal').classList.add('active');
+    var modalHtml = '<div class="modal-overlay open" id="viewModal"><div class="modal" style="max-width:400px;"><div class="modal-header"><h3>Payment Details</h3><button class="modal-close" onclick="POS.closeModal(\'viewModal\')">&times;</button></div>' +
+        '<div class="kpi-grid"><div class="kpi-card"><div class="kpi-label">Payment ID</div><div class="kpi-value">' + POS.esc(p.paymentId) + '</div></div><div class="kpi-card"><div class="kpi-label">Amount</div><div class="kpi-value">' + POS.formatCurrency(p.amount) + '</div></div></div>' +
+        '<div class="modal-actions"><button class="btn btn-secondary" onclick="POS.closeModal(\'viewModal\')">Close</button></div></div></div>';
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
-function closePrintModal(){document.getElementById('printModal').classList.remove('active');}
-
-var editPaymentId = null;
 function editPayment(id) {
-    var p = payments.find(py => py.id == id);
+    var p = payments.find(function(py) { return py.id == id; });
     if (!p) return;
     editPaymentId = id;
-    document.getElementById('addPaymentForm').style.display = 'block';
-    document.getElementById('paymentFormTitle').textContent = 'Edit Payment';
+    $id('addPaymentForm').classList.add('open');
+    $id('paymentFormTitle').textContent = 'Edit Payment';
     loadCustomers(); loadSuppliers();
-    document.getElementById('customerSelect').value = p.customer || '';
-    document.getElementById('supplierSelect').value = p.supplier || '';
-    document.getElementById('invoiceNumber').value = p.invoice || '';
-    document.getElementById('amount').value = p.amount;
-    document.getElementById('paymentMethod').value = p.method;
-    document.getElementById('notes').value = p.notes || '';
+    $id('customerSelect').value = p.customer || '';
+    $id('supplierSelect').value = p.supplier || '';
+    $id('invoiceNumber').value = p.invoice || '';
+    $id('amount').value = p.amount;
+    $id('paymentMethod').value = p.method;
+    $id('notes').value = p.notes || '';
 }
 async function deletePayment(id) {
     if (!confirm('Delete this payment?')) return;
     try {
-        await API.delete('/payments/' + id);
-        showToast('Payment deleted!');
+        await API.deletePayment(id);
+        POS.showToast('Payment deleted!');
         renderPayments();
     } catch (err) {
-        showToast(err.message || 'Delete failed', true);
+        POS.showToast(err.message || 'Delete failed', true);
     }
 }
-
 async function showOutstandingPayments() {
     var sales = [];
-    var customers = [];
-    var paymentsList = [];
     try {
-        sales = await API.getSales();
-        customers = await API.getCustomers();
-        paymentsList = await API.getPayments();
-        payments = paymentsList;
-        customersCache = customers;
-        suppliersCache = await API.getSuppliers();
+        sales = await API.getSales() || [];
+        customersCache = await API.getCustomers() || [];
+        payments = await API.getPayments() || [];
     } catch (err) {
-        showToast('Failed to load data', true);
+        POS.showToast('Failed to load data', true);
     }
     var customerBalances = {};
-    (customers || []).forEach(function(cust) {
-        customerBalances[cust.id] = { customer: cust, totalSales: 0, totalPaid: 0, invoices: [] };
+    customersCache.forEach(function(cust) {
+        customerBalances[cust.id] = { customer: cust, totalSales: 0, totalPaid: 0 };
     });
-    (sales || []).forEach(function(sale) {
-        if (!sale.customer) return;
-        var custId = sale.customer;
+    sales.forEach(function(sale) {
+        if (!sale.customer_id) return;
+        var custId = sale.customer_id;
         if (customerBalances[custId]) {
-            customerBalances[custId].totalSales += sale.total || 0;
-            customerBalances[custId].invoices.push({ id: sale.id, date: sale.date, total: sale.total, payment: sale.payment, items: sale.items });
+            customerBalances[custId].totalSales += parseFloat(sale.total) || 0;
         }
     });
-    (paymentsList || []).forEach(function(p) {
+    payments.forEach(function(p) {
         if (!p.customer) return;
         var custId = p.customer;
         if (customerBalances[custId]) {
-            customerBalances[custId].totalPaid += p.amount || 0;
+            customerBalances[custId].totalPaid += parseFloat(p.amount) || 0;
         }
     });
-    var outstanding = Object.values(customerBalances).filter(function(c) {
-        return (c.totalSales - c.totalPaid) > 0;
-    });
+    var outstanding = Object.values(customerBalances).filter(function(c) { return (c.totalSales - c.totalPaid) > 0; });
     renderOutstandingPayments(outstanding);
 }
-
 function renderOutstandingPayments(outstanding) {
-    var container = document.getElementById('outstandingPaymentsContainer');
-    if (!container) return;
-    if (outstanding.length === 0) {
-        container.innerHTML = '<div style="text-align:center;color:#10b981;padding:40px;"><i class="fas fa-check-circle" style="font-size:48px;margin-bottom:15px;"></i><h3>All payments up to date!</h3><p>No outstanding balances.</p></div>';
+    var container = $id('outstandingPaymentsContainer');
+    if (!outstanding.length) {
+        container.innerHTML = '<p class="empty-state">No outstanding balances found.</p>';
         return;
     }
-    var html = '<div style="overflow-x:auto;"><table class="payments-table" style="margin-top:0;">' +
-        '<thead><tr>' +
-        '<th>Customer</th>' +
-        '<th>Total Sales</th>' +
-        '<th>Total Paid</th>' +
-        '<th>Outstanding</th>' +
-        '<th>Status</th>' +
-        '<th>Last Payment</th>' +
-        '<th>Action</th>' +
-        '</tr></thead><tbody>';
-    outstanding.forEach(function(cust) {
-        var outstandingAmt = cust.totalSales - cust.totalPaid;
-        var statusClass = outstandingAmt === 0 ? 'paid' : (outstandingAmt < cust.totalSales * 0.5 ? 'overdue' : 'pending');
-        var statusText = outstandingAmt === 0 ? 'Paid' : (outstandingAmt < cust.totalSales * 0.5 ? 'Overdue' : 'Partial');
-        var lastPaymentDate = 'Never';
-        html += '<tr>' +
-            '<td><strong>' + (cust.customer.firstName || '') + ' ' + (cust.customer.lastName || '') + '</strong><br><small>' + cust.customer.custId + ' | ' + cust.customer.phone + '</small></td>' +
-            '<td>₦' + cust.totalSales.toFixed(2) + '</td>' +
-            '<td>₦' + cust.totalPaid.toFixed(2) + '</td>' +
-            '<td style="color:#ef4444;font-weight:bold;">₦' + outstandingAmt.toFixed(2) + '</td>' +
-            '<td><span class="payment-status ' + statusClass + '">' + statusText + '</span></td>' +
-            '<td>' + lastPaymentDate + '</td>' +
-            '<td><button class="edit-btn" onclick="showCollectPaymentModal(\'' + cust.customer.id + '\', ' + outstandingAmt + ')"><i class="fas fa-money-bill-wave"></i> Collect</button></td>' +
-        '</tr>';
-    });
-    html += '</tbody></table></div>';
+    var html = '<div class="table-wrap"><table><thead><tr><th>Customer</th><th>Total Sales</th><th>Total Paid</th><th>Outstanding</th><th>Action</th></tr></thead><tbody>' +
+        outstanding.map(function(c) {
+            var outstandingAmt = c.totalSales - c.totalPaid;
+            return '<tr><td><strong>' + POS.esc((c.customer.firstName || '') + ' ' + (c.customer.lastName || '')) + '</strong><br><small>' + POS.esc(c.customer.phone || '') + '</small></td><td>' + POS.formatCurrency(c.totalSales) + '</td><td>' + POS.formatCurrency(c.totalPaid) + '</td><td style="color:#ef4444;font-weight:bold;">' + POS.formatCurrency(outstandingAmt) + '</td><td><button class="btn btn-warning btn-sm" onclick="collectPayment(\'' + c.customer.id + '\', ' + outstandingAmt + ')"><i class="fas fa-money-bill"></i> Collect</button></td></tr>';
+        }).join('') + '</tbody></table></div>';
     container.innerHTML = html;
 }
-
-function showCollectPaymentModal(customerId, outstandingAmount) {
-    API.getCustomers().then(function(customers) {
-        var customer = customers.find(function(c) { return c.id == customerId; });
-        if (!customer) return;
-        var modalHtml = '<div id="collectPaymentModal" class="receipt-modal active" style="z-index:2001;">' +
-            '<div class="receipt-content" style="max-width:500px;">' +
-            '<h3 style="margin-bottom:10px;color:#2c3e50;">Collect Payment</h3>' +
-            '<p style="color:#718096;margin-bottom:20px;">Customer: <strong>' + customer.firstName + ' ' + customer.lastName + '</strong> (' + customer.custId + ')</p>' +
-            '<div style="background:#fee2e2;border:1px solid #fecaca;border-radius:8px;padding:15px;margin-bottom:20px;">' +
-            '<div style="display:flex;justify-content:space-between;font-size:18px;font-weight:bold;color:#ef4444;">' +
-            '<span>Outstanding Balance:</span>' +
-            '<span>₦' + outstandingAmount.toFixed(2) + '</span>' +
-            '</div></div>' +
-            '<div class="form-group" style="margin-bottom:15px;">' +
-            '<label style="display:block;margin-bottom:5px;color:#4a5568;font-weight:500;">Amount to Collect</label>' +
-            '<input type="number" id="collectAmount" min="0.01" max="' + outstandingAmount + '" step="0.01" value="' + outstandingAmount + '" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:4px;">' +
-            '</div>' +
-            '<div class="form-group" style="margin-bottom:15px;">' +
-            '<label style="display:block;margin-bottom:5px;color:#4a5568;font-weight:500;">Payment Method *</label>' +
-            '<select id="collectMethod" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:4px;">' +
-            '<option value="">Select Payment Method</option>' +
-            '<option value="cash"><i class="fas fa-money-bill-wave"></i> Cash</option>' +
-            '<option value="bank_transfer"><i class="fas fa-exchange-alt"></i> Bank Transfer</option>' +
-            '<option value="credit_card"><i class="fas fa-credit-card"></i> Credit Card</option>' +
-            '<option value="debit_card"><i class="fas fa-credit-card"></i> Debit Card</option>' +
-            '<option value="cheque"><i class="fas fa-university"></i> Cheque</option>' +
-            '<option value="giftcard"><i class="fas fa-gift"></i> Gift Card</option>' +
-            '</select>' +
-            '</div>' +
-            '<div class="form-group" style="margin-bottom:20px;">' +
-            '<label style="display:block;margin-bottom:5px;color:#4a5568;font-weight:500;">Notes</label>' +
-            '<textarea id="collectNotes" placeholder="Payment reference, notes..." style="width:100%;padding:10px;border:1px solid #ddd;border-radius:4px;height:80px;"></textarea>' +
-            '</div>' +
-            '<div style="display:flex;gap:10px;justify-content:flex-end;">' +
-            '<button class="receipt-btn secondary" onclick="closeCollectPaymentModal()">Cancel</button>' +
-            '<button class="receipt-btn" onclick="confirmCollectPayment(' + customerId + ')"><i class="fas fa-check"></i> Confirm Payment</button>' +
-            '</div>' +
-            '</div></div>';
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
-        document.getElementById('collectAmount').focus();
-    }).catch(function() { showToast('Failed to load customer', true); });
+function switchPaymentTab(tabId, el) {
+    document.querySelectorAll('.tab-btn').forEach(function(btn) { btn.classList.remove('active'); });
+    document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+    el.classList.add('active');
+    document.getElementById('tab-' + tabId).classList.add('active');
+    if (tabId === 'outstanding') showOutstandingPayments();
 }
-
-function closeCollectPaymentModal() {
-    var modal = document.getElementById('collectPaymentModal');
-    if (modal) modal.remove();
-}
-
-async function confirmCollectPayment(customerId) {
-    var amount = parseFloat(document.getElementById('collectAmount').value) || 0;
-    var method = document.getElementById('collectMethod').value;
-    var notes = document.getElementById('collectNotes').value;
-    if (amount <= 0) { showToast('Enter valid amount', true); return; }
-    if (!method) { showToast('Select payment method', true); return; }
-    try {
-        var customers = await API.getCustomers();
-        var customer = customers.find(function(c) { return c.id == customerId; });
-        var newId = (payments.length > 0 ? Math.max(...payments.map(p => p.id)) : 0) + 1;
-        var paymentId = 'PAY-' + String(newId).padStart(3, '0');
-        var date = new Date().toISOString().split('T')[0];
-        await API.savePayment({
-            id: newId, paymentId: paymentId,
-            customer: customer.id,
-            supplier: '', invoice: 'Outstanding Payment',
-            amount: amount, date: date, method: method,
-            status: 'paid', notes: notes || 'Partial/Full payment collection'
-        });
-        closeCollectPaymentModal();
-        showToast('Payment of ₦' + amount.toFixed(2) + ' collected via ' + method);
-        showOutstandingPayments();
-    } catch (err) {
-        showToast(err.message || 'Failed to record payment', true);
-    }
-}
-
-function toggleUserMenu(event) {
-    event.stopPropagation();
-    var dropdown = document.getElementById('userDropdown');
-    dropdown.classList.toggle('active');
-}
-function closeUserMenu() {
-    var dropdown = document.getElementById('userDropdown');
-    dropdown.classList.remove('active');
-}
-function switchToAdmin() {
-    document.getElementById('currentUserName').textContent = 'Admin User';
-    document.getElementById('dropdownUserName').textContent = 'Admin User';
-    showToast('Switched to Admin User');
-    closeUserMenu();
-}
-function logout() {
-    closeUserMenu();
-    if (confirm('Are you sure you want to logout?')) {
-        API.logout();
-        window.location.href = 'login.html';
-    }
-}
-document.addEventListener('click', function(e) {
-    var dropdown = document.getElementById('userDropdown');
-    var userMenu = document.querySelector('.user-menu');
-    if (dropdown && dropdown.classList.contains('active') && !userMenu.contains(e.target)) {
-        dropdown.classList.remove('active');
-    }
+document.addEventListener('DOMContentLoaded', function() {
+    if (!POS.requireAuth()) return;
+    POS.renderSidebar();
+    POS.renderUserMenu();
+    renderPayments();
 });
-
-document.addEventListener('DOMContentLoaded', async function() {
-    if (!API.isLoggedIn()) { 
-        var demo = getQueryParameter('demo');
-        if (demo !== '1') {
-            window.location.href = 'login.html'; 
-            return; 
-}
-}
-
-function getQueryParameter(name) {
-    var params = new URLSearchParams(window.location.search);
-    return params.get(name) || '0';
-}
 </script>
 </body>
 </html>

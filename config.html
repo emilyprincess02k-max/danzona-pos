@@ -3,19 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Store Config - DANZONA PHARM</title>
+    <title>Store Config - SHEDS POS</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
-body{background:#f2f2f2;min-height:100vh;display:flex;}
-.sidebar{width:260px;background:#064e3b;color:#e2e8f0;height:100vh;overflow-y:auto;box-shadow:2px 0 10px rgba(0,0,0,0.1);flex-shrink:0;}
-.sidebar-header{background:#043e2c;padding:20px 25px;border-bottom:1px solid #059669;}
-.sidebar h1{font-size:22px;color:#10b981;margin:0;font-weight:600;}
-.sidebar ul{list-style:none;padding:15px 0;}
-.sidebar ul li{padding:12px 25px;display:flex;align-items:center;gap:12px;cursor:pointer;border-left:3px solid transparent;transition:all 0.2s ease;font-size:14px;}
-.sidebar ul li i{width:20px;text-align:center;font-size:16px;}
-.sidebar ul li:hover{background:#059669;border-left-color:#10b981;color:#ffffff;}
-.sidebar ul li.active{background:#059669;border-left-color:#10b981;color:#ffffff;}
+:root{--primary:#10b981;--primary-hover:#059669;--primary-soft:#ecfdf5;--primary-ring:rgba(16,185,129,0.1);--danger:#ef4444;--warning:#f59e0b;--info:#3b82f6;--dark:#1f2937;--border:#e5e7eb;--light:#f9fafb;--text:#1f2937;--text-soft:#6b7280;--success:#10b981;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',Arial,sans-serif;}
+body{background:#f3f4f6;min-height:100vh;display:flex;}
+.sidebar{width:260px;background:var(--dark);color:#fff;height:100vh;overflow-y:auto;flex-shrink:0;transition:all 0.3s;}
+.sidebar-header{padding:20px;background:#111827;border-bottom:1px solid #374151;}
+.sidebar-header h1{font-size:22px;color:var(--primary);margin:0;font-weight:600;}
+.sidebar-header p{font-size:12px;color:#9ca3af;margin-top:4px;}
+.sidebar ul{list-style:none;padding:12px 0;}
+.sidebar ul li{padding:12px 22px;display:flex;align-items:center;gap:12px;cursor:pointer;border-left:3px solid transparent;transition:all 0.2s;font-size:14px;}
+.sidebar ul li:hover{background:#374151;color:#fff;border-left-color:var(--primary);}
+.sidebar ul li.active{background:#374151;color:#fff;border-left-color:var(--primary);}
 .main-content{flex:1;display:flex;flex-direction:column;}
 .header{background:#10b981;color:white;padding:15px 25px;display:flex;justify-content:space-between;align-items:center;}
 .header h2{font-size:20px;}
@@ -42,9 +43,10 @@ function navigateTo(page){window.location.href=page;}
 </head>
 <body>
 <div class="sidebar">
-    <div class="sidebar-header">
-        <h1>POS</h1>
-    </div>
+<div class="sidebar-header">
+<h1><i class="fas fa-clinic-medical"></i> SHEDS POS</h1>
+<p>Point of Sale System</p>
+</div>
     <ul>
         <li onclick="navigateTo('dashboard.html')"><i class="fas fa-home"></i> Dashboard</li>
         <li onclick="navigateTo('sales.html')"><i class="fas fa-shopping-cart"></i> Sales</li>
@@ -68,7 +70,7 @@ function navigateTo(page){window.location.href=page;}
     </ul>
 </div>
 <div class="main-content">
-    <div class="header"><h2>Store Config</h2><span id="pharmacyNameDisplay" style="font-weight:500;">Loading...</span></div>
+    <div class="header"><h2>Store Config</h2><span id="pharmacyNameDisplay" style="font-weight:500;">Loading...</span><div class="header-clock" id="topClock"></div></div>
     <div class="content">
     <div class="config-header">
         <h2>Store Configuration</h2>
@@ -77,7 +79,7 @@ function navigateTo(page){window.location.href=page;}
         <h3><i class="fas fa-store"></i> Store Information</h3>
         <div class="config-group">
             <label>Store Name</label>
-            <input type="text" id="storeName" placeholder="Enter store name" value="DANZONA PHARM">
+            <input type="text" id="storeName" placeholder="Enter store name" value="SHEDS POS">
         </div>
     </div>
     <div class="config-section">
@@ -92,7 +94,7 @@ function navigateTo(page){window.location.href=page;}
         </div>
         <div class="config-group">
             <label>Email Address</label>
-            <input type="email" id="emailAddress" placeholder="Enter email address" value="info@danzonapharm.com">
+            <input type="email" id="emailAddress" placeholder="Enter email address" value="info@SHEDSpharm.com">
         </div>
     </div>
     <div class="config-section">
@@ -132,7 +134,7 @@ function navigateTo(page){window.location.href=page;}
         </div>
         <div class="config-group">
             <label>Footer Text</label>
-            <input type="text" id="footerText" placeholder="Footer text on receipt" value="Thank you for choosing DANZONA PHARM!">
+            <input type="text" id="footerText" placeholder="Footer text on receipt" value="Thank you for choosing SHEDS POS!">
         </div>
     </div>
     <div style="text-align:center; margin-top:30px;">
@@ -154,16 +156,16 @@ function showToast(msg, isError){
     setTimeout(function(){t.style.display='none';},3000);
 }
 function loadConfig(){
-    var config=JSON.parse(localStorage.getItem('storeConfig')||'{}');
-    document.getElementById('storeName').value=config.storeName||'DANZONA PHARM';
-    document.getElementById('storeAddress').value=config.storeAddress||'123 Pharmacy Street, Lagos, Nigeria';
-    document.getElementById('phoneNumber').value=config.phoneNumber||'+234 123 4567';
-    document.getElementById('emailAddress').value=config.emailAddress||'info@danzonapharm.com';
-    document.getElementById('lowStockThreshold').value=config.lowStockThreshold||5;
-    document.getElementById('sessionTimeout').value=config.sessionTimeout||30;
-    document.getElementById('storeLogo').value=config.storeLogo||'logo.png';
-    document.getElementById('footerText').value=config.footerText||'Thank you for choosing DANZONA PHARM!';
-}
+     var config=JSON.parse(localStorage.getItem('storeConfig')||'{}');
+     document.getElementById('storeName').value=config.storeName||'SHEDS POS';
+     document.getElementById('storeAddress').value=config.storeAddress||'123 Pharmacy Street, Lagos, Nigeria';
+     document.getElementById('phoneNumber').value=config.phoneNumber||'+234 123 4567';
+     document.getElementById('emailAddress').value=config.emailAddress||'info@SHEDSpharm.com';
+     document.getElementById('lowStockThreshold').value=config.lowStockThreshold||5;
+     document.getElementById('sessionTimeout').value=config.sessionTimeout||30;
+     document.getElementById('storeLogo').value=config.storeLogo||'logo.png';
+     document.getElementById('footerText').value=config.footerText||'Thank you for choosing SHEDS POS!';
+ }
 function saveConfig() {
     var storeName=document.getElementById('storeName').value.trim();
     var storeAddress=document.getElementById('storeAddress').value.trim();
@@ -187,8 +189,8 @@ function saveConfig() {
     showToast('Configuration saved!');
 }
 function updatePharmacyName() {
-    var pharmName = API.getPharmacyName() || 'DANZONA PHARM';
-    var display = document.getElementById('pharmacyNameDisplay');
+     var pharmName = API.getPharmacyName() || 'SHEDS POS';
+     var display = document.getElementById('pharmacyNameDisplay');
     if (display) display.textContent = pharmName;
 }
 function logout() {
@@ -216,3 +218,4 @@ function getQueryParameter(name) {
 </script>
 </body>
 </html>
+

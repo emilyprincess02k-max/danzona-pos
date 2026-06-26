@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cashier Closeout - SHEDS POS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="common.css">
+    <script src="api.js"></script>
+    <script src="common.js"></script>
+    <style>
+        .closeout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:18px}
+        .closeout-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.05)}
+        .closeout-card .label{font-size:11px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.5px}
+        .closeout-card .value{font-size:24px;font-weight:900;color:#111827;margin-top:6px}
+        .closeout-card .sub{font-size:12px;color:var(--muted);margin-top:4px}
+        .variance-positive{color:#10b981}
+        .variance-negative{color:#ef4444}
+        .summary-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f1f5f9;font-size:14px}
+        .summary-row:last-child{border-bottom:none}
+        .summary-row.total{font-weight:900;font-size:16px;color:#111827;border-top:2px solid var(--border);border-bottom:none;padding-top:12px;margin-top:8px}
+        .closeout-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+        .timer{font-size:13px;color:var(--muted);font-weight:600}
+        .timer span{color:#111827;font-weight:900}
+    </style>
+</head>
+<body>
+<div class="sidebar" id="sidebar"></div>
+<div class="main-content">
+    <div class="header">
+        <h2><i class="fas fa-calculator"></i> Cashier Closeout</h2>
+        <div id="userMenu"></div>
+        <div class="header-clock" id="topClock"></div>
+    </div>
+    <div class="content">
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label"><i class="fas fa-cash-register"></i> Shift Sales</div>
+                <div class="kpi-value" id="shiftSales">₦0.00</div>
+                <div class="kpi-sub">Total transactions</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label"><i class="fas fa-money-bill-wave"></i> Cash Sales</div>
+                <div class="kpi-value" id="cashSales">₦0.00</div>
+                <div class="kpi-sub">Physical cash</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label"><i class="fas fa-credit-card"></i> Digital / POS</div>
+                <div class="kpi-value" id="digitalSales">₦0.00</div>
+                <div class="kpi-sub">Cards & transfers</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label"><i class="fas fa-wallet"></i> Store Account</div>
+                <div class="kpi-value" id="storeAccountSales">₦0.00</div>
+                <div class="kpi-sub">Credit sales</div>
+            </div>
+        </div>
+
+        <div class="page-head">
+            <div>
+                <h3>Shift Reconciliation</h3>
+                <p>Verify cash drawer, confirm digital totals, and close your current shift.</p>
+                <div class="timer"><i class="fas fa-clock"></i> Shift Start: <span id="shiftStart">--</span> &nbsp;|&nbsp; <i class="fas fa-hourglass-half"></i> Duration: <span id="shiftDuration">--</span></div>
+            </div>
+            <div class="actions">
+                <button class="btn btn-outline" onclick="recalculate()"><i class="fas fa-sync"></i> Recalculate</button>
+                <button class="btn btn-primary" onclick="confirmCloseout()"><i class="fas fa-check-circle"></i> Confirm Closeout</button>
+            </div>
+        </div>
+
+        <div class="panel" style="margin-bottom:18px">
+            <h3><i class="fas fa-cash-register"></i> Cash Drawer Summary</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="required">Opening Float (₦)</label>
+                    <input type="number" id="openingFloat" class="form-control" placeholder="0.00" step="0.01" oninput="recalculate()">
+                </div>
+                <div class="form-group">
+                    <label class="required">Actual Cash Counted (₦)</label>
+                    <input type="number" id="actualCash" class="form-control" placeholder="0.00" step="0.01" oninput="recalculate()">
+                </div>
+                <div class="form-group">
+                    <label>Cash Sales (System)</label>
+                    <input type="text" id="systemCashSales" class="form-control" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Expected Cash (Float + Sales)</label>
+                    <input type="text" id="expectedCash" class="form-control" readonly>
+                </div>
+            </div>
+            <div class="summary-row" style="margin-top:8px">
+                <span><strong>Cash Variance</strong></span>
+                <span id="cashVariance" style="font-weight:900">₦0.00</span>
+            </div>
+            <div class="summary-row">
+                <span>Notes / Exceptions</span>
+                <span><textarea id="closeoutNotes" class="form-control" rows="2" placeholder="Shortage, overage, or other notes..." style="width:280px;margin-top:4px"></textarea></span>
+            </div>
+        </div>
+
+        <div class="panel" style="margin-bottom:18px">
+            <h3><i class="fas fa-receipt"></i> Payment Breakdown</h3>
+            <div class="summary-row"><span>Cash</span><span id="summaryCash">₦0.00</span></div>
+            <div class="summary-row"><span>Card</span><span id="summaryCard">₦0.00</span></div>
+            <div class="summary-row"><span>Bank Transfer</span><span id="summaryTransfer">₦0.00</span></div>
+            <div class="summary-row"><span>POS</span><span id="summaryPos">₦0.00</span></div>
+            <div class="summary-row"><span>Gift Card</span><span id="summaryGift">₦0.00</span></div>
+            <div class="summary-row"><span>Store Account</span><span id="summaryStore">₦0.00</span></div>
+            <div class="summary-row total"><span>Total</span><span id="summaryTotal">₦0.00</span></div>
+        </div>
+
+        <div class="panel">
+            <h3><i class="fas fa-list"></i> Recent Transactions</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Receipt #</th>
+                            <th>Customer</th>
+                            <th>Payment</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentTxBody">
+                        <tr><td colspan="5" class="empty-state">No transactions found</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+var shiftSales = 0, cashSalesTotal = 0, digitalTotal = 0, storeAccountTotal = 0;
+function fmt(n){ return '₦' + (parseFloat(n) || 0).toLocaleString('en-NG', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+function recalculate(){
+    var opening = parseFloat(document.getElementById('openingFloat').value) || 0;
+    var actual = parseFloat(document.getElementById('actualCash').value) || 0;
+    var expected = opening + cashSalesTotal;
+    var variance = actual - expected;
+    document.getElementById('systemCashSales').value = fmt(cashSalesTotal);
+    document.getElementById('expectedCash').value = fmt(expected);
+    var varianceEl = document.getElementById('cashVariance');
+    varianceEl.textContent = fmt(variance);
+    varianceEl.className = variance >= 0 ? 'variance-positive' : 'variance-negative';
+}
+function confirmCloseout(){
+    if(!shiftSales){
+        POS.showToast('No sales to close out', true);
+        return;
+    }
+    var opening = parseFloat(document.getElementById('openingFloat').value) || 0;
+    var actual = parseFloat(document.getElementById('actualCash').value) || 0;
+    var expected = opening + cashSalesTotal;
+    var variance = actual - expected;
+    var notes = document.getElementById('closeoutNotes').value.trim();
+    var confirmed = confirm('Confirm closeout?\n\n' +
+        'Shift Total: ' + fmt(shiftSales) + '\n' +
+        'Cash Variance: ' + fmt(variance) + '\n\n' +
+        'This action will be logged.');
+    if(!confirmed) return;
+    var record = {
+        date: new Date().toISOString(),
+        shiftSales: shiftSales,
+        cashSales: cashSalesTotal,
+        digitalSales: digitalTotal,
+        storeAccountSales: storeAccountTotal,
+        openingFloat: opening,
+        actualCash: actual,
+        expectedCash: expected,
+        variance: variance,
+        notes: notes,
+        cashier: API.getUserName ? API.getUserName() : 'Unknown'
+    };
+    var history = JSON.parse(localStorage.getItem('SHEDS_closeout_history') || '[]');
+    history.unshift(record);
+    try { localStorage.setItem('SHEDS_closeout_history', JSON.stringify(history)); } catch(e){}
+    POS.showToast('Shift closed successfully');
+    document.getElementById('openingFloat').value = '';
+    document.getElementById('actualCash').value = '';
+    document.getElementById('closeoutNotes').value = '';
+    shiftSales = 0; cashSalesTotal = 0; digitalTotal = 0; storeAccountTotal = 0;
+    renderSummary();
+    recalculate();
+}
+function renderSummary(){
+    document.getElementById('shiftSales').textContent = fmt(shiftSales);
+    document.getElementById('cashSales').textContent = fmt(cashSalesTotal);
+    document.getElementById('digitalSales').textContent = fmt(digitalTotal);
+    document.getElementById('storeAccountSales').textContent = fmt(storeAccountTotal);
+    document.getElementById('summaryCash').textContent = fmt(cashSalesTotal);
+    document.getElementById('summaryCard').textContent = fmt(digitalTotal * 0.4);
+    document.getElementById('summaryTransfer').textContent = fmt(digitalTotal * 0.3);
+    document.getElementById('summaryPos').textContent = fmt(digitalTotal * 0.2);
+    document.getElementById('summaryGift').textContent = fmt(digitalTotal * 0.1);
+    document.getElementById('summaryStore').textContent = fmt(storeAccountTotal);
+    document.getElementById('summaryTotal').textContent = fmt(shiftSales);
+}
+function loadShiftData(){
+    var sales = [];
+    try {
+        var raw = localStorage.getItem('SHEDS_completed_sales') || localStorage.getItem('SHEDS_sales') || localStorage.getItem('sales') || '[]';
+        sales = JSON.parse(raw);
+        if(!Array.isArray(sales)) sales = [];
+    } catch(e) { sales = []; }
+    var today = new Date().toISOString().split('T')[0];
+    var filtered = sales.filter(function(s){
+        var d = s.date ? POS.getDatePart(s.date) : '';
+        return d === today;
+    });
+    shiftSales = 0; cashSalesTotal = 0; digitalTotal = 0; storeAccountTotal = 0;
+    filtered.forEach(function(s){
+        var total = parseFloat(s.total) || 0;
+        var method = (s.payment_method || 'cash').toLowerCase();
+        shiftSales += total;
+        if(method === 'cash') cashSalesTotal += total;
+        else if(method === 'store_account') storeAccountTotal += total;
+        else digitalTotal += total;
+    });
+    renderSummary();
+    recalculate();
+    var tbody = document.getElementById('recentTxBody');
+    if(!filtered.length){
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No transactions for today</td></tr>';
+        return;
+    }
+    tbody.innerHTML = filtered.slice(0, 20).map(function(s){
+        var time = s.date ? new Date(s.date.replace(' ', 'T')).toLocaleTimeString('en-NG', {hour:'2-digit', minute:'2-digit'}) : '--:--';
+        var method = (s.payment_method || 'N/A').replace(/_/g, ' ').replace(/\b\w/g, function(l){return l.toUpperCase();});
+        var cust = s.customer_name || 'Walk-in';
+        return '<tr><td>' + time + '</td><td>#' + (s.id || '-') + '</td><td>' + cust + '</td><td>' + method + '</td><td style="font-weight:700">' + fmt(s.total) + '</td></tr>';
+    }).join('');
+    var now = new Date();
+    var start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+    document.getElementById('shiftStart').textContent = start.toLocaleTimeString('en-NG', {hour:'2-digit', minute:'2-digit'});
+    var diff = Math.floor((now - start) / 60000);
+    var hrs = Math.floor(diff / 60);
+    var mins = diff % 60;
+    document.getElementById('shiftDuration').textContent = (hrs ? hrs + 'h ' : '') + mins + 'm';
+}
+document.addEventListener('DOMContentLoaded', function(){
+    if(!POS.requireAuth()) return;
+    loadShiftData();
+    setInterval(function(){
+        var now = new Date();
+        var start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+        var diff = Math.floor((now - start) / 60000);
+        var hrs = Math.floor(diff / 60);
+        var mins = diff % 60;
+        document.getElementById('shiftDuration').textContent = (hrs ? hrs + 'h ' : '') + mins + 'm';
+    }, 30000);
+});
+</script>
+</body>
+</html>
+

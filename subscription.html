@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subscription - SHEDS POS</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="common.css">
+<style>
+:root{--primary:#10b981;--dark:#0f172a;--light:#f8fafc;--border:#e5e7eb;--warning:#f59e0b;--danger:#ef4444}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',Arial,sans-serif}
+body{background:linear-gradient(135deg,#0f172a,#1e293b);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.sub-container{max-width:800px;width:100%;background:#fff;border-radius:20px;box-shadow:0 25px 60px rgba(0,0,0,0.3);overflow:hidden}
+.sub-header{background:linear-gradient(135deg,#10b981,#059669);color:#fff;padding:30px;text-align:center}
+.sub-header h1{font-size:28px;font-weight:800;margin-bottom:6px}
+.sub-header p{opacity:.9;font-size:14px}
+.sub-body{padding:30px}
+.status-box{border-radius:12px;padding:16px;margin-bottom:24px;display:flex;align-items:center;gap:12px}
+.status-box.trial{background:#fffbeb;border:2px solid #f59e0b}
+.status-box.trial i{color:#f59e0b;font-size:28px}
+.status-box.active{background:#f0fdf4;border:2px solid #10b981}
+.status-box.active i{color:#10b981;font-size:28px}
+.status-box.expired{background:#fef2f2;border:2px solid #ef4444}
+.status-box.expired i{color:#ef4444;font-size:28px}
+.status-box strong{font-size:15px;color:#111827;display:block}
+.status-box span{font-size:13px;color:#6b7280}
+.trial-banner{background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:12px;padding:20px;margin-bottom:24px;text-align:center}
+.trial-banner .days{font-size:48px;font-weight:900;color:#92400e}
+.trial-banner .label{font-size:14px;color:#92400e;font-weight:600}
+.plans-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:24px}
+.plan-card{border:2px solid #e5e7eb;border-radius:14px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;background:#fff}
+.plan-card:hover{border-color:#10b981;transform:translateY(-2px);box-shadow:0 8px 20px rgba(16,185,129,0.12)}
+.plan-card.selected{border-color:#10b981;background:#ecfdf5;box-shadow:0 0 0 3px rgba(16,185,129,0.15)}
+.plan-card h3{font-size:16px;font-weight:800;color:#111827;margin-bottom:6px}
+.plan-card .price{font-size:22px;font-weight:900;color:#10b981;margin-bottom:4px}
+.plan-card .period{font-size:12px;color:#6b7280;margin-bottom:12px}
+.plan-card ul{list-style:none;text-align:left;font-size:12px;color:#374151}
+.plan-card ul li{padding:3px 0;display:flex;align-items:center;gap:6px}
+.plan-card ul li i{color:#10b981;font-size:10px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:13px;font-weight:700;color:#374151;margin-bottom:5px}
+.form-control{width:100%;padding:10px 14px;border:2px solid #e5e7eb;border-radius:10px;font-size:14px;outline:none;transition:border-color .2s}
+.form-control:focus{border-color:#10b981}
+.btn{width:100%;padding:14px;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s}
+.btn-primary{background:#10b981;color:#fff}
+.btn-primary:hover{background:#059669;transform:translateY(-1px)}
+.back-link{text-align:center;margin-top:16px}
+.back-link a{color:#10b981;font-size:13px;font-weight:600;text-decoration:none}
+.back-link a:hover{text-decoration:underline}
+.cycle-toggle{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:24px}
+.cycle-toggle span{font-size:14px;font-weight:700;color:#6b7280}
+.cycle-toggle span.active{color:#10b981}
+.toggle-switch{position:relative;width:56px;height:28px}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:#d1d5db;border-radius:28px;cursor:pointer;transition:.2s}
+.toggle-slider:before{content:'';position:absolute;width:22px;height:22px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s}
+.toggle-switch input:checked+.toggle-slider{background:#10b981}
+.toggle-switch input:checked+.toggle-slider:before{transform:translateX(28px)}
+.yearly-badge{background:#fef3c7;color:#92400e;font-size:10px;font-weight:800;padding:2px 6px;border-radius:4px;margin-left:4px;vertical-align:middle}
+</style>
+</head>
+<body>
+<div class="sub-container">
+  <div class="sub-header">
+    <h1><i class="fas fa-calendar-check"></i> SHEDS POS Subscription</h1>
+    <p>Start your 30-day free trial, then choose a plan</p>
+  </div>
+  <div class="sub-body">
+    <div id="statusBox" class="status-box trial">
+      <i class="fas fa-gift"></i>
+      <div><strong>Free Trial Active</strong><span id="trialStatus">Initializing trial...</span></div>
+    </div>
+    <div id="trialBanner" class="trial-banner">
+      <div class="days" id="trialDays">30</div>
+      <div class="label">days remaining in free trial</div>
+    </div>
+    <div class="cycle-toggle">
+      <span id="monthlyLabel" class="active">Monthly</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="cycleToggle" onchange="toggleCycle(this.checked)">
+        <span class="toggle-slider"></span>
+      </label>
+      <span id="yearlyLabel">Yearly <span class="yearly-badge">SAVE 17%</span></span>
+    </div>
+    <div class="plans-grid">
+      <div class="plan-card" onclick="handlePlanClick(this,'basic',5000,'Basic')" data-monthly="5000" data-yearly="42000">
+        <h3>Basic</h3>
+        <div class="price" id="price-basic">₦5,000</div>
+        <div class="period" id="period-basic">per month</div>
+        <ul><li><i class="fas fa-check"></i> 1 Terminal</li><li><i class="fas fa-check"></i> Basic Support</li><li><i class="fas fa-check"></i> 50 Products</li></ul>
+      </div>
+      <div class="plan-card" onclick="handlePlanClick(this,'standard',10000,'Standard')" data-monthly="10000" data-yearly="84000">
+        <h3>Standard</h3>
+        <div class="price" id="price-standard">₦10,000</div>
+        <div class="period" id="period-standard">per month</div>
+        <ul><li><i class="fas fa-check"></i> 3 Terminals</li><li><i class="fas fa-check"></i> Priority Support</li><li><i class="fas fa-check"></i> 500 Products</li></ul>
+      </div>
+      <div class="plan-card selected" onclick="handlePlanClick(this,'premium',20000,'Premium')" data-monthly="20000" data-yearly="168000">
+        <h3>Premium</h3>
+        <div class="price" id="price-premium">₦20,000</div>
+        <div class="period" id="period-premium">per month</div>
+        <ul><li><i class="fas fa-check"></i> 10 Terminals</li><li><i class="fas fa-check"></i> 24/7 Support</li><li><i class="fas fa-check"></i> Unlimited Products</li></ul>
+      </div>
+      <div class="plan-card" onclick="handlePlanClick(this,'enterprise',50000,'Enterprise')" data-monthly="50000" data-yearly="420000">
+        <h3>Enterprise</h3>
+        <div class="price" id="price-enterprise">₦50,000</div>
+        <div class="period" id="period-enterprise">per month</div>
+        <ul><li><i class="fas fa-check"></i> Unlimited</li><li><i class="fas fa-check"></i> Dedicated Manager</li><li><i class="fas fa-check"></i> Custom Integrations</li></ul>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Business Name</label>
+      <input type="text" id="bizName" class="form-control" placeholder="Enter your business name" value="SHEDS Pharmacy">
+    </div>
+    <button class="btn btn-primary" onclick="showPaymentModal()"><i class="fas fa-credit-card"></i> Make Payment</button>
+    <div class="back-link"><a href="#" onclick="event.preventDefault();window.location.href='sales.html';"><i class="fas fa-arrow-left"></i> Back to POS</a></div>
+  </div>
+</div>
+<div class="modal-overlay" id="paymentModal">
+  <div class="modal" style="max-width:450px;">
+    <div class="modal-header">
+      <h3>Confirm Subscription Payment</h3>
+      <button class="modal-close" onclick="document.getElementById('paymentModal').classList.remove('open')">&times;</button>
+    </div>
+    <div id="paymentContent">
+      <div class="kpi-grid" style="margin-bottom:16px;">
+        <div class="kpi-card"><div class="kpi-label">Plan</div><div class="kpi-value" id="payPlanName" style="font-size:16px;">Premium</div></div>
+        <div class="kpi-card"><div class="kpi-label">Amount</div><div class="kpi-value" id="payAmount" style="font-size:16px;">₦20,000</div></div>
+      </div>
+      <div class="form-group">
+        <label>Payment Method</label>
+        <select id="subPaymentMethod" class="form-control">
+          <option value="card">Card Payment</option>
+          <option value="bank_transfer">Bank Transfer</option>
+          <option value="cash">Cash</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Transaction Reference</label>
+        <input type="text" id="subRef" class="form-control" placeholder="Enter reference if paid via bank transfer">
+      </div>
+      <div id="paymentSuccess" style="display:none;text-align:center;margin:20px 0;">
+        <i class="fas fa-check-circle" style="font-size:48px;color:#10b981;"></i>
+        <p style="margin-top:10px;color:#111827;font-weight:600;">Payment Confirmed!</p>
+        <p style="color:#6b7280;font-size:13px;">Your subscription is now active.</p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="document.getElementById('paymentModal').classList.remove('open')"><i class="fas fa-times"></i> Cancel</button>
+        <button class="btn btn-success" onclick="processSubscriptionPayment()"><i class="fas fa-credit-card"></i> Pay Now</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+var selectedPlan={name:'premium',amount:20000,displayName:'Premium'};
+var TRIAL_KEY='danzona_trial';
+var SUB_KEY='danzona_subscription';
+function $(id){return document.getElementById(id);}
+function selectPlan(el,name,amount,displayName){
+    document.querySelectorAll('.plan-card').forEach(function(c){c.classList.remove('selected');});
+    el.classList.add('selected');
+    selectedPlan={name:name,amount:amount,displayName:displayName};
+}
+function handlePlanClick(el,name,amount,displayName){
+    selectPlan(el,name,amount,displayName);
+    showPaymentModal();
+}
+function toggleCycle(checked){
+    document.querySelectorAll('.plan-card').forEach(function(card){
+        var monthly=card.getAttribute('data-monthly'),yearly=card.getAttribute('data-yearly');
+        if(checked){
+            card.querySelector('.price').textContent='₦'+parseFloat(yearly).toLocaleString();
+            card.querySelector('.period').textContent='per year';
+            selectedPlan.amount=parseFloat(yearly);
+        }else{
+            card.querySelector('.price').textContent='₦'+parseFloat(monthly).toLocaleString();
+            card.querySelector('.period').textContent='per month';
+            selectedPlan.amount=parseFloat(monthly);
+        }
+        if(card.classList.contains('selected')){
+            selectedPlan.name=card.querySelector('h3').textContent.toLowerCase();
+            selectedPlan.displayName=card.querySelector('h3').textContent;
+        }
+    });
+    document.getElementById('monthlyLabel').classList.toggle('active',!checked);
+    document.getElementById('yearlyLabel').classList.toggle('active',checked);
+}
+function showPaymentModal(){
+    $('payPlanName').textContent=selectedPlan.displayName;
+    $('payAmount').textContent='₦'+parseFloat(selectedPlan.amount).toLocaleString();
+    $('subPaymentMethod').value='card';
+    $('subRef').value='';
+    $('paymentSuccess').style.display='none';
+    $('paymentContent').style.display='block';
+    document.querySelector('#paymentModal .modal-actions').style.display='flex';
+    var el=document.getElementById('paymentModal');
+    if(el)el.classList.add('open');
+}
+function processSubscriptionPayment(){
+    var method=$('subPaymentMethod').value;
+    var ref=$('subRef').value||'TX-'+Date.now();
+    activateSubscription();
+    $('paymentContent').style.display='none';
+    document.querySelector('#paymentModal .modal-actions').style.display='none';
+    $('paymentSuccess').style.display='block';
+    setTimeout(function(){
+        var el=document.getElementById('paymentModal');
+        if(el)el.classList.remove('open');
+    },2000);
+}
+function initTrial(){
+    var trial;
+    try{trial=JSON.parse(localStorage.getItem(TRIAL_KEY));}catch(e){trial=null;}
+    if(!trial){
+        var now=new Date();
+        trial={status:'active',startDate:now.toISOString(),endDate:new Date(now.getTime()+30*24*60*60*1000).toISOString()};
+        localStorage.setItem(TRIAL_KEY,JSON.stringify(trial));
+    }
+    updateTrialDisplay(trial);
+}
+function updateTrialDisplay(trial){
+    if(!trial)return;
+    var now=new Date();
+    var end=new Date(trial.endDate);
+    var remaining=Math.ceil((end-now)/(1000*60*60*24));
+    remaining=Math.max(0,remaining);
+    $('trialDays').textContent=remaining;
+    if(remaining<=0){
+        $('statusBox').className='status-box expired';
+        $('statusBox').innerHTML='<i class="fas fa-clock"></i><div><strong>Trial Expired</strong><span>Subscribe now to continue using SHEDS POS.</span></div>';
+        $('trialBanner').style.display='none';
+    }else{
+        $('statusBox').className='status-box trial';
+        $('statusBox').innerHTML='<i class="fas fa-gift"></i><div><strong>Free Trial Active</strong><span>Ends on '+end.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})+'</span></div>';
+        $('trialBanner').style.display='block';
+    }
+}
+function activateSubscription(){
+    var bizName=$('bizName').value.trim()||'SHEDS Pharmacy';
+    var sub={id:'SUB-'+Date.now(),businessName:bizName,plan:selectedPlan.name,amount:selectedPlan.amount,status:'active',activatedAt:new Date().toISOString(),nextBilling:new Date(Date.now()+30*24*60*60*1000).toISOString().split('T')[0]};
+    try{
+        localStorage.setItem(SUB_KEY,JSON.stringify(sub));
+        localStorage.setItem(TRIAL_KEY,JSON.stringify({status:'ended',startDate:new Date().toISOString(),endDate:new Date().toISOString()}));
+    }catch(e){}
+    var box=$('statusBox');
+    box.className='status-box active';
+    box.innerHTML='<i class="fas fa-check-circle"></i><div><strong>Subscription Active</strong><span>Plan: '+sub.plan.charAt(0).toUpperCase()+sub.plan.slice(1)+' | Next billing: '+sub.nextBilling+'</span></div>';
+    $('trialBanner').style.display='none';
+    setTimeout(function(){window.location.href='sales.html';},1500);
+}
+document.addEventListener('DOMContentLoaded',initTrial);
+</script>
+</body>
+</html>

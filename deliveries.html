@@ -3,269 +3,254 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deliveries - DANZONA PHARM</title>
+    <title>Deliveries - SHEDS POS</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
-body{background:#f2f2f2;min-height:100vh;display:flex;}
-.sidebar{width:260px;background:#064e3b;color:#e2e8f0;height:100vh;overflow-y:auto;box-shadow:2px 0 10px rgba(0,0,0,0.1);flex-shrink:0;}
-.sidebar-header{background:#043e2c;padding:20px 25px;border-bottom:1px solid #059669;}
-.sidebar h1{font-size:22px;color:#10b981;margin:0;font-weight:600;}
-.sidebar ul{list-style:none;padding:15px 0;}
-.sidebar ul li{padding:12px 25px;display:flex;align-items:center;gap:12px;cursor:pointer;border-left:3px solid transparent;transition:all 0.2s ease;font-size:14px;}
-.sidebar ul li i{width:20px;text-align:center;font-size:16px;}
-.sidebar ul li:hover{background:#059669;border-left-color:#10b981;color:#ffffff;}
-.sidebar ul li.active{background:#059669;border-left-color:#10b981;color:#ffffff;}
-.main-content{flex:1;display:flex;flex-direction:column;}
-.header{background:#10b981;color:white;padding:15px 25px;display:flex;justify-content:space-between;align-items:center;}
-.header h2{font-size:20px;}
-.content{flex:1;padding:20px;}
-.deliveries-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;}
-.deliveries-header h2{margin:0;}
-.add-delivery-btn{background:#4da3ff;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;font-size:16px;}
-.add-delivery-btn:hover{background:#3b82f6;}
-.deliveries-table{width:100%;border-collapse:collapse;background:white;border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.1);}
-.deliveries-table th,.deliveries-table td{padding:15px;text-align:left;border-bottom:1px solid #eee;}
-.deliveries-table th{background-color:#f8f9fa;font-weight:600;}
-.deliveries-table tr:hover{background-color:#f5f5f5;}
-.delivery-status{padding:4px 8px;border-radius:4px;font-size:14px;font-weight:500;}
-.delivery-status.pending{background:#fef3c7;color:#92400e;}
-.delivery-status.in_transit{background:#dbeafe;color:#1e40af;}
-.delivery-status.delivered{background:#dcfce7;color:#166534;}
-.delivery-status.delayed{background:#fee2e2;color:#991b1b;}
-.action-btns{display:flex;gap:8px;}
-.action-btn{padding:6px 12px;border:none;border-radius:4px;cursor:pointer;font-size:14px;}
-.edit-btn{background:#3b82f6;color:white;}
-.edit-btn:hover{background:#2563eb;}
-.delete-btn{background:#ef4444;color:white;}
-.delete-btn:hover{background:#dc2626;}
-.view-btn{background:#10b981;color:white;}
-.view-btn:hover{background:#059669;}
-.notification-toast{position:fixed;top:20px;right:20px;background:#48bb78;color:white;padding:1rem 1.5rem;border-radius:5px;display:none;z-index:1000;}
-.loading-spinner{text-align:center;padding:20px;color:#718096;}
-</style>
-<script src="api.js"></script>
-<script>
-function navigateTo(page){window.location.href=page;}
-</script>
+    <link rel="stylesheet" href="common.css">
+    <script src="api.js"></script>
+    <script src="common.js"></script>
 </head>
 <body>
-<div class="sidebar">
-    <div class="sidebar-header">
-        <h1>POS</h1>
+<div class="sidebar" id="sidebar"></div>
+<div class="main-content">
+    <div class="header">
+        <h2><i class="fas fa-truck-loading"></i> Deliveries</h2>
+        <div id="userMenu"></div>
+        <div class="header-clock" id="topClock"></div>
     </div>
-    <ul>
-        <li onclick="navigateTo('dashboard.html')"><i class="fas fa-home"></i> Dashboard</li>
-        <li onclick="navigateTo('sales.html')"><i class="fas fa-shopping-cart"></i> Sales</li>
-        <li onclick="navigateTo('variations.html')"><i class="fas fa-plus-circle"></i> Add New Product</li>
-        <li onclick="navigateTo('inventory.html')"><i class="fas fa-boxes"></i> Inventory</li>
-        <li onclick="navigateTo('customers.html')"><i class="fas fa-users"></i> Customers</li>
-        <li onclick="navigateTo('suppliers.html')"><i class="fas fa-truck"></i> Suppliers</li>
-        <li onclick="navigateTo('reports.html')"><i class="fas fa-chart-bar"></i> Reports</li>
-        <li onclick="navigateTo('receiving.html')"><i class="fas fa-file-import"></i> Receiving</li>
-        <li class="active" onclick="navigateTo('deliveries.html')"><i class="fas fa-truck-loading"></i> Deliveries</li>
-        <li onclick="navigateTo('expenses.html')"><i class="fas fa-receipt"></i> Expenses</li>
-        <li onclick="navigateTo('employees.html')"><i class="fas fa-user-tie"></i> Employees</li>
-        <li onclick="navigateTo('appointments.html')"><i class="fas fa-calendar"></i> Appointments</li>
-        <li onclick="navigateTo('giftcards.html')"><i class="fas fa-gift"></i> Gift Cards</li>
-        <li onclick="navigateTo('config.html')"><i class="fas fa-cog"></i> Store Config</li>
-        <li onclick="navigateTo('invoices.html')"><i class="fas fa-file-invoice"></i> Invoices</li>
-        <li onclick="navigateTo('locations.html')"><i class="fas fa-store"></i> Locations</li>
-        <li onclick="navigateTo('messages.html')"><i class="fas fa-envelope"></i> Messages</li>
-        <li onclick="navigateTo('payments.html')"><i class="fas fa-credit-card"></i> Payments</li>
-        <li onclick="navigateTo('login.html')"><i class="fas fa-sign-out-alt"></i> Logout</li>
-    </ul>
-    </div>
-    <div class="main-content">
-    <div class="header"><h2>Deliveries</h2><span id="pharmacyNameDisplay" style="font-weight:500;">Loading...</span></div>
     <div class="content">
-        <div class="deliveries-header">
-            <h2>Delivery Management</h2>
-            <button class="add-delivery-btn" onclick="showAddDeliveryForm()">
-                <i class="fas fa-plus"></i> Schedule Delivery
-            </button>
-        </div>
-        <div id="addDeliveryForm" style="display:none;margin-bottom:20px;padding:20px;background:white;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.1);">
-            <h3 id="deliveryFormTitle">Schedule New Delivery</h3>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;">
-                <div>
-                    <label>Customer *</label>
-                    <select id="customerSelect" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
-                        <option value="">Select Customer</option>
-                    </select>
-                </div>
-                <div>
-                    <label>Delivery Date *</label>
-                    <input type="date" id="deliveryDate" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
-                </div>
-                <div>
-                    <label>Delivery Time</label>
-                    <input type="time" id="deliveryTime" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
-                </div>
-                <div>
-                    <label>Address</label>
-                    <textarea id="deliveryAddress" placeholder="Delivery address" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;height:80px;"></textarea>
-                </div>
-                <div>
-                    <label>Contact Person</label>
-                    <input type="text" id="contactPerson" placeholder="Contact person name" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
-                </div>
-                <div>
-                    <label>Contact Phone</label>
-                    <input type="tel" id="contactPhone" placeholder="Contact phone number" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
-                </div>
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label"><i class="fas fa-truck-loading"></i> Total Deliveries</div>
+                <div class="kpi-value" id="kpiTotal">0</div>
+                <div class="kpi-sub">All scheduled</div>
             </div>
-            <div style="margin-top:15px;text-align:right;">
-                <button onclick="hideAddDeliveryForm()" style="background:#6b7280;color:white;border:none;padding:8px 16px;border-radius:4px;margin-right:10px;">Cancel</button>
-                <button onclick="scheduleDelivery()" style="background:#4da3ff;color:white;border:none;padding:8px 16px;border-radius:4px;">Schedule Delivery</button>
+            <div class="kpi-card">
+                <div class="kpi-label"><i class="fas fa-clock"></i> Pending</div>
+                <div class="kpi-value" style="color:#f59e0b;" id="kpiPending">0</div>
+                <div class="kpi-sub">Awaiting</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label"><i class="fas fa-check-circle"></i> Delivered</div>
+                <div class="kpi-value" style="color:#10b981;" id="kpiDelivered">0</div>
+                <div class="kpi-sub">Completed</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label"><i class="fas fa-times-circle"></i> Delayed</div>
+                <div class="kpi-value" style="color:#ef4444;" id="kpiDelayed">0</div>
+                <div class="kpi-sub">Overdue</div>
             </div>
         </div>
-        <table class="deliveries-table">
-            <thead>
-                <tr>
-                    <th>Delivery ID</th>
-                    <th>Customer</th>
-                    <th>Date</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="deliveriesTableBody"><tr><td colspan="5" class="loading-spinner">Loading...</td></tr></tbody>
-        </table>
+        <div class="page-head">
+            <div>
+                <h3>Delivery Management</h3>
+                <p>Schedule and track deliveries to customers.</p>
+            </div>
+            <button class="btn btn-primary" onclick="showAddDeliveryForm()"><i class="fas fa-plus"></i> Schedule Delivery</button>
+        </div>
+        <div class="panel">
+            <div class="toolbar">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search deliveries..." oninput="renderDeliveries()">
+                <select id="statusFilter" class="form-select" onchange="renderDeliveries()">
+                    <option value="all">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="in_transit">In Transit</option>
+                    <option value="delivered">Delivered</option>
+                </select>
+                <button class="btn btn-info" onclick="exportDeliveriesCSV()"><i class="fas fa-file-export"></i> Export CSV</button>
+            </div>
+        </div>
+        <div id="addDeliveryForm" class="modal-overlay">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 id="deliveryFormTitle">Schedule New Delivery</h3>
+                    <button class="modal-close" onclick="POS.closeModal('addDeliveryForm')">&times;</button>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="required">Customer</label>
+                        <select id="customerSelect" class="form-select"><option value="">Select Customer</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="required">Delivery Date</label>
+                        <input type="date" id="deliveryDate" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Time</label>
+                        <input type="time" id="deliveryTime" class="form-control">
+                    </div>
+                    <div class="form-group full">
+                        <label>Address</label>
+                        <textarea id="deliveryAddress" class="form-control" placeholder="Delivery address"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Contact Person</label>
+                        <input type="text" id="contactPerson" class="form-control" placeholder="Contact name">
+                    </div>
+                    <div class="form-group">
+                        <label>Contact Phone</label>
+                        <input type="tel" id="contactPhone" class="form-control" placeholder="Phone number">
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="POS.closeModal('addDeliveryForm')">Cancel</button>
+                    <button class="btn btn-success" onclick="scheduleDelivery()">Save Delivery</button>
+                </div>
+            </div>
+        </div>
+        <div class="table-panel">
+            <div class="table-top"><strong><i class="fas fa-list"></i> Deliveries</strong><span id="deliveryCount">0 deliveries</span></div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Address</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deliveriesTableBody"><tr><td colspan="7" class="empty-state">Loading...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    <div class="notification-toast" id="toast">Action completed!</div>
 </div>
+<div class="toast" id="toast"></div>
 <script>
-function showToast(msg, isError){
-    var t=document.getElementById('toast');
-    t.textContent=msg;
-    t.style.background = isError ? '#f56565' : '#48bb78';
-    t.style.display='block';
-    setTimeout(function(){t.style.display='none';},3000);
-}
 var deliveries = [];
+var filteredDeliveries = [];
+var customersCache = [];
 var editDeliveryId = null;
-
+function $id(id) { return document.getElementById(id); }
+function updateKPIs() {
+    $id('kpiTotal').textContent = deliveries.length;
+    $id('kpiPending').textContent = deliveries.filter(function(d) { return d.status === 'pending'; }).length;
+    $id('kpiDelivered').textContent = deliveries.filter(function(d) { return d.status === 'delivered'; }).length;
+    $id('kpiDelayed').textContent = deliveries.filter(function(d) { return d.status === 'delayed'; }).length;
+}
 function showAddDeliveryForm() {
     editDeliveryId = null;
-    document.getElementById('addDeliveryForm').style.display = 'block';
-    document.getElementById('deliveryFormTitle').textContent = 'Schedule New Delivery';
-    document.getElementById('customerSelect').value = '';
-    document.getElementById('deliveryDate').value = '';
-    document.getElementById('deliveryTime').value = '';
-    document.getElementById('deliveryAddress').value = '';
-    document.getElementById('contactPerson').value = '';
-    document.getElementById('contactPhone').value = '';
+    $id('addDeliveryForm').classList.add('open');
+    $id('deliveryFormTitle').textContent = 'Schedule New Delivery';
+    $id('customerSelect').value = '';
+    $id('deliveryDate').value = '';
+    $id('deliveryTime').value = '';
+    $id('deliveryAddress').value = '';
+    $id('contactPerson').value = '';
+    $id('contactPhone').value = '';
     loadCustomerOptions();
 }
-function hideAddDeliveryForm() {
-    document.getElementById('addDeliveryForm').style.display = 'none';
-    editDeliveryId = null;
-}
-
 async function loadCustomerOptions() {
     try {
-        var customers = await API.getCustomers();
-        var select = document.getElementById('customerSelect');
-        select.innerHTML = '<option value="">Select Customer</option>' + (customers || []).map(function(c){
-            return '<option value="'+c.id+'">'+(c.firstName||'')+' '+(c.lastName||'')+'</option>';
+        customersCache = await API.getCustomers() || [];
+        $id('customerSelect').innerHTML = '<option value="">Select Customer</option>' + customersCache.map(function(c) {
+            return '<option value="' + c.id + '">' + POS.esc((c.firstName || '') + ' ' + (c.lastName || '')) + '</option>';
         }).join('');
-    } catch (err) {
-        showToast('Failed to load customers', true);
-    }
+    } catch (err) {}
 }
-
 async function scheduleDelivery() {
-    var customer = document.getElementById('customerSelect').value;
-    var date = document.getElementById('deliveryDate').value;
-    var time = document.getElementById('deliveryTime').value;
-    var address = document.getElementById('deliveryAddress').value;
-    var contact = document.getElementById('contactPerson').value;
-    var phone = document.getElementById('contactPhone').value;
-    if (!customer || !date) { showToast('Please select customer and delivery date', true); return; }
+    var customer = $id('customerSelect').value;
+    var date = $id('deliveryDate').value;
+    var time = $id('deliveryTime').value;
+    if (!customer || !date) {
+        POS.showToast('Please select customer and delivery date', true);
+        return;
+    }
     try {
         if (editDeliveryId !== null) {
-            await API.put('/deliveries/' + editDeliveryId, { customer: customer, date: date, time: time, address: address, contact: contact, phone: phone });
-            showToast('Delivery updated!');
+            await API.updateDelivery(editDeliveryId, { customer: customer, date: date, time: time, address: $id('deliveryAddress').value, contact: $id('contactPerson').value, phone: $id('contactPhone').value });
+            POS.showToast('Delivery updated!');
         } else {
-            var newId = deliveries.length > 0 ? Math.max(...deliveries.map(d => d.id)) + 1 : 1;
+            var newId = deliveries.length > 0 ? Math.max.apply(null, deliveries.map(function(d) { return d.id; })) + 1 : 1;
             var deliveryId = 'DEL-' + String(newId).padStart(3, '0');
-            await API.saveDelivery({ id: newId, deliveryId: deliveryId, customer: customer, date: date, time: time, address: address, contact: contact, phone: phone, status: 'pending' });
-            showToast('Delivery scheduled successfully!');
+            await API.saveDelivery({ id: newId, deliveryId: deliveryId, customer: customer, date: date, time: time, address: $id('deliveryAddress').value, contact: $id('contactPerson').value, phone: $id('contactPhone').value, status: 'pending' });
+            POS.showToast('Delivery scheduled!');
         }
-        hideAddDeliveryForm(); renderDeliveries();
+        POS.closeModal('addDeliveryForm');
+        renderDeliveries();
     } catch (err) {
-        showToast(err.message || 'Failed to schedule delivery', true);
+        POS.showToast(err.message || 'Failed to save delivery', true);
     }
 }
 async function renderDeliveries() {
     try {
-        deliveries = await API.getDeliveries();
+        deliveries = await API.getDeliveries() || [];
+        filteredDeliveries = [...deliveries];
     } catch (err) {
         deliveries = [];
-        showToast('Failed to load deliveries', true);
+        POS.showToast('Failed to load deliveries', true);
     }
-    var tbody = document.getElementById('deliveriesTableBody');
-    tbody.innerHTML = deliveries.map(function(d) {
-        return '<tr><td>' + d.deliveryId + '</td><td>' + d.customer + '</td><td>' + d.date + '</td><td><span class="delivery-status ' + d.status + '">' + (d.status === 'pending' ? 'Pending' : (d.status === 'in_transit' ? 'In Transit' : (d.status === 'delivered' ? 'Delivered' : 'Delayed'))) + '</span></td><td class="action-btns"><button class="view-btn" onclick="viewDelivery(' + d.id + ')">View</button><button class="edit-btn" onclick="editDelivery(' + d.id + ')">Edit</button><button class="delete-btn" onclick="deleteDelivery(' + d.id + ')">Delete</button></td></tr>';
-    }).join('');
+    updateKPIs();
+    var q = $id('searchInput').value.toLowerCase();
+    var st = $id('statusFilter').value;
+    filteredDeliveries = deliveries.filter(function(d) {
+        var text = [(d.customer || ''), (d.address || '')].join(' ').toLowerCase();
+        var matchesSearch = !q || text.indexOf(q) > -1;
+        var matchesStatus = st === 'all' || d.status === st;
+        return matchesSearch && matchesStatus;
+    });
+    $id('deliveryCount').textContent = filteredDeliveries.length + ' deliveries';
+    var tbody = $id('deliveriesTableBody');
+    tbody.innerHTML = filteredDeliveries.map(function(d) {
+        return '<tr><td>' + POS.esc(d.deliveryId || '') + '</td><td>' + POS.esc(d.customer || '') + '</td><td>' + POS.formatDate(d.date) + '</td><td>' + POS.esc(d.time || '') + '</td><td>' + POS.esc(d.address || '') + '</td><td>' + POS.statusBadge(d.status || 'pending') + '</td><td class="action-btns"><button class="icon-btn view" onclick="viewDelivery(' + d.id + ')"><i class="fas fa-eye"></i></button><button class="icon-btn edit" onclick="editDelivery(' + d.id + ')"><i class="fas fa-edit"></i></button><button class="icon-btn delete" onclick="deleteDelivery(' + d.id + ')"><i class="fas fa-trash"></i></button></td></tr>';
+    }).join('') || '<tr><td colspan="7" class="empty-state">No deliveries found</td></tr>';
 }
 function viewDelivery(id) {
-    var d = deliveries.find(d => d.id == id);
+    var d = deliveries.find(function(del) { return del.id == id; });
     if (!d) return;
-    alert('Delivery: ' + d.deliveryId + '\nCustomer: ' + d.customer + '\nDate: ' + d.date + '\nAddress: ' + d.address);
+    var modalHtml = '<div class="modal-overlay open" id="viewModal"><div class="modal"><div class="modal-header"><h3>Delivery Details</h3><button class="modal-close" onclick="POS.closeModal(\'viewModal\')">&times;</button></div>' +
+        '<div class="kpi-grid"><div class="kpi-card"><div class="kpi-label">Delivery ID</div><div class="kpi-value">' + POS.esc(d.deliveryId) + '</div></div><div class="kpi-card"><div class="kpi-label">Customer</div><div class="kpi-value">' + POS.esc(d.customer) + '</div></div></div>' +
+        '<div class="form-row" style="margin-top:15px;"><div class="form-group"><label>Date</label><span>' + POS.formatDate(d.date) + '</span></div><div class="form-group"><label>Address</label><span>' + POS.esc(d.address || '-') + '</span></div></div>' +
+        '<div class="modal-actions"><button class="btn btn-secondary" onclick="POS.closeModal(\'viewModal\')">Close</button></div></div></div>';
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
 function editDelivery(id) {
-    var d = deliveries.find(delivery => delivery.id == id);
+    var d = deliveries.find(function(del) { return del.id == id; });
     if (!d) return;
     editDeliveryId = id;
-    document.getElementById('addDeliveryForm').style.display = 'block';
-    document.getElementById('deliveryFormTitle').textContent = 'Edit Delivery';
-    document.getElementById('customerSelect').value = d.customer;
-    document.getElementById('deliveryDate').value = d.date;
-    document.getElementById('deliveryTime').value = d.time;
-    document.getElementById('deliveryAddress').value = d.address;
-    document.getElementById('contactPerson').value = d.contact;
-    document.getElementById('contactPhone').value = d.phone;
+    $id('addDeliveryForm').classList.add('open');
+    $id('deliveryFormTitle').textContent = 'Edit Delivery';
+    loadCustomerOptions().then(function() { $id('customerSelect').value = d.customerId || d.customer; });
+    $id('deliveryDate').value = d.date;
+    $id('deliveryTime').value = d.time;
+    $id('deliveryAddress').value = d.address;
+    $id('contactPerson').value = d.contact;
+    $id('contactPhone').value = d.phone;
 }
 async function deleteDelivery(id) {
     if (!confirm('Delete this delivery?')) return;
     try {
-        await API.delete('/deliveries/' + id);
-        showToast('Delivery deleted!');
+        await API.deleteDelivery(id);
+        POS.showToast('Delivery deleted!');
         renderDeliveries();
     } catch (err) {
-        showToast(err.message || 'Delete failed', true);
+        POS.showToast(err.message || 'Delete failed', true);
     }
 }
-function updatePharmacyName() {
-    var pharmName = API.getPharmacyName() || 'DANZONA PHARM';
-    var display = document.getElementById('pharmacyNameDisplay');
-    if (display) display.textContent = pharmName;
+function exportDeliveriesCSV() {
+    POS.exportCSV('deliveries_' + POS.today() + '.csv',
+        ['Delivery ID', 'Customer', 'Date', 'Time', 'Address', 'Status'],
+        filteredDeliveries.map(function(d) {
+            return {
+                'Delivery ID': d.deliveryId || '',
+                Customer: d.customer || '',
+                Date: d.date || '',
+                Time: d.time || '',
+                Address: d.address || '',
+                Status: d.status || ''
+            };
+        })
+    );
 }
-function logout() {
-    if (confirm('Are you sure you want to logout?')) {
-        API.logout();
-        window.location.href = 'login.html';
-    }
-}
-
-document.addEventListener('DOMContentLoaded', async function() {
-    if (!API.isLoggedIn()) { 
-        var demo = getQueryParameter('demo');
-        if (demo !== '1') {
-            window.location.href = 'login.html'; 
-            return; 
-        }
-    }
-    updatePharmacyName();
-    await renderDeliveries();
+document.addEventListener('DOMContentLoaded', function() {
+    if (!POS.requireAuth()) return;
+    POS.renderSidebar();
+    POS.renderUserMenu();
+    renderDeliveries();
 });
-
-function getQueryParameter(name) {
-    var params = new URLSearchParams(window.location.search);
-    return params.get(name) || '0';
-}
 </script>
 </body>
 </html>

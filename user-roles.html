@@ -1,0 +1,120 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Roles & Permissions - SHEDS POS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="common.css">
+    <script src="api.js"></script>
+    <script src="common.js"></script>
+    <style>
+        .panel{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:18px;box-shadow:0 4px 12px rgba(0,0,0,.04)}
+        .form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:14px}
+        .form-group{display:flex;flex-direction:column;gap:6px}
+        .form-group label{font-size:12px;font-weight:800;color:#374151;text-transform:uppercase;letter-spacing:.3px}
+        .form-control{padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;background:#fff}
+        .form-control:focus{outline:none;border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.12)}
+        .btn{padding:10px 14px;border:0;border-radius:8px;cursor:pointer;font-weight:800;font-size:13px;display:inline-flex;align-items:center;gap:8px;transition:.2s}
+        .btn-primary{background:#10b981;color:#fff}
+        .btn-outline{background:#fff;color:#111827;border:1px solid #d1d5db}
+        .btn-danger{background:#ef4444;color:#fff}
+        .checkbox-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:6px}
+        .checkbox-item{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid #e5e7eb;border-radius:8px;background:#f9fafb}
+        table{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;font-size:14px}
+        th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border)}
+        th{background:#f8fafc;color:#334155;font-size:11px;text-transform:uppercase;letter-spacing:.04em;font-weight:800}
+        tr:last-child td{border-bottom:none}
+        .badge{padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.2px}
+        .empty-state{text-align:center;color:#64748b;padding:36px 16px;font-size:14px}
+    </style>
+</head>
+<body>
+<div class="sidebar" id="sidebar"></div>
+<div class="main-content">
+    <div class="header">
+        <h2><i class="fas fa-user-shield"></i> User Roles & Permissions</h2>
+        <div id="userMenu"></div>
+        <div class="header-clock" id="topClock"></div>
+    </div>
+    <div class="content">
+        <div class="panel">
+            <h3><i class="fas fa-plus"></i> New Role</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Role Name</label>
+                    <input type="text" id="roleName" class="form-control" placeholder="e.g. Pharmacist, Cashier">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" id="roleDesc" class="form-control" placeholder="Short description">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Permissions</label>
+                <div class="checkbox-grid">
+                    <div class="checkbox-item"><input type="checkbox" value="sales" class="rolePerm"> <span>Sales / POS</span></div>
+                    <div class="checkbox-item"><input type="checkbox" value="inventory" class="rolePerm"> <span>Inventory</span></div>
+                    <div class="checkbox-item"><input type="checkbox" value="reports" class="rolePerm"> <span>Reports</span></div>
+                    <div class="checkbox-item"><input type="checkbox" value="customers" class="rolePerm"> <span>Customers</span></div>
+                    <div class="checkbox-item"><input type="checkbox" value="suppliers" class="rolePerm"> <span>Suppliers</span></div>
+                    <div class="checkbox-item"><input type="checkbox" value="expenses" class="rolePerm"> <span>Expenses</span></div>
+                    <div class="checkbox-item"><input type="checkbox" value="employees" class="rolePerm"> <span>Employees</span></div>
+                    <div class="checkbox-item"><input type="checkbox" value="settings" class="rolePerm"> <span>Settings / Config</span></div>
+                    <div class="checkbox-item"><input type="checkbox" value="audit" class="rolePerm"> <span>Audit Log</span></div>
+                    <div class="checkbox-item"><input type="checkbox" value="pharmacy" class="rolePerm"> <span>Pharmacy (Rx / Batch)</span></div>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="saveRole()"><i class="fas fa-save"></i> Save Role</button>
+        </div>
+        <div class="panel">
+            <h3><i class="fas fa-list"></i> Roles</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Role</th><th>Description</th><th>Permissions</th><th>Action</th></tr>
+                    </thead>
+                    <tbody id="rolesBody">
+                        <tr><td colspan="4" class="empty-state">No roles defined</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+function $(id){return document.getElementById(id);}
+var roles=[];
+function esc(s){ return String(s||'').replace(/[&<>"']/g, function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];}); }
+function showToast(m,err){ var t=$('toast'); t.textContent=m; t.className='toast'+(err?' error':''); t.style.display='block'; setTimeout(function(){t.style.display='none';},3000); }
+function saveRole(){
+    var name=$('roleName').value.trim();
+    var desc=$('roleDesc').value.trim();
+    if(!name){ showToast('Role name is required', true); return; }
+    var perms=[];
+    document.querySelectorAll('.rolePerm:checked').forEach(function(c){ perms.push(c.value); });
+    var record={ id:'ROL-'+Date.now(), name:name, desc:desc, perms:perms };
+    roles.unshift(record);
+    try{ localStorage.setItem('SHEDS_roles', JSON.stringify(roles)); }catch(e){}
+    showToast('Role saved');
+    resetRoleForm();
+    renderRoles();
+}
+function resetRoleForm(){ $('roleName').value='';$('roleDesc').value=''; document.querySelectorAll('.rolePerm').forEach(function(c){c.checked=false;}); }
+function renderRoles(){
+    var tbody=$('rolesBody');
+    if(!roles.length){ tbody.innerHTML='<tr><td colspan="4" class="empty-state">No roles defined</td></tr>'; return; }
+    tbody.innerHTML=roles.map(function(r){
+        var perms=(r.perms||[]).join(', ') || 'None';
+        return '<tr><td><strong>'+esc(r.name)+'</strong></td><td>'+esc(r.desc||'-')+'</td><td>'+esc(perms)+'</td><td><button class="btn btn-danger" style="padding:6px 10px;font-size:11px;" onclick="deleteRole(\''+r.id+'\')"><i class="fas fa-trash"></i> Delete</button></td></tr>';
+    }).join('');
+}
+function deleteRole(id){ if(!confirm('Delete role?')) return; roles=roles.filter(function(r){return r.id!==id;}); try{ localStorage.setItem('SHEDS_roles',JSON.stringify(roles)); }catch(e){} renderRoles(); showToast('Deleted'); }
+function loadRoles(){ try{ roles=JSON.parse(localStorage.getItem('SHEDS_roles')||'[]'); if(!Array.isArray(roles)) roles=[]; }catch(e){ roles=[]; } renderRoles(); }
+document.addEventListener('DOMContentLoaded', function(){ if(!POS.requireAuth()) return; loadRoles(); });
+</script>
+</body>
+</html>
+
+

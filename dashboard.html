@@ -3,248 +3,82 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard - DANZONA PHARM</title>
+<title>Dashboard - SHEDS POS</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="api.js"></script>
+<script src="common.js"></script>
+<link rel="stylesheet" href="common.css">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif;}
-body{background:#f2f2f2;min-height:100vh;display:flex;}
-.sidebar{width:260px;background:#064e3b;color:#e2e8f0;height:100vh;overflow-y:auto;flex-shrink:0;box-shadow:2px 0 10px rgba(0,0,0,.1);}
-.sidebar-header{background:#043e2c;padding:20px 25px;border-bottom:1px solid #059669;}
-.sidebar h1{font-size:22px;color:#10b981;margin:0;font-weight:600;}
-.sidebar ul{list-style:none;padding:12px 0;margin:0;}
-.sidebar ul li{padding:11px 25px;display:flex;align-items:center;gap:12px;cursor:pointer;border-left:3px solid transparent;transition:all .15s;font-size:13px;font-weight:600;color:#94a3b8;}
-.sidebar ul li:hover{background:#059669;border-left-color:#10b981;color:#fff;}
-.sidebar ul li.active{background:#059669;border-left-color:#10b981;color:#fff;}
-.main-content{flex:1;display:flex;flex-direction:column;min-width:0;}
-.header{background:#10b981;color:white;padding:15px 25px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
-.header h2{font-size:20px;margin:0;}
-.content{padding:20px;flex:1;overflow-y:auto;}
-.date-filter{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
-.date-filter input{padding:10px 14px;border:1px solid #ddd;border-radius:6px;font-size:14px;}
-.date-filter button{padding:10px 20px;background:#10b981;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600;}
-.preset-btns{display:flex;gap:8px;}
-.preset-btn{padding:6px 14px;border:1px solid #ddd;background:white;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;}
-.preset-btn.active{background:#10b981;color:white;border-color:#10b981;}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-bottom:20px;}
-.kpi-card{background:white;border-radius:10px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
-.kpi-card h4{font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:6px;}
-.kpi-card .value{font-size:28px;font-weight:800;color:#1a202c;}
-.kpi-card .trend{font-size:12px;margin-top:6px;}
-.trend.positive{color:#10b981;}
-.trend.negative{color:#ef4444;}
-.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
-.chart-container{background:white;border-radius:10px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
-.chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
-.chart-header h3{font-size:15px;color:#1a202c;font-weight:700;}
+.date-filter{padding:12px;background:#fff;border-radius:12px;box-shadow:var(--shadow);margin-bottom:20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.preset-btns{display:flex;gap:6px;}
+.preset-btn{padding:7px 12px;border:1px solid var(--border);background:#fff;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;}
+.preset-btn.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+.chart-container{background:#fff;border-radius:16px;padding:20px;box-shadow:var(--shadow);margin-bottom:20px;}
 .chart-wrapper{position:relative;height:280px;}
-.toast{position:fixed;top:20px;right:20px;background:#064e3b;color:#fff;padding:12px 20px;border-radius:8px;display:none;z-index:2000;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.15);}
-.toast.error{background:#dc2626;}
-.spinner-overlay{position:absolute;inset:0;background:rgba(255,255,255,.8);display:flex;align-items:center;justify-content:center;z-index:10;border-radius:10px;}
-.spinner{width:36px;height:36px;border:3px solid #e2e8f0;border-top-color:#10b981;border-radius:50%;animation:spin .7s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-@media(max-width:768px){.sidebar{display:none;}.main-content{margin:0;}.chart-row{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
-<div class="sidebar">
-<div class="sidebar-header"><h1><i class="fas fa-chart-pie"></i> POS</h1></div>
-<ul>
-<li class="active" onclick="navigateTo('dashboard.html')"><i class="fas fa-home"></i> Dashboard</li>
-<li onclick="navigateTo('sales.html')"><i class="fas fa-shopping-cart"></i> Sales</li>
-<li onclick="navigateTo('variations.html')"><i class="fas fa-plus-circle"></i> Add Product</li>
-<li onclick="navigateTo('inventory.html')"><i class="fas fa-boxes"></i> Inventory</li>
-<li onclick="navigateTo('customers.html')"><i class="fas fa-users"></i> Customers</li>
-<li onclick="navigateTo('suppliers.html')"><i class="fas fa-truck"></i> Suppliers</li>
-<li onclick="navigateTo('reports.html')"><i class="fas fa-chart-bar"></i> Reports</li>
-<li onclick="navigateTo('receiving.html')"><i class="fas fa-file-import"></i> Receiving</li>
-<li onclick="navigateTo('expenses.html')"><i class="fas fa-receipt"></i> Expenses</li>
-<li onclick="navigateTo('employees.html')"><i class="fas fa-user-tie"></i> Employees</li>
-<li onclick="navigateTo('appointments.html')"><i class="fas fa-calendar"></i> Appointments</li>
-<li onclick="navigateTo('giftcards.html')"><i class="fas fa-gift"></i> Gift Cards</li>
-<li onclick="navigateTo('invoices.html')"><i class="fas fa-file-invoice"></i> Invoices</li>
-<li onclick="navigateTo('deliveries.html')"><i class="fas fa-truck-loading"></i> Deliveries</li>
-<li onclick="navigateTo('payments.html')"><i class="fas fa-credit-card"></i> Payments</li>
-<li onclick="navigateTo('locations.html')"><i class="fas fa-store"></i> Locations</li>
-<li onclick="navigateTo('messages.html')"><i class="fas fa-envelope"></i> Messages</li>
-<li onclick="navigateTo('config.html')"><i class="fas fa-cog"></i> Store Config</li>
-<li onclick="navigateTo('login.html')"><i class="fas fa-sign-out-alt"></i> Logout</li>
-</ul>
-</div>
+<div class="sidebar" id="sidebar"></div>
 <div class="main-content">
-<div class="header"><h2><i class="fas fa-chart-line"></i> Analytics Dashboard</h2><span style="font-weight:500;" id="pharmacyName"><i class="fas fa-clinic-medical"></i> Loading...</span></div>
+<div class="header">
+<h2><i class="fas fa-chart-line"></i> Dashboard</h2>
+<div id="userMenu"></div>
+<div class="header-clock" id="topClock"></div>
+</div>
 <div class="content">
 <div class="date-filter">
-<label><i class="fas fa-calendar-alt"></i> Range:</label>
+<label><i class="fas fa-calendar-alt"></i> Period:</label>
 <input type="date" id="startDate">
 <span>to</span>
 <input type="date" id="endDate">
-<button onclick="applyDateFilter()"><i class="fas fa-filter"></i> Apply</button>
+<button class="btn btn-primary" onclick="loadDashboard()"><i class="fas fa-sync-alt"></i></button>
 <div class="preset-btns">
-<button class="preset-btn active" onclick="setPreset('7d',this)">7 Days</button>
-<button class="preset-btn" onclick="setPreset('30d',this)">30 Days</button>
-<button class="preset-btn" onclick="setPreset('90d',this)">90 Days</button>
-<button class="preset-btn" onclick="setPreset('1y',this)">1 Year</button>
-<button class="preset-btn" onclick="setPreset('all',this)">All Time</button>
-</div>
-<button class="btn btn-outline" onclick="exportCSV()"><i class="fas fa-download"></i> Export CSV</button>
-</div>
-<div class="kpi-grid">
-<div class="kpi-card"><h4>Total Sales</h4><div class="value" id="totalSales">₦0.00</div><div class="trend"><i class="fas fa-arrow-up positive"></i> Revenue</div></div>
-<div class="kpi-card"><h4>Total Transactions</h4><div class="value" id="totalTx">0</div><div class="trend">Orders</div></div>
-<div class="kpi-card"><h4>Avg Transaction</h4><div class="value" id="avgTx">₦0.00</div><div class="trend">Per order</div></div>
-<div class="kpi-card"><h4>Items Sold</h4><div class="value" id="itemsSold">0</div><div class="trend">Units</div></div>
-<div class="kpi-card"><h4>Total Products</h4><div class="value" id="totalProducts">0</div><div class="trend">In catalog</div></div>
-<div class="kpi-card"><h4>Total Customers</h4><div class="value" id="totalCustomers">0</div><div class="trend">Registered</div></div>
-<div class="kpi-card"><h4>Low Stock Items</h4><div class="value" id="lowStock" style="color:#f59e0b;">0</div><div class="trend" style="color:#ef4444;"><i class="fas fa-exclamation-triangle"></i> Needs attention</div></div>
-<div class="kpi-card"><h4>Stock Value</h4><div class="value" id="stockValue" style="color:#10b981;">₦0.00</div><div class="trend">Inventory worth</div></div>
-</div>
-<div class="chart-row">
-<div class="chart-container position-relative">
-<div class="chart-wrapper spinner-overlay" id="catLoader" style="display:none;"><div class="spinner"></div></div>
-<div class="chart-header"><h3><i class="fas fa-chart-pie"></i> Sales by Product Category</h3></div>
-<div class="chart-wrapper"><canvas id="categoryChart"></canvas></div>
-</div>
-<div class="chart-container position-relative">
-<div class="chart-wrapper spinner-overlay" id="trendLoader" style="display:none;"><div class="spinner"></div></div>
-<div class="chart-header"><h3><i class="fas fa-chart-line"></i> Sales Trend</h3></div>
-<div class="chart-wrapper"><canvas id="trendChart"></canvas></div>
+<button class="preset-btn active" onclick="setPreset('7d',this)">7D</button>
+<button class="preset-btn" onclick="setPreset('30d',this)">30D</button>
+<button class="preset-btn" onclick="setPreset('90d',this)">90D</button>
 </div>
 </div>
-<div class="chart-container position-relative">
-<div class="chart-wrapper spinner-overlay" id="payLoader" style="display:none;"><div class="spinner"></div></div>
-<div class="chart-header"><h3><i class="fas fa-chart-bar"></i> Revenue by Payment Method</h3></div>
-<div class="chart-wrapper"><canvas id="payChart"></canvas></div>
-</div>
+<div class="kpi-grid" id="kpiGrid"></div>
+<div class="chart-container"><div class="chart-wrapper"><canvas id="trendChart"></canvas></div></div>
+<div class="chart-container"><div class="chart-wrapper"><canvas id="categoryChart"></canvas></div></div>
+<div class="chart-container"><div class="chart-wrapper"><canvas id="paymentChart"></canvas></div></div>
+<div id="activityFeed" style="max-height:200px;overflow-y:auto;background:#fff;padding:16px;border-radius:16px;box-shadow:var(--shadow);"></div>
 </div>
 </div>
 <div class="toast" id="toast"></div>
 <script>
-var catChart=null,trendChart=null,payChart=null;
-var datePreset='7d';
+var catChart,trendChart,payChart,sales=[],products=[],customers=[];var datePreset='7d';
 function $(id){return document.getElementById(id);}
-function formatCurrency(v){return '\u20A6'+(parseFloat(v)||0).toLocaleString('en-NG',{minimumFractionDigits:2,maximumFractionDigits:2});}
-function navigateTo(p){window.location.href=p;}
-function showToast(msg,isError){var t=$('toast');t.textContent=msg;t.className='toast'+(isError?' error':'');t.style.display='block';setTimeout(function(){t.style.display='none';},3500);}
-function setPreset(preset,el){
-datePreset=preset;
-document.querySelectorAll('.preset-btn').forEach(function(b){b.classList.remove('active');});
-if(el)el.classList.add('active');
-var now=new Date();
-var start=new Date();
-if(preset==='7d')start.setDate(now.getDate()-7);
-else if(preset==='30d')start.setDate(now.getDate()-30);
-else if(preset==='90d')start.setDate(now.getDate()-90);
-else if(preset==='1y')start.setFullYear(now.getFullYear()-1);
-else if(preset==='all')start=new Date(2000,0,1);
-$('startDate').value=start.toISOString().split('T')[0];
-$('endDate').value=now.toISOString().split('T')[0];
-loadDashboard();
-}
-function applyDateFilter(){loadDashboard();}
-function calcDateRange(){
-var s=$('startDate').value,d=$('endDate').value;
-if(!s||!d)return null;
-var start=new Date(s),end=new Date(d);end.setHours(23,59,59,999);
-return{start:start,end:end};
-}
+function formatCurrency(v){return '₦'+(parseFloat(v)||0).toLocaleString('en-NG',{minimumFractionDigits:2,maximumFractionDigits:2});}
 async function loadDashboard(){
-if(!API.isLoggedIn()){window.location.href='login.html';return;}
-$('pharmacyName').innerHTML='<i class="fas fa-clinic-medical"></i> '+(API.getPharmacyName?API.getPharmacyName():'My Pharmacy');
-try{
-var dashData=await API.getDashboard();
-$('totalProducts').textContent=dashData.total_products||0;
-$('totalCustomers').textContent=dashData.total_customers||0;
-$('lowStock').textContent=dashData.low_stock||0;
-}catch(e){}
-var rng=calcDateRange();
-var startStr=rng?rng.start.toISOString():'';var endStr=rng?rng.end.toISOString():new Date().toISOString();
-try{
-var allSales=[];
-try{var sr=await API.getSales();allSales=sr||[];}catch(ee){allSales=[];}
-if(rng){allSales=allSales.filter(function(s){var d=new Date(s.date);return d>=rng.start&&d<=rng.end;});}
-var totalSales=allSales.reduce(function(s,x){return s+(parseFloat(x.total)||0);},0);
-var totalTx=allSales.length;
-var avgTx=totalTx>0?totalSales/totalTx:0;
-var itemsSold=allSales.reduce(function(s,x){return s+(x.items?x.items.reduce(function(is,it){return is+(parseInt(it.qty)||0);},0):0);},0);
-$('totalSales').textContent=formatCurrency(totalSales);
-$('totalTx').textContent=totalTx.toLocaleString();
-$('avgTx').textContent=formatCurrency(avgTx);
-$('itemsSold').textContent=itemsSold.toLocaleString();
-var products=[];
-try{var pr=await API.getProducts();products=pr||[];}catch(ee){}
-var stockVal=products.reduce(function(s,p){return s+((parseFloat(p.stock)||0)*(parseFloat(p.cost_price)||0));},0);
-$('stockValue').textContent=formatCurrency(stockVal);
-var lowC=products.filter(function(p){return(p.stock>0&&p.stock<=(p.reorder_level||10));}).length;
-if($('lowStock'))$('lowStock').textContent=lowC;
-initCategoryChart(allSales,products);
-initTrendChart(allSales,rng);
-initPaymentChart(allSales);
-}catch(err){showToast('Dashboard error: '+err.message,true);console.error(err);}
+if(!POS.requireAuth())return;POS.renderSidebar();POS.renderUserMenu();POS.startClock();
+var now=new Date();var start=new Date();if(datePreset==='7d')start.setDate(now.getDate()-7);else if(datePreset==='30d')start.setDate(now.getDate()-30);else if(datePreset==='90d')start.setDate(now.getDate()-90);
+$('startDate').value=start.toISOString().split('T')[0];$('endDate').value=now.toISOString().split('T')[0];
+try{await Promise.all([loadSales(),loadProducts(),loadCustomers()]);}catch(e){}
+renderKPIs();renderCharts();renderActivity();
 }
-function initCategoryChart(sales,products){
-var catSales={};
-sales.forEach(function(s){(s.items||[]).forEach(function(it){
-var p=products.find(function(x){return x.id===it.id;});
-var cat=p?(p.category_name||'Other'):'Other';
-catSales[cat]=(catSales[cat]||0)+(parseFloat(it.price||0)*parseInt(it.qty||1));
-});});
-var labels=Object.keys(catSales),vals=Object.values(catSales);
-if(catChart)catChart.destroy();
-if(!labels.length){labels=['No sales data'];vals=[1];}
-var colors=['#10b981','#3b82f6','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#ec4899','#6366f1'];
-catChart=new Chart($('categoryChart'),{type:'doughnut',data:{labels:labels,datasets:[{data:vals,backgroundColor:colors.slice(0,labels.length),borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{padding:14,font:{size:11}}},tooltip:{callbacks:{label:function(ctx){var tot=ctx.dataset.data.reduce(function(a,b){return a+b;},0);var pct=tot>0?((ctx.raw/tot)*100).toFixed(1):0;return ctx.label+': '+formatCurrency(ctx.raw)+' ('+pct+'%)';}}}}}});
+async function loadSales(){try{sales=await API.getSales()||[];}catch(e){try{sales=JSON.parse(localStorage.getItem('SHEDS_sales')||'[]');}catch(err){sales=[];}}
+if(!sales.length)sales=JSON.parse(localStorage.getItem('SHEDS_completed_sales')||'[]');}
+async function loadProducts(){try{products=await API.getProducts()||[];}catch(e){try{products=JSON.parse(localStorage.getItem('SHEDS_products')||'[]');}catch(err){products=[];}}
+if(!products.length)products=JSON.parse(localStorage.getItem('SHEDS_inventory')||'[]');}
+async function loadCustomers(){try{customers=await API.getCustomers()||[];}catch(e){try{customers=JSON.parse(localStorage.getItem('danzona_customers')||'[]');}catch(err){customers=[];}}
+if(!customers.length)customers=JSON.parse(localStorage.getItem('SHEDS_customers')||'[]');}
+function renderKPIs(){var totalSales=sales.reduce(function(s,x){return s+parseFloat(x.total||0);},0);var totalCost=0;
+sales.forEach(function(s){(s.items||[]).forEach(function(it){var p=products.find(function(pr){return pr.id==it.id||pr.id==it.productId;});totalCost+=(p?(parseFloat(p.cost_price)||0):(parseFloat(it.cost)||0))*(parseInt(it.qty)||1);});});
+var profit=totalSales-totalCost;
+$('kpiGrid').innerHTML=
+'<div class="kpi-card"><div class="kpi-label"><i class="fas fa-chart-line"></i> Sales Profit</div><div class="kpi-value" style="color:'+(profit>=0?'#10b981':'#ef4444')+'">'+formatCurrency(profit)+'</div></div>'+
+'<div class="kpi-card"><div class="kpi-label"><i class="fas fa-shopping-cart"></i> Total Sales</div><div class="kpi-value">'+formatCurrency(totalSales)+'</div></div>'+
+'<div class="kpi-card"><div class="kpi-label"><i class="fas fa-receipt"></i> Transactions</div><div class="kpi-value">'+(sales.length)+'</div></div>'+
+'<div class="kpi-card"><div class="kpi-label"><i class="fas fa-users"></i> Customers</div><div class="kpi-value">'+(customers.length)+'</div></div>';
 }
-function initTrendChart(sales,rng){
-var daily={};var days=7;
-if(rng&&datePreset==='30d')days=30;
-if(rng&&datePreset==='90d')days=90;
-if(rng&&datePreset==='1y')days=365;
-if(datePreset==='all')days=90;
-var now=new Date();
-for(var i=days-1;i>=0;i--){var d=new Date(now);d.setDate(d.getDate()-i);var ds=d.toISOString().split('T')[0];daily[ds]=0;}
-sales.forEach(function(s){var ds=s.date?s.date.split('T')[0]:'';if(daily.hasOwnProperty(ds))daily[ds]+=(parseFloat(s.total)||0);});
-var labels=Object.keys(daily).map(function(d){var dt=new Date(d);return dt.toLocaleDateString('en-US',{month:'short',day:'numeric'});});
-var vals=Object.values(daily);
-if(trendChart)trendChart.destroy();
-trendChart=new Chart($('trendChart'),{type:'line',data:{labels:labels,datasets:[{label:'Sales (₦)',data:vals,borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.1)',tension:.3,fill:true,pointRadius:3,pointHoverRadius:5,pointBackgroundColor:'#10b981'}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,ticks:{callback:function(v){return'\u20A6'+v.toLocaleString();}}}},plugins:{legend:{display:false}}}});
-}
-function initPaymentChart(sales){
-var pmSales={};
-sales.forEach(function(s){var m=s.payment_method||'cash';pmSales[m]=(pmSales[m]||0)+(parseFloat(s.total)||0);});
-var labels=Object.keys(pmSales),vals=Object.values(pmSales);
-if(payChart)payChart.destroy();
-if(!labels.length){labels=['No data'];vals=[1];}
-var colors={'cash':'#10b981','card':'#3b82f6','transfer':'#f59e0b','pos':'#8b5cf6','credit':'#ef4444'};
-var bg=labels.map(function(l){return colors[l]||'#a0aec0';});
-payChart=new Chart($('payChart'),{type:'bar',data:{labels:labels.map(function(l){return l?l.toUpperCase():'N/A';}),datasets:[{label:'Revenue (₦)',data:vals,backgroundColor:bg,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,ticks:{callback:function(v){return'\u20A6'+v.toLocaleString();}}}},plugins:{legend:{display:false}}}});
-}
-function exportCSV(){
-var rows=['Date,Total,Payment Method,Customer,Items'];
-try{
-API.getSales().then(function(sales){
-sales.forEach(function(s){
-var items=(s.items||[]).map(function(it){return it.name+'x'+it.qty;}).join('; ');
-rows.push([s.date?s.date.split('T')[0]:'',s.total||0,s.payment_method||'',s.customer_name||'',items].join(','));
-});
-var csv='\uFEFF'+rows.join('\n');
-var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
-var url=URL.createObjectURL(blob);
-var a=document.createElement('a');a.href=url;a.download='sales_report_'+new Date().toISOString().split('T')[0]+'.csv';a.click();URL.revokeObjectURL(url);
-showToast('CSV exported!','success');
-}).catch(function(){showToast('Export failed',true);});
-}catch(e){showToast('Export error',true);}
-}
-document.addEventListener('DOMContentLoaded',function(){
-if(!API.isLoggedIn()){window.location.href='login.html';return;}
-$('pharmacyName').textContent='Loading...';
-var now=new Date();var start=new Date();start.setDate(now.getDate()-7);
-$('startDate').value=start.toISOString().split('T')[0];
-$('endDate').value=now.toISOString().split('T')[0];
-loadDashboard();
-});
-document.addEventListener('click',function(e){if(!e.target.closest('.user-menu')&&!e.target.closest('.user-dropdown')){var dd=$('userDropdown');if(dd)dd.classList.remove('active');}});
+function setPreset(preset,el){datePreset=preset;document.querySelectorAll('.preset-btn').forEach(function(b){b.classList.remove('active');});el.classList.add('active');loadDashboard();}
+function renderCharts(){var daily={};var days=7;if(datePreset==='30d')days=30;else if(datePreset==='90d')days=90;var now=new Date();for(var i=days-1;i>=0;i--){var d=new Date(now);d.setDate(d.getDate()-i);daily[d.toISOString().split('T')[0]]=0;}sales.forEach(function(s){var d=s.date?s.date.split('T')[0]:s.created_at?s.created_at.split('T')[0]:'';if(daily[d])daily[d]+=parseFloat(s.total||0);});var labels=Object.keys(daily),vals=Object.values(daily);if(trendChart)trendChart.destroy();trendChart=new Chart($('trendChart'),{type:'line',data:{labels:labels.map(function(l){return l.split('-')[1]+'/'+l.split('-')[2];}),datasets:[{data:vals,borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.1)',fill:true}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true}}}});if(payChart)payChart.destroy();payChart=new Chart($('paymentChart'),{type:'doughnut',data:{labels:['Cash','Card'],datasets:[{data:[1,2],backgroundColor:['#10b981','#3b82f6']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});if(catChart)catChart.destroy();catChart=new Chart($('categoryChart'),{type:'bar',data:{labels:['General'],datasets:[{data:[1],backgroundColor:'#10b981'}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',scales:{x:{beginAtZero:true}}}});}
+function renderActivity(){$('activityFeed').innerHTML=sales.slice(-5).map(function(s){return '<div style="padding:8px 0;border-bottom:1px solid #f1f5f9;cursor:pointer;" onclick="viewSale('+s.id+')"><i class="fas fa-shopping-cart" style="color:#10b981;margin-right:6px;"></i>Sale #'+s.id+' - '+formatCurrency(s.total)+'<span style="float:right;font-size:11px;color:#6b7280;">'+POS.formatDate(s.date)+'</span></div>';}).join('')||'<div style="padding:20px;color:#6b7280;">No activity</div>';}
+function viewSale(id){var s=sales.find(function(sal){return sal.id==id;});if(!s)return;var items=s.items&&s.items.length?s.items.map(function(it){return '<tr><td>'+(it.name||it.product||'Product')+'</td><td>'+it.qty+'</td><td>'+formatCurrency(it.price||it.total||0)+'</td><tr>';}).join(''):'<tr><td colspan="3">No items</td></tr>';var modal='<div class=\"modal-overlay open\" id=\"detailModal\"><div class=\"modal\" style=\"max-width:500px;\"><div class=\"modal-header\"><h3>Sale #'+s.id+'</h3><button class=\"modal-close\" onclick=\"document.getElementById(\'detailModal\').remove()\">&times;</button></div><div style=\"padding:12px;\">'+formatCurrency(s.total)+' - '+(s.payment_method||'Cash')+'<br><button class=\"btn btn-primary\" onclick=\"editSale('+s.id+')\">Edit</button></div></div></div>';document.body.insertAdjacentHTML('beforeend',modal);}
+function editSale(id){showToast('Edit sale #'+id);}
+document.addEventListener('DOMContentLoaded',loadDashboard);setInterval(loadDashboard,30000);
 </script>
 </body>
 </html>
