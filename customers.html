@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Customers - SHEDS POS</title>
+<title>Customers - SHEDS Enterprise</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="stylesheet" href="common.css">
 <script src="api.js"></script>
@@ -86,13 +86,15 @@ function renderCustomers(){var q=POS.$('searchInput').value.toLowerCase();var se
 async function loadCustomers(){try{customers=await API.getCustomers()||[];}catch(e){try{customers=JSON.parse(localStorage.getItem('danzona_customers')||'[]')||[];}catch(err){customers=[];}POS.showToast('Loaded customers from local storage',true);}updateKPIs();renderCustomers();}
 async function deleteCustomer(id){if(!confirm('Delete this customer?'))return;try{await API.deleteCustomer(id);POS.showToast('Customer deleted');await loadCustomers();}catch(e){var localCustomers=[];try{localCustomers=JSON.parse(localStorage.getItem('danzona_customers')||'[]')||[];}catch(err){localCustomers=[];}customers=customers.filter(function(c){return String(c.id)!==String(id);});localCustomers=localCustomers.filter(function(c){return String(c.id)!==String(id);});localStorage.setItem('danzona_customers',JSON.stringify(localCustomers));POS.showToast('Customer deleted (local)');await loadCustomers();}}
 function exportCustomers(){var rows=filtered.length?filtered:customers;if(!rows.length){POS.showToast('No customers to export',true);return;}POS.exportCSV('danzona_customers_'+POS.today()+'.csv',['Name','Phone','Email','Customer ID','Segment','Loyalty Points','Balance','Address'],rows.map(function(c){return {Name:nameOf(c),Phone:c.phone||'',Email:c.email||'','Customer ID':c.customer_id||c.cust_id||'',Segment:segment(c),'Loyalty Points':num(c.points||c.loyalty_points||c.loyaltyPoints),'Balance':num(c.balance||c.credit_balance||c.creditBalance),Address:c.address||''}}));}
-function printCustomers(){var rows=filtered.length?filtered:customers;POS.printTable('SHEDS POS Customer Report',['Name','Phone','Email','Customer ID','Segment','Loyalty','Balance'],rows.map(function(c){return {Name:nameOf(c),Phone:c.phone||'',Email:c.email||'','Customer ID':c.customer_id||c.cust_id||'',Segment:segment(c),Loyalty:num(c.points||c.loyalty_points||c.loyaltyPoints),Balance:POS.formatCurrency(c.balance||c.credit_balance||c.creditBalance)}}));}
+function printCustomers(){var rows=filtered.length?filtered:customers;POS.printTable('SHEDS Enterprise Customer Report',['Name','Phone','Email','Customer ID','Segment','Loyalty','Balance'],rows.map(function(c){return {Name:nameOf(c),Phone:c.phone||'',Email:c.email||'','Customer ID':c.customer_id||c.cust_id||'',Segment:segment(c),Loyalty:num(c.points||c.loyalty_points||c.loyaltyPoints),Balance:POS.formatCurrency(c.balance||c.credit_balance||c.creditBalance)}}));}
 function openBulkMessageModal(){POS.openModal('bulkMessageModal');}
-function fillTemplate(){var t=POS.$('messageTemplate').value;if(t==='promo')POS.$('bulkMessageBody').value='Hello, enjoy our latest pharmacy wellness promotion this week at SHEDS POS.';if(t==='pickup')POS.$('bulkMessageBody').value='Your order is ready for pickup. Please visit us with your payment reference.';if(t==='birthday')POS.$('bulkMessageBody').value='Happy birthday from SHEDS POS. We wish you good health and a wonderful year.';}
+function fillTemplate(){var t=POS.$('messageTemplate').value;if(t==='promo')POS.$('bulkMessageBody').value='Hello, enjoy our latest pharmacy wellness promotion this week at SHEDS Enterprise.';if(t==='pickup')POS.$('bulkMessageBody').value='Your order is ready for pickup. Please visit us with your payment reference.';if(t==='birthday')POS.$('bulkMessageBody').value='Happy birthday from SHEDS Enterprise. We wish you good health and a wonderful year.';}
 function sendBulkMessage(){var msg=POS.$('bulkMessageBody').value.trim();if(!msg){POS.showToast('Message is required',true);return;}POS.showToast('Bulk message queued for '+filtered.length+' customers');POS.closeModal('bulkMessageModal');}
 document.addEventListener('DOMContentLoaded',function(){if(!POS.requireAuth())return;POS.renderSidebar();POS.renderUserMenu();loadCustomers();});
 </script>
 </body>
 </html>
+
+
 
 

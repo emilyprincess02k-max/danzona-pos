@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gift Cards - SHEDS POS</title>
+    <title>Gift Cards - SHEDS Enterprise</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="common.css">
     <script src="api.js"></script>
@@ -36,7 +36,7 @@
             </div>
             <div class="kpi-card">
                 <div class="kpi-label"><i class="fas fa-coins"></i> Total Value</div>
-                <div class="kpi-value" id="totalValue">?0.00</div>
+                <div class="kpi-value" id="totalValue">₦0.00</div>
                 <div class="kpi-sub">Combined worth</div>
             </div>
         </div>
@@ -266,7 +266,7 @@ function exportGiftCardsCSV() {
 }
 function printGiftCards() {
     var data = filteredCards.length > 0 ? filteredCards : giftcards;
-    POS.printTable('SHEDS POS Gift Cards Report',
+    POS.printTable('SHEDS Enterprise Gift Cards Report',
         ['Card Number', 'Recipient', 'Amount', 'Balance', 'Status', 'Expiry Date'],
         data.map(function(c) {
             return {
@@ -289,4 +289,6 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html>
+
+
 

@@ -1,4 +1,4 @@
-const page = {
+﻿const page = {
   ready(fn) {
     if (document.readyState !== 'loading') return fn();
     document.addEventListener('DOMContentLoaded', fn);
@@ -38,7 +38,7 @@ page.ready(() => {
   const VAT_RATE = 0.075;
 
   function fmt(n) {
-    return '₦' + (parseFloat(n) || 0).toLocaleString('en-NG', { minimumFractionDigits: 2 });
+    return 'â‚¦' + (parseFloat(n) || 0).toLocaleString('en-NG', { minimumFractionDigits: 2 });
   }
 
   function loadCart() {
@@ -241,13 +241,13 @@ page.ready(() => {
     cart = [];
     saveCart();
     renderCart();
-    POS.showToast('Sale held successfully — reason: ' + reasonKey.replace(/_/g, ' '));
+    POS.showToast('Sale held successfully â€” reason: ' + reasonKey.replace(/_/g, ' '));
   }
 
   async function checkout() {
     if (!cart.length) return alert('Cart is empty.');
 
-    const totalText = els.grandTotal.textContent || '₦0.00';
+    const totalText = els.grandTotal.textContent || 'â‚¦0.00';
     const total = parseFloat(totalText.replace(/[^0-9.]/g, '')) || 0;
     const tenderedText = els.amountTendered.value || '0';
     const tendered = parseFloat(tenderedText.replace(/[^0-9.]/g, '')) || 0;
@@ -358,7 +358,7 @@ page.ready(() => {
     els.sidebar.innerHTML = `
       <div class="sidebar-header">
         <div class="sidebar-brand"><i class="fas fa-clinic-medical"></i><div>
-          <h1>${(typeof API !== 'undefined' && API.getPharmacyName ? API.getPharmacyName() : 'Danzona') || 'Danzona'}</h1>
+          <h1>${(typeof API !== 'undefined' && API.getPharmacyName ? API.getPharmacyName() : 'SHEDS Enterprise') || 'SHEDS Enterprise'}</h1>
           <p>POS Terminal</p>
         </div></div>
       </div>
@@ -368,7 +368,7 @@ page.ready(() => {
         `</div>`).join('')}
       </div>
       <div class="sidebar-footer">
-        <div><strong>Secure Session</strong><span>Danzona POS v1.0</span></div>
+        <div><strong>Secure Session</strong><span>SHEDS Enterprise v1.0</span></div>
         <i class="fas fa-shield-alt"></i>
       </div>
     `;
@@ -451,3 +451,4 @@ page.ready(() => {
 
   init();
 });
+

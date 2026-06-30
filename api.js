@@ -1,9 +1,9 @@
-/* Danzona POS - API Client
+/* SHEDS Enterprise - API Client
  * Multi-tenant API using X-API-Key authentication.
  * Usage: API.init(apiKey, username); then API.get('/products'), API.post('/sales', data), etc.
  */
 var API = (function() {
-    var BASE_URL = '';
+    var BASE_URL = '/api';
     var apiKey = localStorage.getItem('danzona_api_key') || '';
     var username = localStorage.getItem('danzona_username') || '';
     var pharmacyName = localStorage.getItem('danzona_pharmacy_name') || '';
@@ -195,3 +195,4 @@ updatePayment: function(id, data) { return this.put('/payments/' + id, data); },
         getCatalogue: function() { return this.get('/catalogue'); }
     };
 })();
+

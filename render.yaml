@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: danzona-pos
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn server:app --bind 0.0.0.0:$PORT
+    healthCheckPath: /
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DB_PATH
+        value: /var/data/danzona_pos.db
+    disk:
+      name: data
+      mountPath: /var/data
+      sizeGB: 1

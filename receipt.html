@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Receipt - SHEDS POS</title>
+<title>Receipt - SHEDS Enterprise</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Courier+Prime:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <script src="api.js"></script>
+<script src="store-config.js"></script>
 <style>
 :root{--primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#dbeafe;--success:#10b981;--dark:#111827;--border:#d1d5db;--text:#1f2937;--muted:#6b7280;--danger:#ef4444;}
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -113,7 +114,7 @@ body{background:#f9fafb;min-height:100vh;padding:20px;font-family:'Inter',Arial,
 </div>
 </div>
 <script>
-function fmt(n){return '₦'+(parseFloat(n)||0).toLocaleString('en-NG',{minimumFractionDigits:2});}
+function fmt(n){try{return StoreConfig.formatCurrency(n);}catch(e){return '?'+(parseFloat(n)||0).toLocaleString('en-NG',{minimumFractionDigits:2});}}
 function esc(s){return String(s||'').replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});}
 function noop(label){window.alert(label+' action is available from this receipt view.');}
 function go(p){window.location.href=p;}
@@ -217,4 +218,6 @@ document.addEventListener('DOMContentLoaded',load);
 </script>
 </body>
 </html>
+
+
 

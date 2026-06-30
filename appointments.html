@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Appointments - SHEDS POS</title>
+    <title>Appointments - SHEDS Enterprise</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="common.css">
     <script src="api.js"></script>
@@ -264,7 +264,7 @@ function exportAppointmentsCSV() {
 }
 function printAppointments() {
     var data = filteredAppointments.length > 0 ? filteredAppointments : appointments;
-    POS.printTable('SHEDS POS Appointments Report',
+    POS.printTable('SHEDS Enterprise Appointments Report',
         ['ID', 'Patient', 'Doctor', 'Date', 'Time', 'Status'],
         data.map(function(a) {
             return {
@@ -287,3 +287,5 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html>
+
+

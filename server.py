@@ -1,6 +1,6 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
-Danzona POS - Multi-Tenant Backend API
+SHEDS POS powered by SHEDS Enterprise - Multi-Tenant Backend API
 Each pharmacy gets isolated data with an API key.
 """
 
@@ -479,6 +479,10 @@ def check_auth():
         'pharmacy_id': g.pharmacy_id,
         'name': g.pharmacy['name']
     }), 200
+
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    return jsonify({'status': 'ok'}), 200
 
 # ---------- Generic CRUD helper ----------
 
@@ -1035,3 +1039,4 @@ if __name__ == '__main__':
         init_db()
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
+
