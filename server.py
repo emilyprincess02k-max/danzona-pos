@@ -14,7 +14,7 @@ from flask import Flask, request, jsonify, g, send_file
 from functools import wraps
 
 app = Flask(__name__)
-app.config['DB_PATH'] = os.environ.get('DB_PATH', 'danzona_pos.db')
+app.config['DB_PATH'] = os.environ.get('DB_PATH', os.path.join(os.path.dirname(__file__), 'danzona_pos.db'))
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'change-me-set-a-real-secret-key')
 
 # ---------- Database ----------
@@ -452,8 +452,7 @@ def staff_login():
     if not users:
         return jsonify({'error': 'Invalid username or password'}), 401
 
-    if len(users) > 1:
-        user = users[0]
+    user = users[0]
     return jsonify({
         'user': {
             'id': user['id'],
