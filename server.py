@@ -17,6 +17,13 @@ app = Flask(__name__)
 app.config['DB_PATH'] = os.environ.get('DB_PATH', os.path.join(os.path.dirname(__file__), 'danzona_pos.db'))
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'change-me-set-a-real-secret-key')
 
+# Initialize DB on startup (works with gunicorn)
+with app.app_context():
+    try:
+        init_db()
+    except Exception as e:
+        pass
+
 # ---------- Database ----------
 
 def get_db():
@@ -1034,8 +1041,6 @@ def serve_static(filename):
     return jsonify({'error': 'Not found'}), 404
 
 if __name__ == '__main__':
-    with app.app_context():
-        init_db()
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
 
