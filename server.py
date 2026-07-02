@@ -17,13 +17,6 @@ app = Flask(__name__)
 app.config['DB_PATH'] = os.environ.get('DB_PATH', os.path.join(os.path.dirname(__file__), 'danzona_pos.db'))
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'change-me-set-a-real-secret-key')
 
-# Initialize DB on startup (works with gunicorn)
-with app.app_context():
-    try:
-        init_db()
-    except Exception as e:
-        pass
-
 # ---------- Database ----------
 
 def get_db():
@@ -40,9 +33,12 @@ def close_db(exception):
         db.close()
 
 def init_db():
-    db = get_db()
+    db_path = app.config['DB_PATH']
+    # Create DB file if not exists with all tables
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
     # Pharmacies (tenants)
-    db.execute('''
+    conn.execute('''
         CREATE TABLE IF NOT EXISTS pharmacies (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
@@ -54,7 +50,7 @@ def init_db():
         )
     ''')
     # Users (staff per pharmacy)
-    db.execute('''
+    conn.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             pharmacy_id INTEGER NOT NULL,
@@ -68,7 +64,7 @@ def init_db():
         )
     ''')
 
-    db.execute('''
+    conn.execute('''
         CREATE TABLE IF NOT EXISTS categories (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             pharmacy_id INTEGER NOT NULL,
@@ -78,7 +74,7 @@ def init_db():
     ''')
 
     # Products per pharmacy
-    db.execute('''
+    conn.execute('''
         CREATE TABLE IF NOT EXISTS products (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             pharmacy_id INTEGER NOT NULL,
@@ -100,7 +96,7 @@ def init_db():
         )
     ''')
     # Sales per pharmacy
-    db.execute('''
+    conn.execute('''
         CREATE TABLE IF NOT EXISTS sales (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             pharmacy_id INTEGER NOT NULL,
@@ -120,7 +116,7 @@ def init_db():
         )
     ''')
     # Customers per pharmacy
-    db.execute('''
+    conn.execute('''
         CREATE TABLE IF NOT EXISTS customers (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             pharmacy_id INTEGER NOT NULL,
@@ -134,7 +130,7 @@ def init_db():
         )
     ''')
     # Employees per pharmacy
-    db.execute('''
+    conn.execute('''
         CREATE TABLE IF NOT EXISTS employees (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             pharmacy_id INTEGER NOT NULL,
@@ -153,7 +149,7 @@ def init_db():
         )
     ''')
     # Inventory per pharmacy
-    db.execute('''
+    conn.execute('''
         CREATE TABLE IF NOT EXISTS inventory (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             pharmacy_id INTEGER NOT NULL,
@@ -169,7 +165,7 @@ def init_db():
         )
     ''')
     # Expenses per pharmacy
-    db.execute('''
+    conn.execute('''
         CREATE TABLE IF NOT EXISTS expenses (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             pharmacy_id INTEGER NOT NULL,
@@ -182,7 +178,7 @@ def init_db():
         )
     ''')
     # Payments / Accounts per pharmacy
-    db.execute('''
+    conn.execute('''
         CREATE TABLE IF NOT EXISTS payments (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             pharmacy_id INTEGER NOT NULL,
@@ -199,7 +195,7 @@ def init_db():
         )
     ''')
     # Locations per pharmacy
-    db.execute('''
+    conn.execute('''
         CREATE TABLE IF NOT EXISTS locations (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             pharmacy_id INTEGER NOT NULL,
@@ -211,7 +207,7 @@ def init_db():
         )
     ''')
     # Appointments per pharmacy
-    db.execute('''
+    conn.execute('''
         CREATE TABLE IF NOT EXISTS appointments (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             pharmacy_id INTEGER NOT NULL,
@@ -226,7 +222,7 @@ def init_db():
         )
     ''')
     # Gift cards per pharmacy
-    db.execute('''
+    conn.execute('''
         CREATE TABLE IF NOT EXISTS giftcards (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             pharmacy_id INTEGER NOT NULL,
@@ -241,7 +237,7 @@ def init_db():
         )
     ''')
     # Messages per pharmacy
-    db.execute('''
+    conn.execute('''
         CREATE TABLE IF NOT EXISTS messages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             pharmacy_id INTEGER NOT NULL,
@@ -254,7 +250,7 @@ def init_db():
         )
     ''')
     # Deliveries per pharmacy
-    db.execute('''
+    conn.execute('''
         CREATE TABLE IF NOT EXISTS deliveries (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             pharmacy_id INTEGER NOT NULL,
@@ -269,7 +265,7 @@ def init_db():
         )
     ''')
     # Invoices per pharmacy
-    db.execute('''
+    conn.execute('''
         CREATE TABLE IF NOT EXISTS invoices (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             pharmacy_id INTEGER NOT NULL,
@@ -287,7 +283,7 @@ def init_db():
         )
     ''')
     # Suppliers per pharmacy
-    db.execute('''
+    conn.execute('''
         CREATE TABLE IF NOT EXISTS suppliers (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             pharmacy_id INTEGER NOT NULL,
@@ -301,7 +297,11 @@ def init_db():
         )
     ''')
 
-    db.commit()
+    conn.commit()
+    conn.close()
+
+# Run init_db at module load for gunicorn
+init_db()
 
 # ---------- Auth Middleware ----------
 
