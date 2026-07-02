@@ -11,9 +11,4 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: DB_PATH
-        value: /var/data/danzona_pos.db
-    disk:
-      name: data
-      mountPath: /var/data
-      sizeGB: 1
-    autoDeploy: true
+        value: /tmp/danzona_pos.db
