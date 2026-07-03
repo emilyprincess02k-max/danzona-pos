@@ -98,20 +98,22 @@ def require_role(*roles):
 
 @app.route('/api/auth/register', methods=['POST'])
 def register_pharmacy():
-    data = request.get_json()
-    name = data.get('name', '').strip()
-    address = data.get('address', '')
-    phone = data.get('phone', '')
-    email = data.get('email', '')
-    admin_username = data.get('admin_username', '').strip()
-    admin_password = data.get('admin_password', '')
-    admin_name = data.get('admin_name', admin_username)
-
-    if not name or not admin_username or not admin_password:
-        return jsonify({'error': 'Pharmacy name, admin username and password are required'}), 400
-
-    api_key = secrets.token_urlsafe(32)
     try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        name = data.get('name', '').strip()
+        address = data.get('address', '')
+        phone = data.get('phone', '')
+        email = data.get('email', '')
+        admin_username = data.get('admin_username', '').strip()
+        admin_password = data.get('admin_password', '')
+        admin_name = data.get('admin_name', admin_username)
+
+        if not name or not admin_username or not admin_password:
+            return jsonify({'error': 'Pharmacy name, admin username and password are required'}), 400
+
+        api_key = secrets.token_urlsafe(32)
         db = get_db()
         cursor = db.execute(
             'INSERT INTO pharmacies (name, address, phone, email, api_key) VALUES (?, ?, ?, ?, ?)',
@@ -132,70 +134,77 @@ def register_pharmacy():
         }), 201
     except sqlite3.IntegrityError:
         return jsonify({'error': 'API key collision, please try again'}), 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/auth/login', methods=['POST'])
 def login():
-    data = request.get_json()
-    api_key = data.get('api_key', '').strip()
-    username = data.get('username', '').strip()
-    password = data.get('password', '')
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        api_key = data.get('api_key', '').strip()
+        username = data.get('username', '').strip()
+        password = data.get('password', '')
 
-    if not username or not password:
-        return jsonify({'error': 'Username and password are required'}), 400
+        if not username or not password:
+            return jsonify({'error': 'Username and password are required'}), 400
 
-    db = get_db()
-    
-    # If API key provided, look up pharmacy first
-    if api_key:
-        pharmacy = db.execute('SELECT * FROM pharmacies WHERE api_key = ?', (api_key,)).fetchone()
-        if not pharmacy:
-            return jsonify({'error': 'Invalid API key'}), 401
-        user = db.execute(
-            'SELECT * FROM users WHERE pharmacy_id = ? AND username = ? AND password = ?',
-            (pharmacy['id'], username, password)
-        ).fetchone()
-        if not user:
-            return jsonify({'error': 'Invalid username or password'}), 401
-        return jsonify({
-            'user': {
-                'id': user['id'],
-                'username': user['username'],
-                'name': user['name'],
-                'role': user['role'],
-                'store': user['store']
-            },
-            'pharmacy': {
-                'id': pharmacy['id'],
-                'name': pharmacy['name'],
-                'api_key': pharmacy['api_key'],
-                'address': pharmacy['address'],
-                'phone': pharmacy['phone']
-            }
-        }), 200
-    else:
-        users = db.execute(
-            'SELECT u.*, p.api_key, p.name as pharmacy_name, p.address, p.phone FROM users u JOIN pharmacies p ON u.pharmacy_id = p.id WHERE u.username = ? AND u.password = ?',
-            (username, password)
-        ).fetchall()
-        if not users:
-            return jsonify({'error': 'Invalid username or password'}), 401
-        user = users[0]
-        return jsonify({
-            'user': {
-                'id': user['id'],
-                'username': user['username'],
-                'name': user['name'],
-                'role': user['role'],
-                'store': user['store']
-            },
-            'pharmacy': {
-                'id': user['pharmacy_id'],
-                'name': user['pharmacy_name'],
-                'api_key': user['api_key'],
-                'address': user['address'],
-                'phone': user['phone']
-            }
-        }), 200
+        db = get_db()
+        
+        # If API key provided, look up pharmacy first
+        if api_key:
+            pharmacy = db.execute('SELECT * FROM pharmacies WHERE api_key = ?', (api_key,)).fetchone()
+            if not pharmacy:
+                return jsonify({'error': 'Invalid API key'}), 401
+            user = db.execute(
+                'SELECT * FROM users WHERE pharmacy_id = ? AND username = ? AND password = ?',
+                (pharmacy['id'], username, password)
+            ).fetchone()
+            if not user:
+                return jsonify({'error': 'Invalid username or password'}), 401
+            return jsonify({
+                'user': {
+                    'id': user['id'],
+                    'username': user['username'],
+                    'name': user['name'],
+                    'role': user['role'],
+                    'store': user['store']
+                },
+                'pharmacy': {
+                    'id': pharmacy['id'],
+                    'name': pharmacy['name'],
+                    'api_key': pharmacy['api_key'],
+                    'address': pharmacy['address'],
+                    'phone': pharmacy['phone']
+                }
+            }), 200
+        else:
+            users = db.execute(
+                'SELECT u.*, p.api_key, p.name as pharmacy_name, p.address, p.phone FROM users u JOIN pharmacies p ON u.pharmacy_id = p.id WHERE u.username = ? AND u.password = ?',
+                (username, password)
+            ).fetchall()
+            if not users:
+                return jsonify({'error': 'Invalid username or password'}), 401
+            user = users[0]
+            return jsonify({
+                'user': {
+                    'id': user['id'],
+                    'username': user['username'],
+                    'name': user['name'],
+                    'role': user['role'],
+                    'store': user['store']
+                },
+                'pharmacy': {
+                    'id': user['pharmacy_id'],
+                    'name': user['pharmacy_name'],
+                    'api_key': user['api_key'],
+                    'address': user['address'],
+                    'phone': user['phone']
+                }
+            }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/auth/staff-login', methods=['POST'])
 def staff_login():
