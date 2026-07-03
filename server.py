@@ -33,7 +33,10 @@ def close_db(exception):
         db.close()
 
 def init_db():
-    db_path = app.config['DB_PATH']
+    db_path = app.config.get('DB_PATH', os.path.join(os.path.dirname(__file__), 'danzona_pos.db'))
+    db_dir = os.path.dirname(db_path)
+    if db_dir and not os.path.exists(db_dir):
+        os.makedirs(db_dir, exist_ok=True)
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     conn.execute('CREATE TABLE IF NOT EXISTS pharmacies (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, address TEXT, phone TEXT, email TEXT, api_key TEXT UNIQUE NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP)')
