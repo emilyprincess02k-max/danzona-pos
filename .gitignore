@@ -10,3 +10,9 @@ node_modules/
 Thumbs.db
 *.tmp
 *.log
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example
